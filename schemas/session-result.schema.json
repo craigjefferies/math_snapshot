@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maths-snapshots.local/schemas/session-result.schema.json",
+  "title": "Phase 2 Maths Snapshot Session Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "session_id",
+    "generated_at",
+    "teacher",
+    "student",
+    "section_year_levels",
+    "strand_summary",
+    "overall_summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "assessment_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "teacher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" }
+      }
+    },
+    "student": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" }
+      }
+    },
+    "section_year_levels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section_id",
+          "section_title",
+          "strand",
+          "attempts",
+          "observed_year_level",
+          "score_percent",
+          "mastery_band",
+          "confidence"
+        ],
+        "properties": {
+          "section_id": { "type": "string" },
+          "section_title": { "type": "string" },
+          "strand": { "type": "string" },
+          "target_year_variant": { "type": "integer", "minimum": 1, "maximum": 13 },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "variant_id",
+                "year_level",
+                "score_percent",
+                "correct",
+                "total",
+                "skipped",
+                "mastery_band",
+                "item_results"
+              ],
+              "properties": {
+                "variant_id": { "type": "string" },
+                "year_level": { "type": "integer", "minimum": 1, "maximum": 13 },
+                "score_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "correct": { "type": "integer", "minimum": 0 },
+                "total": { "type": "integer", "minimum": 0 },
+                "skipped": { "type": "integer", "minimum": 0 },
+                "mastery_band": {
+                  "type": "string",
+                  "enum": ["Secure", "Developing", "Not Yet"]
+                },
+                "item_results": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["item_id", "response", "is_correct", "is_skipped"],
+                    "properties": {
+                      "item_id": { "type": "string" },
+                      "response": {
+                        "oneOf": [
+                          { "type": "string" },
+                          { "type": "number" },
+                          {
+                            "type": "object",
+                            "additionalProperties": {
+                              "oneOf": [
+                                { "type": "string" },
+                                { "type": "number" }
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      "is_correct": { "type": "boolean" },
+                      "is_skipped": { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "observed_year_level": { "type": "string" },
+          "score_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+          "mastery_band": {
+            "type": "string",
+            "enum": ["Secure", "Developing", "Not Yet"]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["High", "Medium", "Low"]
+          },
+          "teacher_notes": {
+            "type": "string"
+          },
+          "teacher_override": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["enabled", "reason"],
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "reason": { "type": "string" },
+              "overridden_year": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "strand_summary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["strand_name", "observed_year_level", "confidence", "supporting_sections"],
+        "properties": {
+          "strand_name": { "type": "string" },
+          "observed_year_level": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["High", "Medium", "Low"]
+          },
+          "supporting_sections": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "overall_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_operating_year", "confidence", "method"],
+      "properties": {
+        "observed_operating_year": { "type": "string" },
+        "confidence": {
+          "type": "string",
+          "enum": ["High", "Medium", "Low"]
+        },
+        "method": { "type": "string" }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

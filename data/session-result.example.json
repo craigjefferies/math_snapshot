@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "assessment_id": "nz_phase2_maths_snapshot_2025",
+  "session_id": "session-example",
+  "generated_at": "2026-03-05T00:00:00Z",
+  "teacher": {
+    "name": "Example Teacher"
+  },
+  "student": {
+    "name": "Example Student"
+  },
+  "section_year_levels": [
+    {
+      "section_id": "sec_03",
+      "section_title": "Add and Subtract Whole Numbers",
+      "strand": "Number Operations",
+      "target_year_variant": 4,
+      "attempts": [
+        {
+          "variant_id": "var_sec_03_y4",
+          "year_level": 4,
+          "score_percent": 100,
+          "correct": 2,
+          "total": 2,
+          "skipped": 0,
+          "mastery_band": "Secure",
+          "item_results": [
+            {
+              "item_id": "itm_sec_03_y4_q1",
+              "response": "449",
+              "is_correct": true,
+              "is_skipped": false
+            }
+          ]
+        }
+      ],
+      "observed_year_level": "Y4",
+      "score_percent": 100,
+      "mastery_band": "Secure",
+      "confidence": "High",
+      "teacher_override": {
+        "enabled": false,
+        "reason": ""
+      }
+    }
+  ],
+  "strand_summary": [
+    {
+      "strand_name": "Number Operations",
+      "observed_year_level": "Y4",
+      "confidence": "High",
+      "supporting_sections": [
+        "3. Add and Subtract Whole Numbers"
+      ]
+    }
+  ],
+  "overall_summary": {
+    "observed_operating_year": "Y4",
+    "confidence": "High",
+    "method": "Weighted mean of strand-level observed years"
+  },
+  "notes": [
+    "Formative snapshot evidence only.",
+    "Not standardised or norm referenced."
+  ]
+}

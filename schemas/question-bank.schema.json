@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maths-snapshots.local/schemas/question-bank.schema.json",
+  "title": "Phase 2 Maths Snapshot Question Bank",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assessment",
+    "sections",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assessment_id",
+        "name",
+        "publisher_year",
+        "learning_phase",
+        "intended_year_range",
+        "notes"
+      ],
+      "properties": {
+        "assessment_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_\\-]+$"
+        },
+        "name": { "type": "string" },
+        "publisher_year": { "type": "integer", "minimum": 2000, "maximum": 2100 },
+        "learning_phase": { "type": "string" },
+        "intended_year_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "integer", "minimum": 1, "maximum": 13 },
+            "max": { "type": "integer", "minimum": 1, "maximum": 13 }
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file_name": { "type": "string" },
+            "page_count": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/section" }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section_id",
+        "section_number",
+        "title",
+        "strand",
+        "topic",
+        "variants",
+        "mastery_thresholds"
+      ],
+      "properties": {
+        "section_id": {
+          "type": "string",
+          "pattern": "^sec_[0-9]{2}[a-z]?$"
+        },
+        "section_number": { "type": "integer", "minimum": 1, "maximum": 50 },
+        "part": { "type": "string" },
+        "title": { "type": "string" },
+        "strand": {
+          "type": "string",
+          "enum": [
+            "Number Structure",
+            "Number Operations",
+            "Rational Numbers"
+          ]
+        },
+        "topic": { "type": "string" },
+        "instructions": { "type": "string" },
+        "time_mode": {
+          "type": "string",
+          "enum": ["untimed", "timed_flash", "timed_section"],
+          "default": "untimed"
+        },
+        "default_time_limit_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "variants": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/variant" }
+        },
+        "mastery_thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["secure_pct", "developing_pct"],
+          "properties": {
+            "secure_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "developing_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variant_id", "year_level", "item_refs"],
+      "properties": {
+        "variant_id": {
+          "type": "string",
+          "pattern": "^var_[a-z0-9_\\-]+$"
+        },
+        "year_level": { "type": "integer", "minimum": 1, "maximum": 13 },
+        "item_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^itm_[a-z0-9_\\-]+$"
+          }
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "section_id",
+        "variant_id",
+        "prompt",
+        "answer_type",
+        "answer"
+      ],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "pattern": "^itm_[a-z0-9_\\-]+$"
+        },
+        "section_id": {
+          "type": "string",
+          "pattern": "^sec_[0-9]{2}[a-z]?$"
+        },
+        "variant_id": {
+          "type": "string",
+          "pattern": "^var_[a-z0-9_\\-]+$"
+        },
+        "prompt": { "type": "string" },
+        "answer_type": {
+          "type": "string",
+          "enum": [
+            "integer",
+            "decimal",
+            "fraction",
+            "short_text",
+            "multi_field"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field_id", "label", "answer_type"],
+            "properties": {
+              "field_id": {
+                "type": "string",
+                "pattern": "^fld_[a-z0-9_\\-]+$"
+              },
+              "label": { "type": "string" },
+              "answer_type": {
+                "type": "string",
+                "enum": ["integer", "decimal", "fraction", "short_text"]
+              }
+            }
+          }
+        },
+        "answer": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "integer" },
+            { "type": "number" },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  { "type": "string" },
+                  { "type": "integer" },
+                  { "type": "number" }
+                ]
+              }
+            }
+          ]
+        },
+        "accepted_answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "anyOf": [
+                  { "type": "string" },
+                  { "type": "integer" },
+                  { "type": "number" }
+                ]
+              },
+              "kind": {
+                "type": "string",
+                "enum": ["literal", "equivalent_numeric", "equivalent_fraction"]
+              }
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "numeric_tolerance": { "type": "number", "minimum": 0 },
+            "fraction_equivalence": { "type": "boolean" }
+          }
+        },
+        "time_limit_seconds": { "type": "integer", "minimum": 1 },
+        "source_page": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

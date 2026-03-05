@@ -1,0 +1,3099 @@
+{
+  "schema_version": "1.0.0",
+  "assessment": {
+    "assessment_id": "nz_phase2_maths_snapshot_2025",
+    "name": "2025 Phase 2 Maths Snapshot",
+    "publisher_year": 2025,
+    "learning_phase": "Phase 2",
+    "intended_year_range": {
+      "min": 4,
+      "max": 6
+    },
+    "notes": [
+      "Formative snapshot; use sections independently.",
+      "Not standardised or norm referenced.",
+      "Do not complete all sections in one sitting."
+    ],
+    "source": {
+      "file_name": "2025 Phase 2 Maths Snapshot Answers.pdf",
+      "page_count": 11
+    }
+  },
+  "sections": [
+    {
+      "section_id": "sec_01",
+      "section_number": 1,
+      "title": "Place Value",
+      "strand": "Number Structure",
+      "topic": "Read and write numbers and identify 1/10/100 before and after",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_01_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_01_y3_q01",
+            "itm_sec_01_y3_q02",
+            "itm_sec_01_y3_q03",
+            "itm_sec_01_y3_q04",
+            "itm_sec_01_y3_q05",
+            "itm_sec_01_y3_q06",
+            "itm_sec_01_y3_q07",
+            "itm_sec_01_y3_q08",
+            "itm_sec_01_y3_q09",
+            "itm_sec_01_y3_q10",
+            "itm_sec_01_y3_q11",
+            "itm_sec_01_y3_q12",
+            "itm_sec_01_y3_q13",
+            "itm_sec_01_y3_q14",
+            "itm_sec_01_y3_q15"
+          ]
+        },
+        {
+          "variant_id": "var_sec_01_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_01_y4_q01",
+            "itm_sec_01_y4_q02",
+            "itm_sec_01_y4_q03",
+            "itm_sec_01_y4_q04",
+            "itm_sec_01_y4_q05",
+            "itm_sec_01_y4_q06",
+            "itm_sec_01_y4_q07",
+            "itm_sec_01_y4_q08",
+            "itm_sec_01_y4_q09",
+            "itm_sec_01_y4_q10",
+            "itm_sec_01_y4_q11",
+            "itm_sec_01_y4_q12",
+            "itm_sec_01_y4_q13",
+            "itm_sec_01_y4_q14",
+            "itm_sec_01_y4_q15"
+          ]
+        },
+        {
+          "variant_id": "var_sec_01_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_01_y5_q01",
+            "itm_sec_01_y5_q02",
+            "itm_sec_01_y5_q03",
+            "itm_sec_01_y5_q04",
+            "itm_sec_01_y5_q05",
+            "itm_sec_01_y5_q06",
+            "itm_sec_01_y5_q07",
+            "itm_sec_01_y5_q08",
+            "itm_sec_01_y5_q09",
+            "itm_sec_01_y5_q10",
+            "itm_sec_01_y5_q11",
+            "itm_sec_01_y5_q12",
+            "itm_sec_01_y5_q13",
+            "itm_sec_01_y5_q14",
+            "itm_sec_01_y5_q15"
+          ]
+        },
+        {
+          "variant_id": "var_sec_01_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_01_y6_q01",
+            "itm_sec_01_y6_q02",
+            "itm_sec_01_y6_q03",
+            "itm_sec_01_y6_q04",
+            "itm_sec_01_y6_q05",
+            "itm_sec_01_y6_q06",
+            "itm_sec_01_y6_q07",
+            "itm_sec_01_y6_q08",
+            "itm_sec_01_y6_q09",
+            "itm_sec_01_y6_q10",
+            "itm_sec_01_y6_q11",
+            "itm_sec_01_y6_q12",
+            "itm_sec_01_y6_q13",
+            "itm_sec_01_y6_q14",
+            "itm_sec_01_y6_q15"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_02",
+      "section_number": 2,
+      "title": "Round Whole Numbers and Decimals",
+      "strand": "Number Operations",
+      "topic": "Round whole numbers and decimals",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_02_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_02_y3_q01",
+            "itm_sec_02_y3_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_02_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_02_y4_q01",
+            "itm_sec_02_y4_q02",
+            "itm_sec_02_y4_q03",
+            "itm_sec_02_y4_q04"
+          ]
+        },
+        {
+          "variant_id": "var_sec_02_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_02_y5_q01",
+            "itm_sec_02_y5_q02",
+            "itm_sec_02_y5_q03",
+            "itm_sec_02_y5_q04",
+            "itm_sec_02_y5_q05"
+          ]
+        },
+        {
+          "variant_id": "var_sec_02_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_02_y6_q01",
+            "itm_sec_02_y6_q02",
+            "itm_sec_02_y6_q03",
+            "itm_sec_02_y6_q04",
+            "itm_sec_02_y6_q05"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_03",
+      "section_number": 3,
+      "title": "Add and Subtract Whole Numbers",
+      "strand": "Number Operations",
+      "topic": "Add and subtract whole numbers",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_03_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_03_y3_q01",
+            "itm_sec_03_y3_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_03_y4_q01",
+            "itm_sec_03_y4_q02",
+            "itm_sec_03_y4_q03",
+            "itm_sec_03_y4_q04"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_03_y5_q01",
+            "itm_sec_03_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_03_y6_q01",
+            "itm_sec_03_y6_q02"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_04",
+      "section_number": 4,
+      "title": "Recall Multiplication and Division Facts",
+      "strand": "Number Operations",
+      "topic": "Basic facts recall",
+      "instructions": "Run in timed mode. Each item can be shown for 4 seconds. Skips are allowed.",
+      "time_mode": "timed_flash",
+      "variants": [
+        {
+          "variant_id": "var_sec_04_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_04_y3_q01",
+            "itm_sec_04_y3_q02",
+            "itm_sec_04_y3_q03",
+            "itm_sec_04_y3_q04",
+            "itm_sec_04_y3_q05",
+            "itm_sec_04_y3_q06",
+            "itm_sec_04_y3_q07",
+            "itm_sec_04_y3_q08",
+            "itm_sec_04_y3_q09",
+            "itm_sec_04_y3_q10"
+          ]
+        },
+        {
+          "variant_id": "var_sec_04_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_04_y4_q01",
+            "itm_sec_04_y4_q02",
+            "itm_sec_04_y4_q03",
+            "itm_sec_04_y4_q04",
+            "itm_sec_04_y4_q05",
+            "itm_sec_04_y4_q06",
+            "itm_sec_04_y4_q07",
+            "itm_sec_04_y4_q08",
+            "itm_sec_04_y4_q09",
+            "itm_sec_04_y4_q10"
+          ]
+        },
+        {
+          "variant_id": "var_sec_04_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_04_y5_q01",
+            "itm_sec_04_y5_q02",
+            "itm_sec_04_y5_q03",
+            "itm_sec_04_y5_q04",
+            "itm_sec_04_y5_q05",
+            "itm_sec_04_y5_q06",
+            "itm_sec_04_y5_q07",
+            "itm_sec_04_y5_q08",
+            "itm_sec_04_y5_q09",
+            "itm_sec_04_y5_q10"
+          ]
+        },
+        {
+          "variant_id": "var_sec_04_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_04_y6_q01",
+            "itm_sec_04_y6_q02",
+            "itm_sec_04_y6_q03",
+            "itm_sec_04_y6_q04",
+            "itm_sec_04_y6_q05",
+            "itm_sec_04_y6_q06",
+            "itm_sec_04_y6_q07",
+            "itm_sec_04_y6_q08",
+            "itm_sec_04_y6_q09",
+            "itm_sec_04_y6_q10"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "default_time_limit_seconds": 4
+    },
+    {
+      "section_id": "sec_05a",
+      "section_number": 5,
+      "title": "Multiplication Operations",
+      "strand": "Number Operations",
+      "topic": "Multiply whole numbers",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_05a_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_05a_y3_q01",
+            "itm_sec_05a_y3_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05a_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_05a_y4_q01",
+            "itm_sec_05a_y4_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05a_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_05a_y5_q01",
+            "itm_sec_05a_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05a_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_05a_y6_q01"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "part": "a"
+    },
+    {
+      "section_id": "sec_05b",
+      "section_number": 5,
+      "title": "Division Operations",
+      "strand": "Number Operations",
+      "topic": "Divide whole numbers including remainders",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_05b_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_05b_y3_q01",
+            "itm_sec_05b_y3_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05b_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_05b_y4_q01",
+            "itm_sec_05b_y4_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05b_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_05b_y5_q01",
+            "itm_sec_05b_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_05b_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_05b_y6_q01",
+            "itm_sec_05b_y6_q02"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "part": "b"
+    },
+    {
+      "section_id": "sec_06a",
+      "section_number": 6,
+      "title": "Compare and Order Decimals",
+      "strand": "Rational Numbers",
+      "topic": "Identify larger decimal",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_06a_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_06a_y4_q01",
+            "itm_sec_06a_y4_q02",
+            "itm_sec_06a_y4_q03",
+            "itm_sec_06a_y4_q04"
+          ]
+        },
+        {
+          "variant_id": "var_sec_06a_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_06a_y5_q01",
+            "itm_sec_06a_y5_q02",
+            "itm_sec_06a_y5_q03",
+            "itm_sec_06a_y5_q04"
+          ]
+        },
+        {
+          "variant_id": "var_sec_06a_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_06a_y6_q01",
+            "itm_sec_06a_y6_q02",
+            "itm_sec_06a_y6_q03",
+            "itm_sec_06a_y6_q04"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "part": "a"
+    },
+    {
+      "section_id": "sec_06b",
+      "section_number": 6,
+      "title": "Decimals, Fractions and Percentage Conversions",
+      "strand": "Rational Numbers",
+      "topic": "Convert between fractions, decimals and percentages",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_06b_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_06b_y4_q01",
+            "itm_sec_06b_y4_q02",
+            "itm_sec_06b_y4_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_06b_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_06b_y5_q01",
+            "itm_sec_06b_y5_q02",
+            "itm_sec_06b_y5_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_06b_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_06b_y6_q01",
+            "itm_sec_06b_y6_q02",
+            "itm_sec_06b_y6_q03",
+            "itm_sec_06b_y6_q04",
+            "itm_sec_06b_y6_q05",
+            "itm_sec_06b_y6_q06",
+            "itm_sec_06b_y6_q07",
+            "itm_sec_06b_y6_q08",
+            "itm_sec_06b_y6_q09"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "part": "b"
+    },
+    {
+      "section_id": "sec_07",
+      "section_number": 7,
+      "title": "Multiply and Divide Numbers by 10 and 100",
+      "strand": "Rational Numbers",
+      "topic": "Scale numbers by powers of 10",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_07_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_07_y4_q01",
+            "itm_sec_07_y4_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_07_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_07_y5_q01",
+            "itm_sec_07_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_07_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_07_y6_q01",
+            "itm_sec_07_y6_q02",
+            "itm_sec_07_y6_q03",
+            "itm_sec_07_y6_q04"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_08",
+      "section_number": 8,
+      "title": "Add and Subtract Decimals",
+      "strand": "Rational Numbers",
+      "topic": "Decimal addition and subtraction",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_08_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_08_y4_q01",
+            "itm_sec_08_y4_q02",
+            "itm_sec_08_y4_q03",
+            "itm_sec_08_y4_q04"
+          ]
+        },
+        {
+          "variant_id": "var_sec_08_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_08_y5_q01",
+            "itm_sec_08_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_08_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_08_y6_q01",
+            "itm_sec_08_y6_q02"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_09",
+      "section_number": 9,
+      "title": "Convert Between Mixed Numbers and Improper Fractions",
+      "strand": "Rational Numbers",
+      "topic": "Mixed and improper fractions",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_09_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_09_y4_q01",
+            "itm_sec_09_y4_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_09_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_09_y5_q01",
+            "itm_sec_09_y5_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_09_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_09_y6_q01",
+            "itm_sec_09_y6_q02"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_10",
+      "section_number": 10,
+      "title": "Find a Fraction (or Percentage) of a Number",
+      "strand": "Rational Numbers",
+      "topic": "Fraction and percentage of amounts",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_10_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_10_y4_q01",
+            "itm_sec_10_y4_q02",
+            "itm_sec_10_y4_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_10_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_10_y5_q01",
+            "itm_sec_10_y5_q02",
+            "itm_sec_10_y5_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_10_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_10_y6_q01",
+            "itm_sec_10_y6_q02",
+            "itm_sec_10_y6_q03"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_11",
+      "section_number": 11,
+      "title": "Compare, Order and Simplify Fractions",
+      "strand": "Rational Numbers",
+      "topic": "Fraction comparison, equivalence and simplest form",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_11_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_11_y4_q01",
+            "itm_sec_11_y4_q02",
+            "itm_sec_11_y4_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_11_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_11_y5_q01",
+            "itm_sec_11_y5_q02",
+            "itm_sec_11_y5_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_11_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_11_y6_q01",
+            "itm_sec_11_y6_q02",
+            "itm_sec_11_y6_q03"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_12",
+      "section_number": 12,
+      "title": "Add and Subtract Fractions",
+      "strand": "Rational Numbers",
+      "topic": "Fraction addition and subtraction",
+      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "time_mode": "untimed",
+      "variants": [
+        {
+          "variant_id": "var_sec_12_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_12_y3_q01",
+            "itm_sec_12_y3_q02",
+            "itm_sec_12_y3_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_12_y4",
+          "year_level": 4,
+          "item_refs": [
+            "itm_sec_12_y4_q01",
+            "itm_sec_12_y4_q02",
+            "itm_sec_12_y4_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_12_y5",
+          "year_level": 5,
+          "item_refs": [
+            "itm_sec_12_y5_q01",
+            "itm_sec_12_y5_q02",
+            "itm_sec_12_y5_q03"
+          ]
+        },
+        {
+          "variant_id": "var_sec_12_y6",
+          "year_level": 6,
+          "item_refs": [
+            "itm_sec_12_y6_q01",
+            "itm_sec_12_y6_q02",
+            "itm_sec_12_y6_q03"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    }
+  ],
+  "items": [
+    {
+      "item_id": "itm_sec_01_y3_q01",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "1 more than 870",
+      "answer_type": "integer",
+      "answer": 871,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q02",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "1 more than 409",
+      "answer_type": "integer",
+      "answer": 410,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q03",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "1 less than 870",
+      "answer_type": "integer",
+      "answer": 869,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q04",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "1 less than 409",
+      "answer_type": "integer",
+      "answer": 408,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q05",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "10 more than 870",
+      "answer_type": "integer",
+      "answer": 880,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q06",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "10 more than 409",
+      "answer_type": "integer",
+      "answer": 419,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q07",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "10 less than 870",
+      "answer_type": "integer",
+      "answer": 860,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q08",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "10 less than 409",
+      "answer_type": "integer",
+      "answer": 399,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q09",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "100 more than 870",
+      "answer_type": "integer",
+      "answer": 970,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q10",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "100 more than 409",
+      "answer_type": "integer",
+      "answer": 509,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q11",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "100 less than 870",
+      "answer_type": "integer",
+      "answer": 770,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q12",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "100 less than 409",
+      "answer_type": "integer",
+      "answer": 309,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q13",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "Expand this number: 759",
+      "answer_type": "short_text",
+      "answer": "700 + 50 + 9",
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q14",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "How many tens are in 759?",
+      "answer_type": "integer",
+      "answer": 75,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y3_q15",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y3",
+      "prompt": "How many hundreds are in 759?",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q01",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "1 more than 4,732",
+      "answer_type": "integer",
+      "answer": 4733,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q02",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "1 more than 2,099",
+      "answer_type": "integer",
+      "answer": 2100,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q03",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "1 less than 4,732",
+      "answer_type": "integer",
+      "answer": 4731,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q04",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "1 less than 2,099",
+      "answer_type": "integer",
+      "answer": 2098,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q05",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "10 more than 4,732",
+      "answer_type": "integer",
+      "answer": 4742,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q06",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "10 more than 2,099",
+      "answer_type": "integer",
+      "answer": 2109,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q07",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "10 less than 4,732",
+      "answer_type": "integer",
+      "answer": 4722,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q08",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "10 less than 2,099",
+      "answer_type": "integer",
+      "answer": 2089,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q09",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "100 more than 4,732",
+      "answer_type": "integer",
+      "answer": 4832,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q10",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "100 more than 2,099",
+      "answer_type": "integer",
+      "answer": 2199,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q11",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "100 less than 4,732",
+      "answer_type": "integer",
+      "answer": 4632,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q12",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "100 less than 2,099",
+      "answer_type": "integer",
+      "answer": 1999,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q13",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "Expand this number: 5,624",
+      "answer_type": "short_text",
+      "answer": "5000 + 600 + 20 + 4",
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q14",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "How many tens are in 5,624?",
+      "answer_type": "integer",
+      "answer": 562,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y4_q15",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y4",
+      "prompt": "How many hundreds are in 5,624?",
+      "answer_type": "integer",
+      "answer": 56,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q01",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "1 more than 73,481",
+      "answer_type": "integer",
+      "answer": 73482,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q02",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "1 more than 81,097",
+      "answer_type": "integer",
+      "answer": 81098,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q03",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "1 less than 73,481",
+      "answer_type": "integer",
+      "answer": 73480,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q04",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "1 less than 81,097",
+      "answer_type": "integer",
+      "answer": 81096,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q05",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "10 more than 73,481",
+      "answer_type": "integer",
+      "answer": 73491,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q06",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "10 more than 81,097",
+      "answer_type": "integer",
+      "answer": 81107,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q07",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "10 less than 73,481",
+      "answer_type": "integer",
+      "answer": 73471,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q08",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "10 less than 81,097",
+      "answer_type": "integer",
+      "answer": 81087,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q09",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "100 more than 73,481",
+      "answer_type": "integer",
+      "answer": 73581,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q10",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "100 more than 81,097",
+      "answer_type": "integer",
+      "answer": 81197,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q11",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "100 less than 73,481",
+      "answer_type": "integer",
+      "answer": 73381,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q12",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "100 less than 81,097",
+      "answer_type": "integer",
+      "answer": 80997,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q13",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "Expand this number: 27,431",
+      "answer_type": "short_text",
+      "answer": "20000 + 7000 + 400 + 30 + 1",
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q14",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "How many tens are in 27,431?",
+      "answer_type": "integer",
+      "answer": 2743,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y5_q15",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y5",
+      "prompt": "How many hundreds are in 27,431?",
+      "answer_type": "integer",
+      "answer": 274,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q01",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "1 more than 628,547",
+      "answer_type": "integer",
+      "answer": 628548,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q02",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "1 more than 789,099",
+      "answer_type": "integer",
+      "answer": 789100,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q03",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "1 less than 628,547",
+      "answer_type": "integer",
+      "answer": 628546,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q04",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "1 less than 789,099",
+      "answer_type": "integer",
+      "answer": 789098,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q05",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "10 more than 628,547",
+      "answer_type": "integer",
+      "answer": 628557,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q06",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "10 more than 789,099",
+      "answer_type": "integer",
+      "answer": 789109,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q07",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "10 less than 628,547",
+      "answer_type": "integer",
+      "answer": 628537,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q08",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "10 less than 789,099",
+      "answer_type": "integer",
+      "answer": 789089,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q09",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "100 more than 628,547",
+      "answer_type": "integer",
+      "answer": 628647,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q10",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "100 more than 789,099",
+      "answer_type": "integer",
+      "answer": 789199,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q11",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "100 less than 628,547",
+      "answer_type": "integer",
+      "answer": 628447,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q12",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "100 less than 789,099",
+      "answer_type": "integer",
+      "answer": 788999,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q13",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "Expand this number: 729,976",
+      "answer_type": "short_text",
+      "answer": "700000 + 20000 + 9000 + 900 + 70 + 6",
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q14",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "How many tens are in 729,976?",
+      "answer_type": "integer",
+      "answer": 72997,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_01_y6_q15",
+      "section_id": "sec_01",
+      "variant_id": "var_sec_01_y6",
+      "prompt": "How many hundreds are in 729,976?",
+      "answer_type": "integer",
+      "answer": 7299,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_02_y3_q01",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "Round 759 to the nearest ten",
+      "answer_type": "integer",
+      "answer": 760,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y3_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "Round 759 to the nearest hundred",
+      "answer_type": "integer",
+      "answer": 800,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y4_q01",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y4",
+      "prompt": "Round 5,624 to the nearest ten",
+      "answer_type": "integer",
+      "answer": 5620,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y4_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y4",
+      "prompt": "Round 5,624 to the nearest hundred",
+      "answer_type": "integer",
+      "answer": 5600,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y4_q03",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y4",
+      "prompt": "Round 5,624 to the nearest thousand",
+      "answer_type": "integer",
+      "answer": 6000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y4_q04",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y4",
+      "prompt": "Round 6.4 to the nearest whole number",
+      "answer_type": "decimal",
+      "answer": 6,
+      "source_page": 3,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_02_y5_q01",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y5",
+      "prompt": "Round 27,431 to the nearest ten",
+      "answer_type": "integer",
+      "answer": 27430,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y5_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y5",
+      "prompt": "Round 27,431 to the nearest hundred",
+      "answer_type": "integer",
+      "answer": 27400,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y5_q03",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y5",
+      "prompt": "Round 27,431 to the nearest thousand",
+      "answer_type": "integer",
+      "answer": 27000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y5_q04",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y5",
+      "prompt": "Round 27,431 to the nearest ten thousand",
+      "answer_type": "integer",
+      "answer": 30000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y5_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y5",
+      "prompt": "Round 13.53 to the nearest whole number",
+      "answer_type": "decimal",
+      "answer": 14,
+      "source_page": 3,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_02_y6_q01",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y6",
+      "prompt": "Round 729,976 to the nearest ten",
+      "answer_type": "integer",
+      "answer": 729980,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y6_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y6",
+      "prompt": "Round 729,976 to the nearest hundred",
+      "answer_type": "integer",
+      "answer": 730000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y6_q03",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y6",
+      "prompt": "Round 729,976 to the nearest thousand",
+      "answer_type": "integer",
+      "answer": 730000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y6_q04",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y6",
+      "prompt": "Round 729,976 to the nearest ten thousand",
+      "answer_type": "integer",
+      "answer": 730000,
+      "source_page": 3
+    },
+    {
+      "item_id": "itm_sec_02_y6_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y6",
+      "prompt": "Round 13.53 to the nearest tenth",
+      "answer_type": "decimal",
+      "answer": 13.5,
+      "source_page": 3,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y3_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y3",
+      "prompt": "37 + 18",
+      "answer_type": "integer",
+      "answer": 55,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y3_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y3",
+      "prompt": "43 - 28",
+      "answer_type": "integer",
+      "answer": 15,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y4_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y4",
+      "prompt": "325 + 124",
+      "answer_type": "integer",
+      "answer": 449,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y4_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y4",
+      "prompt": "484 + 347",
+      "answer_type": "integer",
+      "answer": 831,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y4_q03",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y4",
+      "prompt": "784 - 532",
+      "answer_type": "integer",
+      "answer": 252,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y4_q04",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y4",
+      "prompt": "623 - 258",
+      "answer_type": "integer",
+      "answer": 365,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y5_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y5",
+      "prompt": "4,125 + 377",
+      "answer_type": "integer",
+      "answer": 4502,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y5_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y5",
+      "prompt": "8,037 - 1,648",
+      "answer_type": "integer",
+      "answer": 6389,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y6_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y6",
+      "prompt": "26,578 + 13,425",
+      "answer_type": "integer",
+      "answer": 40003,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_03_y6_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y6",
+      "prompt": "242,527 - 58,382",
+      "answer_type": "integer",
+      "answer": 184145,
+      "source_page": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q01",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "2 x 8",
+      "answer_type": "integer",
+      "answer": 16,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q02",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "3 x 6",
+      "answer_type": "integer",
+      "answer": 18,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q03",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "6 x 5",
+      "answer_type": "integer",
+      "answer": 30,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q04",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "7 x 10",
+      "answer_type": "integer",
+      "answer": 70,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q05",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "5 x ? = 40",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q06",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "14 / 2",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q07",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "40 / 5",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q08",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "60 / 10",
+      "answer_type": "integer",
+      "answer": 6,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q09",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "24 / 3",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y3_q10",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y3",
+      "prompt": "20 / ? = 5",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q01",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "4 x 6",
+      "answer_type": "integer",
+      "answer": 24,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q02",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "4 x 3",
+      "answer_type": "integer",
+      "answer": 12,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q03",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "8 x 4",
+      "answer_type": "integer",
+      "answer": 32,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q04",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "3 x 6",
+      "answer_type": "integer",
+      "answer": 18,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q05",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "6 x ? = 42",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q06",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "24 / 6",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q07",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "12 / 4",
+      "answer_type": "integer",
+      "answer": 3,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q08",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "42 / 6",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q09",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "36 / 4",
+      "answer_type": "integer",
+      "answer": 9,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y4_q10",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y4",
+      "prompt": "16 / ? = 4",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q01",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "7 x 7",
+      "answer_type": "integer",
+      "answer": 49,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q02",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "6 x 8",
+      "answer_type": "integer",
+      "answer": 48,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q03",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "9 x 8",
+      "answer_type": "integer",
+      "answer": 72,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q04",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "7 x 9",
+      "answer_type": "integer",
+      "answer": 63,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q05",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "8 x ? = 56",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q06",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "28 / 7",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q07",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "56 / 8",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q08",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "64 / 8",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q09",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "63 / 9",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y5_q10",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y5",
+      "prompt": "72 / ? = 8",
+      "answer_type": "integer",
+      "answer": 9,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q01",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "3 x 7",
+      "answer_type": "integer",
+      "answer": 21,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q02",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "7 x 8",
+      "answer_type": "integer",
+      "answer": 56,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q03",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "9 x 6",
+      "answer_type": "integer",
+      "answer": 54,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q04",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "4 x 9",
+      "answer_type": "integer",
+      "answer": 36,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q05",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "8 x ? = 64",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q06",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "49 / 7",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q07",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "32 / 8",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q08",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "27 / 3",
+      "answer_type": "integer",
+      "answer": 9,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q09",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "54 / 9",
+      "answer_type": "integer",
+      "answer": 6,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_04_y6_q10",
+      "section_id": "sec_04",
+      "variant_id": "var_sec_04_y6",
+      "prompt": "63 / ? = 9",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 5,
+      "time_limit_seconds": 4
+    },
+    {
+      "item_id": "itm_sec_05a_y3_q01",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y3",
+      "prompt": "4 x 6",
+      "answer_type": "integer",
+      "answer": 24,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y3_q02",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y3",
+      "prompt": "2 x 23",
+      "answer_type": "integer",
+      "answer": 46,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y4_q01",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y4",
+      "prompt": "7 x 8",
+      "answer_type": "integer",
+      "answer": 56,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y4_q02",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y4",
+      "prompt": "54 x 3",
+      "answer_type": "integer",
+      "answer": 162,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y5_q01",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y5",
+      "prompt": "453 x 6",
+      "answer_type": "integer",
+      "answer": 2718,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y5_q02",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y5",
+      "prompt": "26 x 45",
+      "answer_type": "integer",
+      "answer": 1170,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y6_q01",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y6",
+      "prompt": "54 x 132",
+      "answer_type": "integer",
+      "answer": 7128,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q01",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "24 / 3",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q02",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "32 / 4",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05b_y4_q01",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y4",
+      "prompt": "65 / 5",
+      "answer_type": "integer",
+      "answer": 13,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05b_y4_q02",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y4",
+      "prompt": "252 / 3",
+      "answer_type": "integer",
+      "answer": 84,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05b_y5_q01",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y5",
+      "prompt": "79 / 3",
+      "answer_type": "short_text",
+      "answer": "26 r1",
+      "source_page": 6,
+      "accepted_answers": [
+        {
+          "value": "26r1",
+          "kind": "literal"
+        },
+        {
+          "value": "26 remainder 1",
+          "kind": "literal"
+        },
+        {
+          "value": 26.33333333,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": "26.33333333",
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "validation": {
+        "numeric_tolerance": 0.001
+      }
+    },
+    {
+      "item_id": "itm_sec_05b_y5_q02",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y5",
+      "prompt": "194 / 6",
+      "answer_type": "short_text",
+      "answer": "32 r2",
+      "source_page": 6,
+      "accepted_answers": [
+        {
+          "value": "32r2",
+          "kind": "literal"
+        },
+        {
+          "value": "32 remainder 2",
+          "kind": "literal"
+        },
+        {
+          "value": 32.33333333,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": "32.33333333",
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "validation": {
+        "numeric_tolerance": 0.001
+      }
+    },
+    {
+      "item_id": "itm_sec_05b_y6_q01",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y6",
+      "prompt": "293 / 7",
+      "answer_type": "short_text",
+      "answer": "41 r6",
+      "source_page": 6,
+      "accepted_answers": [
+        {
+          "value": "41r6",
+          "kind": "literal"
+        },
+        {
+          "value": "41 remainder 6",
+          "kind": "literal"
+        },
+        {
+          "value": 41.857142857,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": "41.857142857",
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "validation": {
+        "numeric_tolerance": 0.001
+      }
+    },
+    {
+      "item_id": "itm_sec_05b_y6_q02",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y6",
+      "prompt": "4,154 / 8",
+      "answer_type": "short_text",
+      "answer": "519 r2",
+      "source_page": 6,
+      "accepted_answers": [
+        {
+          "value": "519r2",
+          "kind": "literal"
+        },
+        {
+          "value": "519 remainder 2",
+          "kind": "literal"
+        },
+        {
+          "value": 519.25,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": "519.25",
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "validation": {
+        "numeric_tolerance": 0.001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y4_q01",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y4",
+      "prompt": "Which is larger: 0.6 or 0.40?",
+      "answer_type": "decimal",
+      "answer": 0.6,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y4_q02",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y4",
+      "prompt": "Which is larger: 0.2 or 0.31?",
+      "answer_type": "decimal",
+      "answer": 0.31,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y4_q03",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y4",
+      "prompt": "Which is larger: 0 or 0.5?",
+      "answer_type": "decimal",
+      "answer": 0.5,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y4_q04",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y4",
+      "prompt": "Which is larger: 0.2 or 0.4?",
+      "answer_type": "decimal",
+      "answer": 0.4,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y5_q01",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y5",
+      "prompt": "Which is larger: 0.7 or 0.32?",
+      "answer_type": "decimal",
+      "answer": 0.7,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y5_q02",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y5",
+      "prompt": "Which is larger: 0.27 or 0.395?",
+      "answer_type": "decimal",
+      "answer": 0.395,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y5_q03",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y5",
+      "prompt": "Which is larger: 0 or 0.05?",
+      "answer_type": "decimal",
+      "answer": 0.05,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y5_q04",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y5",
+      "prompt": "Which is larger: 0.3 or 0.10?",
+      "answer_type": "decimal",
+      "answer": 0.3,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y6_q01",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y6",
+      "prompt": "Which is larger: 0.8 or 0.57?",
+      "answer_type": "decimal",
+      "answer": 0.8,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y6_q02",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y6",
+      "prompt": "Which is larger: 0.56 or 0.811?",
+      "answer_type": "decimal",
+      "answer": 0.811,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y6_q03",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y6",
+      "prompt": "Which is larger: 0 or 0.07?",
+      "answer_type": "decimal",
+      "answer": 0.07,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06a_y6_q04",
+      "section_id": "sec_06a",
+      "variant_id": "var_sec_06a_y6",
+      "prompt": "Which is larger: 0.4 or 0.6?",
+      "answer_type": "decimal",
+      "answer": 0.6,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y4_q01",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y4",
+      "prompt": "Convert 7/10 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.7,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y4_q02",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y4",
+      "prompt": "Convert 2/10 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.2,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y4_q03",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y4",
+      "prompt": "Convert 8/10 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.8,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y5_q01",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y5",
+      "prompt": "Convert 54/100 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.54,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y5_q02",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y5",
+      "prompt": "Convert 43/100 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.43,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y5_q03",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y5",
+      "prompt": "Convert 3/100 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.03,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q01",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 25/100 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.25,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q02",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 0.25 to a percentage",
+      "answer_type": "short_text",
+      "answer": "25%",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "25",
+          "kind": "literal"
+        }
+      ]
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q03",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 25% to a fraction",
+      "answer_type": "fraction",
+      "answer": "25/100",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "1/4",
+          "kind": "equivalent_fraction"
+        }
+      ],
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q04",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 6/10 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.6,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q05",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 0.6 to a percentage",
+      "answer_type": "short_text",
+      "answer": "60%",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "60",
+          "kind": "literal"
+        }
+      ]
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q06",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 60% to a fraction",
+      "answer_type": "fraction",
+      "answer": "6/10",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "3/5",
+          "kind": "equivalent_fraction"
+        }
+      ],
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q07",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 85/100 to a decimal",
+      "answer_type": "decimal",
+      "answer": 0.85,
+      "source_page": 7,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q08",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 0.85 to a percentage",
+      "answer_type": "short_text",
+      "answer": "85%",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "85",
+          "kind": "literal"
+        }
+      ]
+    },
+    {
+      "item_id": "itm_sec_06b_y6_q09",
+      "section_id": "sec_06b",
+      "variant_id": "var_sec_06b_y6",
+      "prompt": "Convert 85% to a fraction",
+      "answer_type": "fraction",
+      "answer": "85/100",
+      "source_page": 7,
+      "accepted_answers": [
+        {
+          "value": "17/20",
+          "kind": "equivalent_fraction"
+        }
+      ],
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y4_q01",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y4",
+      "prompt": "23 / 10",
+      "answer_type": "decimal",
+      "answer": 2.3,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y4_q02",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y4",
+      "prompt": "137 / 10",
+      "answer_type": "decimal",
+      "answer": 13.7,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y5_q01",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y5",
+      "prompt": "56 / 10",
+      "answer_type": "decimal",
+      "answer": 5.6,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y5_q02",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y5",
+      "prompt": "328 / 100",
+      "answer_type": "decimal",
+      "answer": 3.28,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y6_q01",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y6",
+      "prompt": "35.4 / 10",
+      "answer_type": "decimal",
+      "answer": 3.54,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y6_q02",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y6",
+      "prompt": "75 / 100",
+      "answer_type": "decimal",
+      "answer": 0.75,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y6_q03",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y6",
+      "prompt": "0.58 x 10",
+      "answer_type": "decimal",
+      "answer": 5.8,
+      "source_page": 8,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_07_y6_q04",
+      "section_id": "sec_07",
+      "variant_id": "var_sec_07_y6",
+      "prompt": "6.73 x 100",
+      "answer_type": "integer",
+      "answer": 673,
+      "source_page": 8
+    },
+    {
+      "item_id": "itm_sec_08_y4_q01",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y4",
+      "prompt": "1.6 + 0.2",
+      "answer_type": "decimal",
+      "answer": 1.8,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y4_q02",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y4",
+      "prompt": "0.8 + 0.4",
+      "answer_type": "decimal",
+      "answer": 1.2,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y4_q03",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y4",
+      "prompt": "0.8 - 0.3",
+      "answer_type": "decimal",
+      "answer": 0.5,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y4_q04",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y4",
+      "prompt": "1.3 - 0.6",
+      "answer_type": "decimal",
+      "answer": 0.7,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y5_q01",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y5",
+      "prompt": "2.42 + 1.5",
+      "answer_type": "decimal",
+      "answer": 3.92,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y5_q02",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y5",
+      "prompt": "16.55 - 2.4",
+      "answer_type": "decimal",
+      "answer": 14.15,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y6_q01",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y6",
+      "prompt": "215.7 + 43.59",
+      "answer_type": "decimal",
+      "answer": 259.29,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_08_y6_q02",
+      "section_id": "sec_08",
+      "variant_id": "var_sec_08_y6",
+      "prompt": "42.25 - 21.83",
+      "answer_type": "decimal",
+      "answer": 20.42,
+      "source_page": 9,
+      "validation": {
+        "numeric_tolerance": 0.0001
+      }
+    },
+    {
+      "item_id": "itm_sec_09_y4_q01",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y4",
+      "prompt": "Write 11/3 as a mixed number",
+      "answer_type": "short_text",
+      "answer": "3 2/3",
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_09_y4_q02",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y4",
+      "prompt": "Write 4 1/5 as an improper fraction",
+      "answer_type": "fraction",
+      "answer": "21/5",
+      "source_page": 10,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_09_y5_q01",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y5",
+      "prompt": "Write 23/8 as a mixed number",
+      "answer_type": "short_text",
+      "answer": "2 7/8",
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_09_y5_q02",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y5",
+      "prompt": "Write 2 6/7 as an improper fraction",
+      "answer_type": "fraction",
+      "answer": "20/7",
+      "source_page": 10,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_09_y6_q01",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y6",
+      "prompt": "Write 34/11 as a mixed number",
+      "answer_type": "short_text",
+      "answer": "3 1/11",
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_09_y6_q02",
+      "section_id": "sec_09",
+      "variant_id": "var_sec_09_y6",
+      "prompt": "Write 4 3/20 as an improper fraction",
+      "answer_type": "fraction",
+      "answer": "83/20",
+      "source_page": 10,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_10_y4_q01",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y4",
+      "prompt": "1/5 of 45",
+      "answer_type": "integer",
+      "answer": 9,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y4_q02",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y4",
+      "prompt": "1/3 of 24",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y4_q03",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y4",
+      "prompt": "1/4 of 12",
+      "answer_type": "integer",
+      "answer": 3,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y5_q01",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y5",
+      "prompt": "3/5 of 35",
+      "answer_type": "integer",
+      "answer": 21,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y5_q02",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y5",
+      "prompt": "5/6 of 30",
+      "answer_type": "integer",
+      "answer": 25,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y5_q03",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y5",
+      "prompt": "2/3 of 15",
+      "answer_type": "integer",
+      "answer": 10,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y6_q01",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y6",
+      "prompt": "3/8 of 72",
+      "answer_type": "integer",
+      "answer": 27,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y6_q02",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y6",
+      "prompt": "3/5 of 30",
+      "answer_type": "integer",
+      "answer": 18,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_10_y6_q03",
+      "section_id": "sec_10",
+      "variant_id": "var_sec_10_y6",
+      "prompt": "30% of 220",
+      "answer_type": "integer",
+      "answer": 66,
+      "source_page": 10
+    },
+    {
+      "item_id": "itm_sec_11_y4_q01",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y4",
+      "prompt": "Circle the larger (or =): 2/4 vs 5/8",
+      "answer_type": "fraction",
+      "answer": "5/8",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y4_q02",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y4",
+      "prompt": "Circle the larger (or =): 2/3 vs 4/6",
+      "answer_type": "short_text",
+      "answer": "=",
+      "source_page": 11
+    },
+    {
+      "item_id": "itm_sec_11_y4_q03",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y4",
+      "prompt": "Circle the larger (or =): 2/5 vs 3/10",
+      "answer_type": "fraction",
+      "answer": "2/5",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y5_q01",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y5",
+      "prompt": "Circle the larger (or =): 2/4 vs 5/12",
+      "answer_type": "fraction",
+      "answer": "2/4",
+      "source_page": 11,
+      "accepted_answers": [
+        {
+          "value": "1/2",
+          "kind": "equivalent_fraction"
+        }
+      ],
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y5_q02",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y5",
+      "prompt": "Circle the larger (or =): 6/10 vs 42/100",
+      "answer_type": "fraction",
+      "answer": "6/10",
+      "source_page": 11,
+      "accepted_answers": [
+        {
+          "value": "3/5",
+          "kind": "equivalent_fraction"
+        }
+      ],
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y5_q03",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y5",
+      "prompt": "Circle the larger (or =): 2/6 vs 4/12",
+      "answer_type": "short_text",
+      "answer": "=",
+      "source_page": 11
+    },
+    {
+      "item_id": "itm_sec_11_y6_q01",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y6",
+      "prompt": "Simplify 6/8",
+      "answer_type": "fraction",
+      "answer": "3/4",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y6_q02",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y6",
+      "prompt": "Simplify 8/12",
+      "answer_type": "fraction",
+      "answer": "2/3",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_11_y6_q03",
+      "section_id": "sec_11",
+      "variant_id": "var_sec_11_y6",
+      "prompt": "Simplify 80/100",
+      "answer_type": "fraction",
+      "answer": "4/5",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y3_q01",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y3",
+      "prompt": "1/8 + 1/8",
+      "answer_type": "fraction",
+      "answer": "2/8",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y3_q02",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y3",
+      "prompt": "1/3 + 1/3 + 1/3",
+      "answer_type": "fraction",
+      "answer": "3/3",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y3_q03",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y3",
+      "prompt": "1/6 + 1/6 + 1/6 + 1/6",
+      "answer_type": "fraction",
+      "answer": "4/6",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y4_q01",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y4",
+      "prompt": "2/4 + 2/4",
+      "answer_type": "fraction",
+      "answer": "4/4",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y4_q02",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y4",
+      "prompt": "1/6 + 2/6 + 2/6",
+      "answer_type": "fraction",
+      "answer": "5/6",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y4_q03",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y4",
+      "prompt": "7/8 - 3/8",
+      "answer_type": "fraction",
+      "answer": "4/8",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y5_q01",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y5",
+      "prompt": "2/3 + 2/3",
+      "answer_type": "fraction",
+      "answer": "4/3",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y5_q02",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y5",
+      "prompt": "5/6 + 2/6 + 2/6",
+      "answer_type": "fraction",
+      "answer": "9/6",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y5_q03",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y5",
+      "prompt": "1 3/8 - 4/8",
+      "answer_type": "fraction",
+      "answer": "7/8",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y6_q01",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y6",
+      "prompt": "2/3 + 2/6",
+      "answer_type": "fraction",
+      "answer": "6/6",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y6_q02",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y6",
+      "prompt": "3/8 + 1/4",
+      "answer_type": "fraction",
+      "answer": "5/8",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    },
+    {
+      "item_id": "itm_sec_12_y6_q03",
+      "section_id": "sec_12",
+      "variant_id": "var_sec_12_y6",
+      "prompt": "4/5 - 3/10",
+      "answer_type": "fraction",
+      "answer": "5/10",
+      "source_page": 11,
+      "validation": {
+        "fraction_equivalence": true
+      }
+    }
+  ]
+}
