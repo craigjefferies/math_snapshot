@@ -840,6 +840,32 @@ fieldset {
   line-height: 1.35;
 }
 
+.inline-fraction {
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  grid-template-rows: auto 2px auto;
+  min-width: 1.2em;
+  margin: 0 0.08em;
+  vertical-align: -0.22em;
+}
+
+.inline-fraction-num,
+.inline-fraction-den {
+  display: block;
+  line-height: 1;
+  font-size: 0.72em;
+}
+
+.inline-fraction-line {
+  display: block;
+  width: 100%;
+  min-width: 1.2em;
+  height: 2px;
+  background: currentColor;
+  margin: 0.08em 0;
+}
+
 .item-card input {
   font-size: 1.1rem;
 }
@@ -866,8 +892,15 @@ fieldset {
   display: inline-grid;
   align-items: center;
   gap: 0.625rem;
-  grid-template-columns: minmax(72px, 92px) auto minmax(84px, 120px);
   width: min(320px, 100%);
+}
+
+.fraction-entry-mixed {
+  grid-template-columns: minmax(72px, 92px) auto minmax(84px, 120px);
+}
+
+.fraction-entry-simple {
+  grid-template-columns: minmax(84px, 120px);
 }
 
 .fraction-whole {

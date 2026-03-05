@@ -667,7 +667,6 @@ function renderAssessment() {
   const currentIndex = attempt.current_item_index;
   const currentItem = items[currentIndex];
   const currentResponse = attempt.responses[currentItem.item_id];
-  const currentPromptDisplay = formatPromptForDisplay(currentItem);
   const completedCount = items.filter((item) => !isBlank(attempt.responses[item.item_id])).length;
   const isLastQuestion = currentIndex === items.length - 1;
   const nextLabel = isLastQuestion ? "Save & Finish" : "Save & Next";
@@ -732,7 +731,7 @@ function renderAssessment() {
       <form id="questionForm" class="item-list">
         <article class="item-card">
           <h3>Q${currentIndex + 1}</h3>
-          <p class="item-prompt">${escapeHtml(currentPromptDisplay)}</p>
+          <p class="item-prompt">${formatPromptHtml(currentItem)}</p>
           ${renderItemInput(currentItem, currentResponse)}
         </article>
         <div class="actions-row">
@@ -787,8 +786,11 @@ function renderItemInput(item, savedResponse) {
 
   if (isFractionInputItem(item)) {
     const fractionResponse = normalizeFractionEntryResponse(savedResponse);
+    const inputLayout = getFractionInputLayout(item);
+    const showWholeField = inputLayout === "mixed";
     return `
-      <div class="fraction-entry" aria-label="Fraction input">
+      <div class="fraction-entry ${showWholeField ? "fraction-entry-mixed" : "fraction-entry-simple"}" aria-label="Fraction input">
+        ${showWholeField ? `
         <input
           class="fraction-whole"
           name="${item.item_id}__whole"
@@ -797,7 +799,7 @@ function renderItemInput(item, savedResponse) {
           autocomplete="off"
           aria-label="Whole number"
         />
-        <span class="fraction-whole-sep" aria-hidden="true"></span>
+        <span class="fraction-whole-sep" aria-hidden="true"></span>` : ""}
         <div class="fraction-stack">
         <input
           class="fraction-slot fraction-num"
@@ -870,7 +872,9 @@ function getInputHint(item) {
     return "Use remainder form (for example 26 r1) or a matching decimal.";
   }
   if (isFractionInputItem(item)) {
-    return "Use the left box for a whole number if needed, then numerator over denominator.";
+    return getFractionInputLayout(item) === "mixed"
+      ? "Use the whole-number box, then numerator over denominator."
+      : "Use numerator over denominator.";
   }
   if (/percentage/i.test(prompt)) {
     return "Percentage answers can be entered with or without the % symbol.";
@@ -1489,6 +1493,10 @@ function hasRelationSymbolAnswer(item) {
   return accepted.some((option) => normalizeLiteral(option?.value) === "=");
 }
 
+function getFractionInputLayout(item) {
+  return getFractionFormatRequirement(item) === "mixed" ? "mixed" : "simple";
+}
+
 function getFractionFormatRequirement(item) {
   const prompt = String(item?.prompt || "").toLowerCase();
   if (prompt.includes("mixed number")) {
@@ -1543,6 +1551,52 @@ function formatPromptForDisplay(item) {
     return prompt;
   }
   return prompt.replace(/\s\/\s/g, " ÷ ");
+}
+
+function formatPromptHtml(item) {
+  const prompt = formatPromptForDisplay(item);
+  return renderInlineFractions(prompt);
+}
+
+function renderInlineFractions(text) {
+  const source = String(text ?? "");
+  const pattern = /\\frac\{([^{}]+)\}\{([^{}]+)\}|(^|[^\w])(-?\d+)\/(\d+)(?=$|[^\w])/g;
+  let html = "";
+  let lastIndex = 0;
+
+  for (const match of source.matchAll(pattern)) {
+    const matchText = match[0];
+    const matchIndex = match.index ?? 0;
+    const isLatexFraction = match[1] !== undefined;
+
+    html += escapeHtml(source.slice(lastIndex, matchIndex));
+
+    if (isLatexFraction) {
+      html += buildInlineFractionHtml(match[1], match[2]);
+    } else {
+      const prefix = match[3] ?? "";
+      html += escapeHtml(prefix);
+      html += buildInlineFractionHtml(match[4], match[5]);
+    }
+
+    lastIndex = matchIndex + matchText.length;
+  }
+
+  html += escapeHtml(source.slice(lastIndex));
+  return html;
+}
+
+function buildInlineFractionHtml(numerator, denominator) {
+  const numeratorText = String(numerator ?? "").trim();
+  const denominatorText = String(denominator ?? "").trim();
+  const ariaLabel = `${numeratorText} over ${denominatorText}`;
+  return `
+    <span class="inline-fraction" aria-label="${escapeAttribute(ariaLabel)}">
+      <span class="inline-fraction-num">${escapeHtml(numeratorText)}</span>
+      <span class="inline-fraction-line" aria-hidden="true"></span>
+      <span class="inline-fraction-den">${escapeHtml(denominatorText)}</span>
+    </span>
+  `;
 }
 
 function normalizeFractionEntryResponse(value) {
