@@ -37,6 +37,33 @@ python3 -m http.server 4173
 ```
 Open `http://localhost:4173`.
 
+Node option:
+```bash
+cd /home/craigjefferies/projects/maths_snapshots
+npm start
+```
+Open `http://localhost:4173`.
+
+## Deploy to Railway
+This repo includes a minimal Node static server for Railway in `package.json` and `server.js`.
+
+Railway steps:
+```bash
+cd /home/craigjefferies/projects/maths_snapshots
+git add package.json server.js .gitignore README.md
+git commit -m "Add Railway deployment config"
+git push
+```
+
+Then in Railway:
+1. Create a new project from the GitHub repo.
+2. Railway will detect Node automatically.
+3. No build command is required.
+4. Start command is `npm start`.
+5. Railway will inject `PORT` automatically.
+
+After deploy, open the generated Railway domain.
+
 ## Data and schemas
 - Question bank schema: `schemas/question-bank.schema.json`
 - Session result schema: `schemas/session-result.schema.json`

@@ -1,0 +1,12 @@
+{
+  "name": "math_snapshot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static app server for Maths Snapshots",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
