@@ -847,7 +847,8 @@ fieldset {
   grid-template-rows: auto 2px auto;
   min-width: 1.2em;
   margin: 0 0.08em;
-  vertical-align: -0.22em;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .inline-fraction-num,
