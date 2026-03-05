@@ -789,6 +789,16 @@ function renderItemInput(item, savedResponse) {
     return `
       <div class="fraction-entry" aria-label="Fraction input">
         <input
+          class="fraction-whole"
+          name="${item.item_id}__whole"
+          value="${escapeAttribute(savedResponse?.whole ?? "")}"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Whole number"
+        />
+        <span class="fraction-whole-sep" aria-hidden="true"></span>
+        <div class="fraction-stack">
+        <input
           class="fraction-slot fraction-num"
           name="${item.item_id}__num"
           value="${escapeAttribute(savedResponse?.numerator ?? "")}"
@@ -805,6 +815,7 @@ function renderItemInput(item, savedResponse) {
           autocomplete="off"
           aria-label="Denominator"
         />
+        </div>
       </div>
       ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
     `;
@@ -858,7 +869,7 @@ function getInputHint(item) {
     return "Use remainder form (for example 26 r1) or a matching decimal.";
   }
   if (isFractionInputItem(item)) {
-    return "Use top box for numerator and bottom box for denominator.";
+    return "Use the left box for a whole number if needed, then numerator over denominator.";
   }
   if (/percentage/i.test(prompt)) {
     return "Percentage answers can be entered with or without the % symbol.";
@@ -941,6 +952,7 @@ function readItemResponseFromForm(form, item) {
 
   if (isFractionInputItem(item)) {
     return {
+      whole: normalizeInput(formData.get(`${item.item_id}__whole`)),
       numerator: normalizeInput(formData.get(`${item.item_id}__num`)),
       denominator: normalizeInput(formData.get(`${item.item_id}__den`))
     };
@@ -1165,7 +1177,7 @@ function defaultResponseForItem(item) {
   }
 
   if (isFractionInputItem(item)) {
-    return { numerator: "", denominator: "" };
+    return { whole: "", numerator: "", denominator: "" };
   }
 
   if (item.answer_type === "multi_field") {
@@ -1232,7 +1244,7 @@ function matchesOption(item, response, expectedValue, kind = "literal") {
   }
 
   if (kind === "equivalent_fraction") {
-    return fractionMatch(response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001);
+    return fractionEquivalentMatch(item, response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001);
   }
 
   if (item.answer_type === "integer" || item.answer_type === "decimal") {
@@ -1240,7 +1252,7 @@ function matchesOption(item, response, expectedValue, kind = "literal") {
   }
 
   if (item.answer_type === "fraction" || item.validation?.fraction_equivalence) {
-    return fractionMatch(response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001)
+    return fractionEquivalentMatch(item, response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001)
       || literalMatch(response, expectedValue);
   }
 
@@ -1280,6 +1292,24 @@ function fractionMatch(a, b, tolerance) {
     return false;
   }
   return Math.abs(left - right) <= tolerance;
+}
+
+function fractionEquivalentMatch(item, response, expectedValue, tolerance) {
+  if (!fractionMatch(response, expectedValue, tolerance)) {
+    return false;
+  }
+
+  const requirement = getFractionFormatRequirement(item);
+  if (requirement === "either") {
+    return true;
+  }
+
+  const responseFormat = detectFractionFormat(response);
+  if (responseFormat === "unknown") {
+    return false;
+  }
+
+  return responseFormat === requirement;
 }
 
 function literalMatch(a, b) {
@@ -1447,6 +1477,54 @@ function isFractionInputItem(item) {
   return item?.answer_type === "fraction";
 }
 
+function getFractionFormatRequirement(item) {
+  const prompt = String(item?.prompt || "").toLowerCase();
+  if (prompt.includes("mixed number")) {
+    return "mixed";
+  }
+  if (prompt.includes("improper fraction")) {
+    return "improper";
+  }
+  return "either";
+}
+
+function detectFractionFormat(value) {
+  if (typeof value === "object" && value !== null) {
+    const whole = String(value.whole ?? "").trim();
+    const numerator = String(value.numerator ?? "").trim();
+    const denominator = String(value.denominator ?? "").trim();
+    if (whole && numerator && denominator) {
+      return "mixed";
+    }
+    if (!whole && numerator && denominator) {
+      return "improper";
+    }
+    if (whole && !numerator && !denominator) {
+      return "mixed";
+    }
+    return "unknown";
+  }
+
+  const text = expandUnicodeFractions(String(value ?? ""))
+    .trim()
+    .replace(/,/g, "")
+    .replace(/\s+/g, " ");
+
+  if (!text) {
+    return "unknown";
+  }
+  if (/^-?\d+\s+\d+\/\d+$/.test(text)) {
+    return "mixed";
+  }
+  if (/^-?\d+\/\d+$/.test(text)) {
+    return "improper";
+  }
+  if (/^-?\d+$/.test(text)) {
+    return "mixed";
+  }
+  return "unknown";
+}
+
 function formatPromptForDisplay(item) {
   const prompt = String(item?.prompt ?? "");
   if (isFractionInputItem(item)) {
@@ -1500,23 +1578,31 @@ function parseNumeric(value) {
 
 function parseFractionLike(value) {
   if (typeof value === "object" && value !== null) {
+    const wholeRaw = String(value.whole ?? "").trim();
     const numeratorRaw = String(value.numerator ?? "").trim();
     const denominatorRaw = String(value.denominator ?? "").trim();
 
-    if (!numeratorRaw && !denominatorRaw) {
+    if (!wholeRaw && !numeratorRaw && !denominatorRaw) {
       return null;
     }
 
-    if (numeratorRaw && !denominatorRaw) {
+    if (wholeRaw && !numeratorRaw && !denominatorRaw) {
+      return parseNumeric(wholeRaw);
+    }
+
+    if (!wholeRaw && numeratorRaw && !denominatorRaw) {
       return parseNumeric(numeratorRaw);
     }
 
+    const whole = wholeRaw ? parseNumeric(wholeRaw) : 0;
     const numerator = parseNumeric(numeratorRaw);
     const denominator = parseNumeric(denominatorRaw);
-    if (numerator === null || denominator === null || denominator === 0) {
+    if ((wholeRaw && whole === null) || numerator === null || denominator === null || denominator === 0) {
       return null;
     }
-    return numerator / denominator;
+
+    const sign = whole < 0 ? -1 : 1;
+    return whole + sign * (numerator / denominator);
   }
 
   if (typeof value === "number") {
@@ -2408,14 +2494,21 @@ function formatAnswerForExport(value) {
   }
 
   if (typeof value === "object") {
-    if ("numerator" in value || "denominator" in value) {
+    if ("whole" in value || "numerator" in value || "denominator" in value) {
+      const whole = String(value.whole ?? "").trim();
       const numerator = String(value.numerator ?? "").trim();
       const denominator = String(value.denominator ?? "").trim();
-      if (!numerator && !denominator) {
+      if (!whole && !numerator && !denominator) {
         return "";
       }
-      if (!denominator) {
+      if (whole && !numerator && !denominator) {
+        return whole;
+      }
+      if (!whole && !denominator) {
         return numerator;
+      }
+      if (whole) {
+        return denominator ? `${whole} ${numerator}/${denominator}` : whole;
       }
       return `${numerator}/${denominator}`;
     }
