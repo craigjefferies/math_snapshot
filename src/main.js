@@ -786,12 +786,13 @@ function renderItemInput(item, savedResponse) {
   }
 
   if (isFractionInputItem(item)) {
+    const fractionResponse = normalizeFractionEntryResponse(savedResponse);
     return `
       <div class="fraction-entry" aria-label="Fraction input">
         <input
           class="fraction-whole"
           name="${item.item_id}__whole"
-          value="${escapeAttribute(savedResponse?.whole ?? "")}"
+          value="${escapeAttribute(fractionResponse.whole)}"
           inputmode="numeric"
           autocomplete="off"
           aria-label="Whole number"
@@ -801,7 +802,7 @@ function renderItemInput(item, savedResponse) {
         <input
           class="fraction-slot fraction-num"
           name="${item.item_id}__num"
-          value="${escapeAttribute(savedResponse?.numerator ?? "")}"
+          value="${escapeAttribute(fractionResponse.numerator)}"
           inputmode="numeric"
           autocomplete="off"
           aria-label="Numerator"
@@ -810,7 +811,7 @@ function renderItemInput(item, savedResponse) {
         <input
           class="fraction-slot fraction-den"
           name="${item.item_id}__den"
-          value="${escapeAttribute(savedResponse?.denominator ?? "")}"
+          value="${escapeAttribute(fractionResponse.denominator)}"
           inputmode="numeric"
           autocomplete="off"
           aria-label="Denominator"
@@ -1232,7 +1233,7 @@ function inferDefaultKind(item) {
   if (item.answer_type === "integer" || item.answer_type === "decimal") {
     return "equivalent_numeric";
   }
-  if (item.answer_type === "fraction" || item.validation?.fraction_equivalence) {
+  if (isFractionResponseItem(item)) {
     return "equivalent_fraction";
   }
   return "literal";
@@ -1251,7 +1252,7 @@ function matchesOption(item, response, expectedValue, kind = "literal") {
     return numericMatch(response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001);
   }
 
-  if (item.answer_type === "fraction" || item.validation?.fraction_equivalence) {
+  if (isFractionResponseItem(item)) {
     return fractionEquivalentMatch(item, response, expectedValue, item.validation?.numeric_tolerance ?? 0.000001)
       || literalMatch(response, expectedValue);
   }
@@ -1474,7 +1475,18 @@ function expandedFormGridColumns(boxCount) {
 }
 
 function isFractionInputItem(item) {
-  return item?.answer_type === "fraction";
+  return isFractionResponseItem(item) && !hasRelationSymbolAnswer(item);
+}
+
+function isFractionResponseItem(item) {
+  return item?.answer_type === "fraction"
+    || !!item?.validation?.fraction_equivalence
+    || getFractionFormatRequirement(item) !== "either";
+}
+
+function hasRelationSymbolAnswer(item) {
+  const accepted = [{ value: item?.answer }].concat(item?.accepted_answers || []);
+  return accepted.some((option) => normalizeLiteral(option?.value) === "=");
 }
 
 function getFractionFormatRequirement(item) {
@@ -1531,6 +1543,50 @@ function formatPromptForDisplay(item) {
     return prompt;
   }
   return prompt.replace(/\s\/\s/g, " ÷ ");
+}
+
+function normalizeFractionEntryResponse(value) {
+  if (typeof value === "object" && value !== null) {
+    return {
+      whole: String(value.whole ?? "").trim(),
+      numerator: String(value.numerator ?? "").trim(),
+      denominator: String(value.denominator ?? "").trim()
+    };
+  }
+
+  const text = expandUnicodeFractions(String(value ?? ""))
+    .trim()
+    .replace(/,/g, "")
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\s+/g, " ");
+
+  if (!text) {
+    return { whole: "", numerator: "", denominator: "" };
+  }
+
+  const mixedMatch = text.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedMatch) {
+    return {
+      whole: mixedMatch[1],
+      numerator: mixedMatch[2],
+      denominator: mixedMatch[3]
+    };
+  }
+
+  const fractionMatchResult = text.match(/^(-?\d+)\/(\d+)$/);
+  if (fractionMatchResult) {
+    return {
+      whole: "",
+      numerator: fractionMatchResult[1],
+      denominator: fractionMatchResult[2]
+    };
+  }
+
+  if (/^-?\d+$/.test(text)) {
+    return { whole: text, numerator: "", denominator: "" };
+  }
+
+  return { whole: text, numerator: "", denominator: "" };
 }
 
 function focusQuestionInput() {
