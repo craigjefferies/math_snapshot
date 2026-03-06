@@ -1039,6 +1039,11 @@ fieldset {
   line-height: 1.15;
 }
 
+.result-hero-copy {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
 .result-hero-xl {
   font-size: 1.9rem;
 }
@@ -1101,6 +1106,11 @@ fieldset {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.625rem;
+}
+
+.attempt-card-outcome strong {
+  color: #334155;
+  font-size: 0.84rem;
 }
 
 .attempt-card-copy {

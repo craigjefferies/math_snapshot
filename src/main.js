@@ -1014,11 +1014,11 @@ function renderSectionSummary(run) {
   setReviewSection(run.section_id);
   const summary = run.summary;
   const section = state.sectionsById.get(run.section_id);
+  const decision = buildSectionDecision(summary);
   const hasNextSection = state.session.current_section_index < state.session.section_runs.length - 1;
   const isSingleSectionSession = state.session.section_runs.length === 1;
   const isSessionComplete = !!state.session.generated_at;
   const showCompletionExports = isSingleSectionSession && isSessionComplete;
-  const mClass = masteryBadgeClass(summary.mastery_band);
   const scoreDisplay = `${summary.correct_answers} / ${summary.total_questions} correct`;
   const primaryAction = hasNextSection
     ? `<button id="continueSectionBtn" class="btn-primary">Continue To Next Section</button>`
@@ -1041,17 +1041,21 @@ function renderSectionSummary(run) {
 
       <div class="result-hero">
         <div class="result-hero-cell result-hero-primary">
-          <span class="result-hero-label">Observed Year Level</span>
-          <span class="result-hero-value">${escapeHtml(summary.observed_year_level)}</span>
+          <span class="result-hero-label">Best-Fit Year Level</span>
+          <span class="result-hero-value">${escapeHtml(decision.bestFitYear)}</span>
         </div>
         <div class="result-hero-cell">
           <span class="result-hero-label">Score</span>
           <span class="result-hero-value">${escapeHtml(scoreDisplay)}</span>
         </div>
         <div class="result-hero-cell">
-          <span class="result-hero-label">Result</span>
-          <span class="mastery-badge mastery-${mClass}">${escapeHtml(summary.mastery_band)}</span>
+          <span class="result-hero-label">Summary</span>
+          <span class="result-hero-value result-hero-copy">${escapeHtml(decision.headline)}</span>
         </div>
+      </div>
+
+      <div class="summary-banner">
+        <strong>Why this year level:</strong> ${escapeHtml(decision.evidence)}
       </div>
 
       <h2>Assessment Path</h2>
@@ -1060,20 +1064,16 @@ function renderSectionSummary(run) {
         ${summary.attempts.map((attempt) => {
           const isObservedAttempt = yearLabelForDisplay(attempt.year_level) === summary.observed_year_level
             && attempt.mastery_band === summary.mastery_band;
-          const outcomeCopy = attempt.mastery_band === "Secure"
-            ? "Moved up after this attempt."
-            : (attempt.mastery_band === "Not Yet"
-              ? "Stopped here after needing support."
-              : "Stopped here with partial success.");
+          const outcomeCopy = describeAttemptProgress(attempt.mastery_band);
           return `
             <article class="attempt-card ${isObservedAttempt ? "attempt-card-observed" : ""}">
               <div class="attempt-card-head">
-                <strong>${escapeHtml(yearLabelForDisplay(attempt.year_level))}</strong>
+                <strong>${escapeHtml(formatTeacherYearLabel(attempt.year_level))}</strong>
                 ${isObservedAttempt ? `<span class="attempt-card-flag">Observed level</span>` : ""}
               </div>
               <p class="attempt-card-metrics">${attempt.correct}/${attempt.total} correct${attempt.skipped ? ` · ${attempt.skipped} skipped` : ""}</p>
               <div class="attempt-card-outcome">
-                <span class="mastery-badge mastery-${masteryBadgeClass(attempt.mastery_band)}">${escapeHtml(attempt.mastery_band)}</span>
+                <strong>${escapeHtml(describeAttemptBand(attempt.mastery_band))}</strong>
                 <span class="attempt-card-copy">${escapeHtml(outcomeCopy)}</span>
               </div>
             </article>
@@ -1937,8 +1937,8 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
 
       <div class="result-hero result-hero-final">
         <div class="result-hero-cell result-hero-primary">
-          <span class="result-hero-label">Overall Operating Year Level</span>
-          <span class="result-hero-value result-hero-xl">${escapeHtml(overallSummary.observed_operating_year)}</span>
+          <span class="result-hero-label">Overall Best-Fit Year Level</span>
+          <span class="result-hero-value result-hero-xl">${escapeHtml(formatTeacherYearLabel(overallSummary.observed_operating_year))}</span>
         </div>
         <div class="result-hero-cell">
           <span class="result-hero-label">Sections Completed</span>
@@ -1953,21 +1953,25 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
       <h2>Section Results</h2>
       <div class="section-summary-grid">
         ${sectionReportRows
-          .map((row) => row.summary
-            ? `<article class="section-summary-card">
+          .map((row) => {
+            if (!row.summary) {
+              return `<article class="section-summary-card section-summary-card-pending">
                 <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-                <p><strong>${escapeHtml(row.summary.observed_year_level)}</strong> · ${row.summary.correct_answers}/${row.summary.total_questions}</p>
-                <span class="mastery-badge mastery-${masteryBadgeClass(row.summary.mastery_band)}">${escapeHtml(row.summary.mastery_band)}</span>
+                <p><strong>Not completed</strong></p>
+                <p>No evidence collected yet.</p>
+              </article>`;
+            }
+            const decision = buildSectionDecision(row.summary);
+            return `<article class="section-summary-card">
+                <h3>${escapeHtml(sectionLabel(row.section))}</h3>
+                <p><strong>${escapeHtml(decision.bestFitYear)}</strong> · ${row.summary.correct_answers}/${row.summary.total_questions}</p>
+                <p>${escapeHtml(decision.shortReason)}</p>
                 <div class="section-summary-actions">
                   <button type="button" data-review-section="${escapeAttribute(row.section.section_id)}">Review</button>
                   <button type="button" data-print-section="${escapeAttribute(row.section.section_id)}">Print PDF</button>
                 </div>
-              </article>`
-            : `<article class="section-summary-card section-summary-card-pending">
-                <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-                <p><strong>Not completed</strong></p>
-                <span class="mastery-badge mastery-pending">Pending</span>
-              </article>`)
+              </article>`;
+          })
           .join("")}
       </div>
       <div class="table-wrap">
@@ -1976,42 +1980,40 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
             <tr>
               <th>Section</th>
               <th>Status</th>
-              <th>Year Level</th>
+              <th>Best-Fit Year</th>
               <th>Correct</th>
-              <th>Result</th>
+              <th>Why This Year</th>
             </tr>
           </thead>
           <tbody>
             ${sectionReportRows
-              .map((row) => row.summary
-                ? `
-                    <tr>
-                      <td>${escapeHtml(sectionLabel(row.section))}</td>
-                      <td>Completed</td>
-                      <td>${escapeHtml(row.summary.observed_year_level)}</td>
-                      <td>${row.summary.correct_answers} / ${row.summary.total_questions}</td>
-                      <td><span class="mastery-badge mastery-${masteryBadgeClass(row.summary.mastery_band)}">${escapeHtml(row.summary.mastery_band)}</span></td>
-                    </tr>
-                  `
-                : `
+              .map((row) => {
+                if (!row.summary) {
+                  return `
                     <tr>
                       <td>${escapeHtml(sectionLabel(row.section))}</td>
                       <td>Not completed</td>
                       <td>—</td>
                       <td>—</td>
-                      <td><span class="mastery-badge mastery-pending">Pending</span></td>
+                      <td>No evidence collected yet.</td>
                     </tr>
-                  `)
+                  `;
+                }
+                const decision = buildSectionDecision(row.summary);
+                return `
+                    <tr>
+                      <td>${escapeHtml(sectionLabel(row.section))}</td>
+                      <td>Completed</td>
+                      <td>${escapeHtml(decision.bestFitYear)}</td>
+                      <td>${row.summary.correct_answers} / ${row.summary.total_questions}</td>
+                      <td>${escapeHtml(decision.shortReason)}</td>
+                    </tr>
+                  `;
+              })
               .join("")}
           </tbody>
         </table>
       </div>
-      <p class="mastery-legend">
-        <strong>Result key:</strong>&ensp;
-        <span class="mastery-badge mastery-secure">Secure</span> strong understanding&ensp;
-        <span class="mastery-badge mastery-developing">Developing</span> some gaps&ensp;
-        <span class="mastery-badge mastery-notyet">Not Yet</span> needs more support
-      </p>
 
       <h2>Strand Summary</h2>
       <div class="table-wrap">
@@ -2029,7 +2031,7 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
               .map((strand) => `
                 <tr>
                   <td>${escapeHtml(strand.strand_name)}</td>
-                  <td>${escapeHtml(strand.observed_year_level)}</td>
+                  <td>${escapeHtml(formatTeacherYearLabel(strand.observed_year_level))}</td>
                   <td>${escapeHtml(strand.confidence)}</td>
                   <td>${escapeHtml(strand.supporting_sections.join(", "))}</td>
                 </tr>
@@ -2172,17 +2174,18 @@ function buildOverallSummary(strandSummary) {
 function downloadSectionTeacherPdf(run) {
   const section = state.sectionsById.get(run.section_id);
   const summary = run.summary;
+  const decision = buildSectionDecision(summary);
   const phase = state.bank?.assessment?.learning_phase || "Phase 2";
   const nextSteps = getNextStepForSection(section, summary);
   const timestamp = formatReportTimestamp(new Date().toISOString());
 
   const attemptsRows = summary.attempts.map((attempt) => `
     <tr>
-      <td>${escapeHtml(yearLabelForDisplay(attempt.year_level))}</td>
+      <td>${escapeHtml(formatTeacherYearLabel(attempt.year_level))}</td>
       <td>${attempt.score_percent}%</td>
       <td>${attempt.correct}/${attempt.total}</td>
       <td>${attempt.skipped}</td>
-      <td>${escapeHtml(attempt.mastery_band)}</td>
+      <td>${escapeHtml(describeAttemptBand(attempt.mastery_band))}</td>
     </tr>
   `).join("");
 
@@ -2194,16 +2197,18 @@ function downloadSectionTeacherPdf(run) {
       ["Teacher", state.session.teacher.name],
       ["Student", state.session.student.name],
       ["Section", sectionLabel(section)],
-      ["Final Year Level (Section)", summary.observed_year_level],
+      ["Best-Fit Year Level (Section)", decision.bestFitYear],
       ["Correct", `${summary.correct_answers}/${summary.total_questions}`]
     ],
     bodyHtml: `
+      <h3>Year-Level Decision</h3>
+      <p><strong>${escapeHtml(decision.headline)}</strong> ${escapeHtml(decision.evidence)}</p>
       <h3>Next Steps</h3>
       <ul>${nextSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ul>
       <h3>Attempt History</h3>
       <table>
         <thead>
-          <tr><th>Year</th><th>Score</th><th>Correct</th><th>Skipped</th><th>Result</th></tr>
+          <tr><th>Year</th><th>Score</th><th>Correct</th><th>Skipped</th><th>What Happened</th></tr>
         </thead>
         <tbody>${attemptsRows}</tbody>
       </table>
@@ -2231,13 +2236,13 @@ function downloadFinalTeacherPdf() {
           </tr>
         `;
       }
+      const decision = buildSectionDecision(row.summary);
       const nextStep = getNextStepForSection(row.section, row.summary)[0] || "";
       return `
         <tr>
           <td>${escapeHtml(sectionLabel(row.section))}</td>
-          <td>${escapeHtml(row.summary.observed_year_level)}</td>
-          <td>${row.summary.correct_answers}/${row.summary.total_questions}</td>
-          <td>${escapeHtml(row.summary.mastery_band)}</td>
+          <td>${escapeHtml(decision.bestFitYear)}</td>
+          <td>${escapeHtml(decision.shortReason)}</td>
           <td>${escapeHtml(nextStep)}</td>
         </tr>
       `;
@@ -2259,7 +2264,7 @@ function downloadFinalTeacherPdf() {
       ["Student", state.session.student.name],
       ["Phase", phase],
       ["Sections Completed", `${completedSections}/${sectionReportRows.length}`],
-      ["Final Year Level", overall.observed_operating_year],
+      ["Overall Best-Fit Year Level", formatTeacherYearLabel(overall.observed_operating_year)],
       ["Confidence", overall.confidence]
     ],
     bodyHtml: `
@@ -2268,9 +2273,8 @@ function downloadFinalTeacherPdf() {
         <thead>
           <tr>
             <th>Section</th>
-            <th>Observed Year</th>
-            <th>Correct</th>
-            <th>Mastery</th>
+            <th>Best-Fit Year</th>
+            <th>Why This Year</th>
             <th>Next Step</th>
           </tr>
         </thead>
@@ -2291,7 +2295,7 @@ function downloadFinalTeacherPdf() {
             .map((strand) => `
               <tr>
                 <td>${escapeHtml(strand.strand_name)}</td>
-                <td>${escapeHtml(strand.observed_year_level)}</td>
+                <td>${escapeHtml(formatTeacherYearLabel(strand.observed_year_level))}</td>
                 <td>${escapeHtml(strand.confidence)}</td>
                 <td>${escapeHtml(strand.supporting_sections.join(", "))}</td>
               </tr>
@@ -2386,6 +2390,7 @@ function openPdfPrintWindow(html, reportName) {
 
 function getNextStepForSection(section, summary) {
   const topic = section?.topic || summary.section_title;
+  const bestFitYear = formatTeacherYearLabel(summary.observed_year_level);
 
   if (summary.observed_year_level === "Not Attempted") {
     return [`Schedule this section for evidence in ${topic}.`];
@@ -2400,7 +2405,7 @@ function getNextStepForSection(section, summary) {
 
   if (summary.mastery_band === "Developing") {
     return [
-      `Target misconceptions in ${topic} at ${summary.observed_year_level}.`,
+      `Target misconceptions in ${topic} at ${bestFitYear}.`,
       "Re-check with 3-5 short follow-up questions next lesson."
     ];
   }
@@ -2408,7 +2413,7 @@ function getNextStepForSection(section, summary) {
   return [
     summary.observed_year_level === PRE_PHASE_LABEL
       ? `Re-teach prerequisite skills for ${topic} prior to Year 4.`
-      : `Re-teach prerequisite skills for ${topic} below ${summary.observed_year_level}.`,
+      : `Re-teach prerequisite skills for ${topic} below ${bestFitYear}.`,
     "Use worked examples and guided practice before reassessment."
   ];
 }
@@ -2844,11 +2849,127 @@ function getTeacherNotesForSection(sectionId) {
   return run?.teacher_notes || "";
 }
 
-// ── Mastery badge helper ──────────────────────────────────────────────────────
-function masteryBadgeClass(band) {
-  if (band === "Secure") return "secure";
-  if (band === "Developing") return "developing";
-  return "notyet";
+function formatTeacherYearLabel(value) {
+  if (value === PRE_PHASE_LABEL) {
+    return `Below Y${PHASE_MIN_YEAR}`;
+  }
+
+  if (typeof value === "number") {
+    const year = Number(value);
+    if (!Number.isFinite(year)) {
+      return "";
+    }
+    return year < PHASE_MIN_YEAR ? `Y${year} question set` : `Y${year}`;
+  }
+
+  return String(value ?? "");
+}
+
+function describeAttemptBand(band) {
+  if (band === "Secure") {
+    return "Level met";
+  }
+  if (band === "Developing") {
+    return "Partial success";
+  }
+  return "Needs earlier content";
+}
+
+function describeAttemptProgress(band) {
+  if (band === "Secure") {
+    return "Moved up to a harder year level after this attempt.";
+  }
+  if (band === "Developing") {
+    return "Stopped here because this level still needs support.";
+  }
+  return "Moved down or stopped because earlier skills are still needed.";
+}
+
+function buildSectionDecision(summary) {
+  if (!summary || summary.observed_year_level === "Not Attempted") {
+    return {
+      bestFitYear: "Not attempted",
+      headline: "No year-level decision yet.",
+      evidence: "No questions were completed in this section.",
+      shortReason: "No evidence collected yet."
+    };
+  }
+
+  const attempts = [...summary.attempts].sort((a, b) => a.year_level - b.year_level);
+  const bestFitYear = formatTeacherYearLabel(summary.observed_year_level);
+  const observedYear = parseYearLabel(summary.observed_year_level);
+  const observedAttempt = Number.isFinite(observedYear)
+    ? attempts.find((attempt) => attempt.year_level === observedYear) ?? null
+    : null;
+  const upperAttempt = observedAttempt
+    ? attempts.find((attempt) => attempt.year_level === observedAttempt.year_level + 1)
+      ?? attempts.find((attempt) => attempt.year_level > observedAttempt.year_level)
+      ?? null
+    : null;
+  const lowerSecureAttempt = observedAttempt
+    ? [...attempts]
+      .reverse()
+      .find((attempt) => attempt.year_level < observedAttempt.year_level && attempt.mastery_band === "Secure")
+      ?? null
+    : null;
+  const lowestAttempt = attempts[0] ?? null;
+
+  if (summary.mastery_band === "Secure" && observedAttempt) {
+    const observedYearLabel = formatTeacherYearLabel(observedAttempt.year_level);
+    return {
+      bestFitYear,
+      headline: `Working at ${bestFitYear} in this section.`,
+      evidence: upperAttempt
+        ? `${observedYearLabel} was met with ${observedAttempt.correct}/${observedAttempt.total} correct, but ${formatTeacherYearLabel(upperAttempt.year_level)} was not met (${upperAttempt.correct}/${upperAttempt.total}), so ${bestFitYear} is the best-fit level.`
+        : `${observedYearLabel} was met with ${observedAttempt.correct}/${observedAttempt.total} correct, so ${bestFitYear} is the strongest year-level evidence collected in this section.`,
+      shortReason: upperAttempt
+        ? `${observedYearLabel} met (${observedAttempt.correct}/${observedAttempt.total}); ${formatTeacherYearLabel(upperAttempt.year_level)} not met (${upperAttempt.correct}/${upperAttempt.total}).`
+        : `${observedYearLabel} met (${observedAttempt.correct}/${observedAttempt.total}).`
+    };
+  }
+
+  if (summary.mastery_band === "Developing" && observedAttempt) {
+    const observedYearLabel = formatTeacherYearLabel(observedAttempt.year_level);
+    const clauses = [];
+
+    if (lowerSecureAttempt) {
+      clauses.push(`${formatTeacherYearLabel(lowerSecureAttempt.year_level)} was met (${lowerSecureAttempt.correct}/${lowerSecureAttempt.total})`);
+    }
+
+    clauses.push(`${observedYearLabel} was partly met (${observedAttempt.correct}/${observedAttempt.total})`);
+
+    if (upperAttempt) {
+      clauses.push(`${formatTeacherYearLabel(upperAttempt.year_level)} was not met (${upperAttempt.correct}/${upperAttempt.total})`);
+    }
+
+    return {
+      bestFitYear,
+      headline: `Working at ${bestFitYear} in this section, with support still needed.`,
+      evidence: `${clauses.join(". ")}. Place the student at ${bestFitYear} for now, but this level is not secure yet.`,
+      shortReason: [
+        lowerSecureAttempt ? `${formatTeacherYearLabel(lowerSecureAttempt.year_level)} met` : "",
+        `${observedYearLabel} partly met (${observedAttempt.correct}/${observedAttempt.total})`,
+        upperAttempt ? `${formatTeacherYearLabel(upperAttempt.year_level)} not met (${upperAttempt.correct}/${upperAttempt.total})` : ""
+      ].filter(Boolean).join("; ") + "."
+    };
+  }
+
+  if (lowestAttempt) {
+    const lowestYearLabel = formatTeacherYearLabel(lowestAttempt.year_level);
+    return {
+      bestFitYear,
+      headline: `Working below Y${PHASE_MIN_YEAR} in this section.`,
+      evidence: `${lowestYearLabel} was not met (${lowestAttempt.correct}/${lowestAttempt.total}), so earlier prerequisite skills are still needed.`,
+      shortReason: `${lowestYearLabel} not met (${lowestAttempt.correct}/${lowestAttempt.total}); needs earlier skills.`
+    };
+  }
+
+  return {
+    bestFitYear,
+    headline: `Working at ${bestFitYear} in this section.`,
+    evidence: "Use the attempt history below as the current evidence for this decision.",
+    shortReason: "See attempt history."
+  };
 }
 
 function getCurrentRun() {
