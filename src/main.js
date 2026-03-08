@@ -1231,6 +1231,7 @@ function renderTeacherProbe(run) {
   const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
   const teacherProbe = run.teacher_probe || buildTeacherProbePlan(section, run.summary, diagnosticSummary);
   const probeItems = teacherProbe.probe_items || [];
+  const languageChecks = teacherProbe.language_checks || [];
 
   run.diagnostic_summary = diagnosticSummary;
   run.teacher_probe = teacherProbe;
@@ -1240,27 +1241,6 @@ function renderTeacherProbe(run) {
   const content = `
     <section class="panel">
       <h1>${escapeHtml(sectionLabel(section))} — Short Teacher Probe</h1>
-      <p class="note">Use this only to clarify why the student broke, not to extend the assessment. Two to four quick prompts is enough.</p>
-
-      <div class="result-hero">
-        <div class="result-hero-cell result-hero-primary">
-          <span class="result-hero-label">NZC Best-Fit</span>
-          <span class="result-hero-value">${escapeHtml(formatTeacherYearLabel(run.summary.observed_year_level))}</span>
-        </div>
-        <div class="result-hero-cell">
-          <span class="result-hero-label">Confidence</span>
-          <span class="result-hero-value">${escapeHtml(run.summary.confidence)}</span>
-        </div>
-        <div class="result-hero-cell">
-          <span class="result-hero-label">Likely Issue</span>
-          <span class="result-hero-value result-hero-copy">${escapeHtml(diagnosticSummary.likely_misconception)}</span>
-        </div>
-      </div>
-
-      <div class="summary-banner">
-        <strong>Start here:</strong> ${escapeHtml(diagnosticSummary.last_secure_skill)}<br />
-        <strong>Best representation:</strong> ${escapeHtml(diagnosticSummary.recommended_representation)}
-      </div>
 
       <form id="teacherProbeForm" class="teacher-probe-form">
         <div class="teacher-probe-list">
@@ -1289,6 +1269,23 @@ function renderTeacherProbe(run) {
             </article>
           `).join("")}
         </div>
+
+        <section class="teacher-language-check">
+          <h2>Language Comprehension</h2>
+          <p class="subtle">Use this when the wording may be part of the issue.</p>
+          <div class="teacher-language-grid">
+            ${languageChecks.map((item) => `
+              <label class="field-group-label teacher-language-item">
+                <span>${escapeHtml(item.term)}</span>
+                <select name="languageCheck__${escapeAttribute(item.term)}">
+                  ${["not_checked", "understood", "unclear", "not_understood"]
+                    .map((value) => `<option value="${value}" ${item.status === value ? "selected" : ""}>${escapeHtml(formatLanguageStatus(value))}</option>`)
+                    .join("")}
+                </select>
+              </label>
+            `).join("")}
+          </div>
+        </section>
 
         <label class="field-group-label">
           Teacher summary
@@ -1326,6 +1323,10 @@ function onTeacherProbeSubmit(event) {
     response_mode: String(formData.get(`probeResponse__${item.probe_id}`) || "not_attempted"),
     evidence_code: String(formData.get(`probeCode__${item.probe_id}`) || "").trim(),
     teacher_note: String(formData.get(`probeNote__${item.probe_id}`) || "").trim()
+  }));
+  run.teacher_probe.language_checks = (run.teacher_probe.language_checks || []).map((item) => ({
+    ...item,
+    status: String(formData.get(`languageCheck__${item.term}`) || "not_checked")
   }));
   run.teacher_probe.teacher_summary = String(formData.get("teacherProbeSummary") || "").trim();
   run.teacher_probe.status = "completed";
@@ -2246,6 +2247,7 @@ function buildTeacherProbePlan(section, summary, diagnosticSummary) {
     return {
       status: "not_run",
       probe_items: [],
+      language_checks: buildLanguageCheckItems(section),
       teacher_summary: ""
     };
   }
@@ -2260,6 +2262,7 @@ function buildTeacherProbePlan(section, summary, diagnosticSummary) {
       evidence_code: prompt.evidence_code,
       teacher_note: ""
     })),
+    language_checks: buildLanguageCheckItems(section),
     teacher_summary: ""
   };
 }
@@ -2297,12 +2300,38 @@ function getTeacherProbePrompts(section, summary) {
   ];
 }
 
+function buildLanguageCheckItems(section) {
+  const baseTerms = ["digit", "number"];
+  const sectionTerms = section?.section_id === "sec_01"
+    ? ["less than", "more than", "before", "after", "tens", "hundreds", "expand", "how many tens are in"]
+    : section?.strand === "Number Structure"
+      ? ["less than", "more than", "before", "after", "tens", "hundreds", "expand"]
+      : section?.strand === "Rational Numbers"
+        ? ["fraction", "numerator", "denominator", "equivalent", "percentage"]
+        : ["add", "subtract", "multiply", "divide", "more than", "less than"];
+
+  return [...new Set(baseTerms.concat(sectionTerms))].map((term) => ({
+    term,
+    status: "not_checked"
+  }));
+}
+
 function formatProbeResponseMode(value) {
   const labels = {
     not_attempted: "Not yet checked",
     secure: "Secure",
     partial: "Partial",
     incorrect: "Incorrect"
+  };
+  return labels[value] || value;
+}
+
+function formatLanguageStatus(value) {
+  const labels = {
+    not_checked: "Not checked",
+    understood: "Understood",
+    unclear: "Unclear",
+    not_understood: "Not understood"
   };
   return labels[value] || value;
 }
@@ -2499,6 +2528,14 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
                 <article class="teacher-probe-card">
                   <h3>${escapeHtml(sectionLabel(row.section))}</h3>
                   <p class="teacher-probe-prompt">${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed. See saved item-level notes in the exported session file.")}</p>
+                  ${row.run.teacher_probe.language_checks?.some((item) => item.status !== "not_checked")
+                    ? `<p><strong>Language:</strong> ${escapeHtml(
+                      row.run.teacher_probe.language_checks
+                        .filter((item) => item.status !== "not_checked")
+                        .map((item) => `${item.term} (${formatLanguageStatus(item.status)})`)
+                        .join(", ")
+                    )}</p>`
+                    : ""}
                 </article>
               `).join("")}
             </div>`
@@ -2740,6 +2777,14 @@ function downloadFinalTeacherPdf() {
     .map((row) => `
       <h3>${escapeHtml(sectionLabel(row.section))} Probe</h3>
       <p>${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed with item-level notes only.")}</p>
+      ${row.run.teacher_probe.language_checks?.some((item) => item.status !== "not_checked")
+        ? `<p><strong>Language:</strong> ${escapeHtml(
+          row.run.teacher_probe.language_checks
+            .filter((item) => item.status !== "not_checked")
+            .map((item) => `${item.term} (${formatLanguageStatus(item.status)})`)
+            .join(", ")
+        )}</p>`
+        : ""}
       <table>
         <thead>
           <tr>
@@ -2974,6 +3019,7 @@ function buildSessionResult() {
         teacher_probe: state.session.section_runs.find((run) => run.section_id === summary.section_id)?.teacher_probe || {
           status: "not_run",
           probe_items: [],
+          language_checks: [],
           teacher_summary: ""
         },
         teacher_override: {

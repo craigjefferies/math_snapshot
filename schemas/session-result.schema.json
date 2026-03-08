@@ -164,7 +164,7 @@
           "teacher_probe": {
             "type": ["object", "null"],
             "additionalProperties": false,
-            "required": ["status", "probe_items", "teacher_summary"],
+            "required": ["status", "probe_items", "language_checks", "teacher_summary"],
             "properties": {
               "status": {
                 "type": "string",
@@ -185,6 +185,21 @@
                     },
                     "evidence_code": { "type": "string" },
                     "teacher_note": { "type": "string" }
+                  }
+                }
+              },
+              "language_checks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["term", "status"],
+                  "properties": {
+                    "term": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["not_checked", "understood", "unclear", "not_understood"]
+                    }
                   }
                 }
               },
