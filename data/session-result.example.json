@@ -51,7 +51,6 @@
       "teacher_probe": {
         "status": "not_run",
         "probe_items": [],
-        "language_checks": [],
         "teacher_summary": ""
       },
       "teacher_override": {

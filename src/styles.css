@@ -275,6 +275,46 @@ fieldset {
   text-transform: uppercase;
 }
 
+.phase-switcher {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.phase-switch {
+  display: grid;
+  gap: 0.18rem;
+  min-height: 68px;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  text-align: left;
+}
+
+.phase-switch strong {
+  font-size: 1rem;
+}
+
+.phase-switch small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.phase-switch:hover {
+  border-color: #93c5fd;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.phase-switch.is-active {
+  border-color: #2563eb;
+  background:
+    linear-gradient(180deg, #dbeafe 0%, #eff6ff 100%);
+  box-shadow: inset 0 0 0 1px rgb(37 99 235 / 0.12);
+  color: #1d4ed8;
+}
+
 .sidebar-nav {
   display: grid;
   gap: 0.5rem;
@@ -353,6 +393,7 @@ fieldset {
 
 .teacher-shell.sidebar-collapsed .brand-copy,
 .teacher-shell.sidebar-collapsed .sidebar-link-text,
+.teacher-shell.sidebar-collapsed .phase-switch small,
 .teacher-shell.sidebar-collapsed .sidebar-toggle-text {
   display: none;
 }
@@ -366,7 +407,21 @@ fieldset {
   padding-inline: 0;
 }
 
+.teacher-shell.sidebar-collapsed .phase-switch {
+  min-height: 52px;
+  padding: 0.7rem 0.5rem;
+  text-align: center;
+}
+
+.teacher-shell.sidebar-collapsed .phase-switch strong {
+  font-size: 0.88rem;
+}
+
 .teacher-shell.mode-student .sidebar-nav {
+  display: none;
+}
+
+.teacher-shell.mode-student .phase-switcher {
   display: none;
 }
 
@@ -1074,11 +1129,44 @@ fieldset {
   font-weight: 600;
 }
 
-.teacher-probe-grid {
+.teacher-probe-options {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  margin-bottom: 0.75rem;
+}
+
+.teacher-probe-option {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr;
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.teacher-probe-option:hover {
+  border-color: #7c9b91;
+  background: #f1f7f4;
+  transform: translateY(-1px);
+}
+
+.teacher-probe-option input {
+  margin-top: 0.15rem;
+}
+
+.teacher-probe-option span {
+  color: #0f172a;
+  font-size: 0.97rem;
+  line-height: 1.45;
+}
+
+.teacher-probe-option.is-selected {
+  border-color: #2f6f60;
+  background: #ecf8f3;
+  box-shadow: 0 0 0 2px rgba(47, 111, 96, 0.12);
 }
 
 .expanded-boxes {

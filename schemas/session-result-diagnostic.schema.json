@@ -175,16 +175,26 @@
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["probe_id", "prompt", "response_mode", "evidence_code", "teacher_note"],
+                  "required": ["probe_id", "prompt", "evidence_code", "response_options", "selected_option", "selected_label"],
                   "properties": {
                     "probe_id": { "type": "string" },
                     "prompt": { "type": "string" },
-                    "response_mode": {
-                      "type": "string",
-                      "enum": ["secure", "partial", "incorrect", "not_attempted"]
-                    },
                     "evidence_code": { "type": "string" },
-                    "teacher_note": { "type": "string" }
+                    "response_options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["id", "label"],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "label": { "type": "string" },
+                          "misconception_hint": { "type": "string" }
+                        }
+                      }
+                    },
+                    "selected_option": { "type": "string" },
+                    "selected_label": { "type": "string" }
                   }
                 }
               },

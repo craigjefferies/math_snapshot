@@ -64,17 +64,38 @@
         "probe_items": [
           {
             "probe_id": "pv_409_materials",
-            "prompt": "Show me 409 with materials.",
-            "response_mode": "not_attempted",
-            "evidence_code": "representation_check",
-            "teacher_note": ""
+            "prompt": "What most likely caused the place-value errors?",
+            "evidence_code": "likely_barrier",
+            "response_options": [
+              {
+                "id": "direction",
+                "label": "The student may be confusing 1/10/100 less with counting on.",
+                "misconception_hint": "The student may be mixing up direction words such as less, before, and after."
+              },
+              {
+                "id": "structure",
+                "label": "The student does not yet see the number as hundreds, tens, and ones."
+              }
+            ],
+            "selected_option": "",
+            "selected_label": ""
           },
           {
             "probe_id": "pv_10_less_409",
-            "prompt": "What is 10 less than 409? Show me how you know.",
-            "response_mode": "not_attempted",
-            "evidence_code": "regrouping_across_zero",
-            "teacher_note": ""
+            "prompt": "Which language seemed to block the response?",
+            "evidence_code": "language_comprehension",
+            "response_options": [
+              {
+                "id": "direction_words",
+                "label": "Less than / before / after caused confusion."
+              },
+              {
+                "id": "place_value_words",
+                "label": "Digit, number, tens, hundreds, expand caused confusion."
+              }
+            ],
+            "selected_option": "",
+            "selected_label": ""
           }
         ],
         "teacher_summary": ""

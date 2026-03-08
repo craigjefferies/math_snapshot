@@ -1,15 +1,35 @@
-const DATA_URL = new URL("../data/phase2-question-bank.json", import.meta.url);
+const PHASE_CONFIGS = {
+  phase1: {
+    key: "phase1",
+    label: "Phase 1",
+    subtitle: "Y0-3 Snapshot",
+    data_url: new URL("../data/phase1-question-bank.json", import.meta.url),
+    default_start_mode: "from_floor",
+    default_start_year: 0,
+    floor_label: "Start from 6 months and build upon",
+    specified_years: [0, 1, 2, 3]
+  },
+  phase2: {
+    key: "phase2",
+    label: "Phase 2",
+    subtitle: "Y4-6 Snapshot",
+    data_url: new URL("../data/phase2-question-bank.json", import.meta.url),
+    default_start_mode: "from_floor",
+    default_start_year: 3,
+    floor_label: "Start from Pre-Year 4 check (Y3 question set) and build upon",
+    specified_years: [3, 4, 5, 6]
+  }
+};
 
 const STRAND_WEIGHTS = {
   "Number Structure": 0.2,
   "Number Operations": 0.4,
   "Rational Numbers": 0.4
 };
-const PHASE_MIN_YEAR = 4;
-const PRE_PHASE_LABEL = `Pre-Y${PHASE_MIN_YEAR} (Y3 question set)`;
 const UI_STORAGE_KEY = "maths_snapshot_ui_v1";
 
 const state = {
+  banksByPhase: new Map(),
   bank: null,
   itemsById: new Map(),
   sectionsById: new Map(),
@@ -18,7 +38,8 @@ const state = {
   ui: {
     sidebar_collapsed: loadSidebarPreference(),
     show_history_panel: false,
-    review_section_id: null
+    review_section_id: null,
+    current_phase: loadCurrentPhasePreference()
   }
 };
 
@@ -28,15 +49,16 @@ init();
 
 async function init() {
   try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) {
-      throw new Error(`Could not load question bank (${response.status})`);
+    for (const config of Object.values(PHASE_CONFIGS)) {
+      const response = await fetch(config.data_url);
+      if (!response.ok) {
+        throw new Error(`Could not load question bank for ${config.label} (${response.status})`);
+      }
+      const bank = await response.json();
+      validateBankShape(bank);
+      state.banksByPhase.set(config.key, bank);
     }
-    const bank = await response.json();
-    validateBankShape(bank);
-    state.bank = bank;
-    state.itemsById = new Map(bank.items.map((item) => [item.item_id, item]));
-    state.sectionsById = new Map(bank.sections.map((section) => [section.section_id, section]));
+    activatePhase(state.ui.current_phase, { rerender: false });
     renderSetup();
   } catch (error) {
     renderError(error);
@@ -49,6 +71,60 @@ function validateBankShape(bank) {
   }
 }
 
+function getCurrentPhaseConfig() {
+  return PHASE_CONFIGS[state.ui.current_phase] || PHASE_CONFIGS.phase2;
+}
+
+function getPhaseMinYear() {
+  const min = Number(state.bank?.assessment?.intended_year_range?.min);
+  return Number.isFinite(min) ? min : 4;
+}
+
+function getPrePhaseLabel() {
+  return state.ui.current_phase === "phase2"
+    ? `Pre-Y${getPhaseMinYear()} (Y3 question set)`
+    : "";
+}
+
+function activatePhase(phaseKey, options = {}) {
+  const { rerender = true } = options;
+  const config = PHASE_CONFIGS[phaseKey] || PHASE_CONFIGS.phase2;
+  const bank = state.banksByPhase.get(config.key);
+  if (!bank) {
+    throw new Error(`Question bank for ${config.label} is not loaded.`);
+  }
+
+  state.ui.current_phase = config.key;
+  saveCurrentPhasePreference(config.key);
+  state.bank = bank;
+  state.itemsById = new Map(bank.items.map((item) => [item.item_id, item]));
+  state.sectionsById = new Map(bank.sections.map((section) => [section.section_id, section]));
+
+  if (rerender) {
+    state.notice = "";
+    state.session = null;
+    clearSessionFromStorage();
+    renderSetup();
+  }
+}
+
+function onPhaseToggle(nextPhaseKey) {
+  if (nextPhaseKey === state.ui.current_phase) {
+    return;
+  }
+
+  const savedSession = loadSessionFromStorage();
+  const hasInProgressSession = isSessionInProgress() || (!!savedSession && !savedSession.generated_at);
+  if (hasInProgressSession) {
+    const shouldLeave = window.confirm("Switch phase and discard this in-progress session?");
+    if (!shouldLeave) {
+      return;
+    }
+  }
+
+  activatePhase(nextPhaseKey);
+}
+
 function renderPage(contentHtml, options = {}) {
   const {
     headerContextHtml = "",
@@ -57,6 +133,7 @@ function renderPage(contentHtml, options = {}) {
     lockSidebar = false
   } = options;
   const hasHeaderContext = headerContextHtml.trim().length > 0;
+  const phaseConfig = getCurrentPhaseConfig();
   const shellNavItems = buildShellNavItems();
   const navItems = lockSidebar
     ? shellNavItems.map((item) => ({ ...item, enabled: item.key === activeStep }))
@@ -78,9 +155,22 @@ function renderPage(contentHtml, options = {}) {
           <span class="brand-mark" aria-hidden="true">${iconSvg("logo")}</span>
           <span class="brand-copy">
             <strong class="brand-title">Maths Snapshots</strong>
-            <small class="brand-subtitle">Phase 2 Snapshot</small>
+            <small class="brand-subtitle">${escapeHtml(phaseConfig.subtitle)}</small>
           </span>
         </div>
+
+        <section class="phase-switcher" aria-label="Learning phase">
+          ${Object.values(PHASE_CONFIGS).map((config) => `
+            <button
+              type="button"
+              class="phase-switch ${config.key === phaseConfig.key ? "is-active" : ""}"
+              data-phase-switch="${config.key}"
+            >
+              <strong>${escapeHtml(config.label)}</strong>
+              <small>${escapeHtml(config.subtitle)}</small>
+            </button>
+          `).join("")}
+        </section>
 
         <nav class="sidebar-nav">
           ${navItems
@@ -130,6 +220,11 @@ function renderPage(contentHtml, options = {}) {
 }
 
 function bindShellActions() {
+  const phaseButtons = document.querySelectorAll("[data-phase-switch]");
+  for (const button of phaseButtons) {
+    button.addEventListener("click", () => onPhaseToggle(button.dataset.phaseSwitch));
+  }
+
   const sidebarToggle = document.getElementById("sidebarToggleBtn");
   if (sidebarToggle) {
     sidebarToggle.addEventListener("click", onSidebarToggle);
@@ -339,8 +434,25 @@ function renderError(error) {
   renderPage(content, { homeEnabled: false, activeStep: "setup" });
 }
 
+function getAvailableStartYears() {
+  const phaseConfig = getCurrentPhaseConfig();
+  return phaseConfig.specified_years;
+}
+
+function formatSetupYearLabel(year) {
+  if (state.ui.current_phase === "phase1") {
+    return year === 0 ? "6 months" : `Y${year}`;
+  }
+  if (state.ui.current_phase === "phase2" && year === 3) {
+    return "Pre-Y4";
+  }
+  return `Y${year}`;
+}
+
 function renderSetup() {
   const sections = getSortedSections();
+  const phaseConfig = getCurrentPhaseConfig();
+  const startYears = getAvailableStartYears();
   const savedSession = loadSessionFromStorage();
   const sessionHistory = loadSessionHistoryFromStorage();
   const resumeBanner = (savedSession && !savedSession.generated_at)
@@ -416,18 +528,18 @@ function renderSetup() {
   const content = `
     <section class="panel panel-setup">
       ${resumeBanner}
-      <h1>Phase 2 Maths Snapshot</h1>
+      <h1>${escapeHtml(state.bank?.assessment?.name || `${phaseConfig.label} Maths Snapshot`)}</h1>
       <p class="subtle">Select the sections you want to run, choose a starting year level, and enter names for the PDF report. Each section takes around 3–5 minutes. Hand the device to the student when ready.</p>
       ${historyPanel}
 
       <form id="setupForm" class="grid-form grid-form-setup">
         <fieldset class="start-mode start-mode-compact">
           <legend>Starting Questions</legend>
-          <p class="subtle start-note">Chooses the first year-level questions shown for each section. Pre-Year 4 uses the Y3 set.</p>
+          <p class="subtle start-note">Chooses the first year-level questions shown for each section.</p>
 
           <label class="radio-row radio-choice">
-            <input type="radio" name="startMode" value="from_pre_y4" checked />
-            <span>Start from Pre-Year 4 check (Y3 question set) and build upon</span>
+            <input type="radio" name="startMode" value="from_floor" checked />
+            <span>${escapeHtml(phaseConfig.floor_label)}</span>
           </label>
 
           <div class="radio-row radio-row-specified">
@@ -436,22 +548,12 @@ function renderSetup() {
               <span>Start from specified year</span>
             </label>
             <div id="specifiedYearWrap" class="specified-year-inline disabled" aria-label="Specified year options">
-              <label class="year-check">
-                <input type="radio" name="startYear" value="3" disabled />
-                <span>Pre-Y4</span>
-              </label>
-              <label class="year-check">
-                <input type="radio" name="startYear" value="4" checked disabled />
-                <span>Y4</span>
-              </label>
-              <label class="year-check">
-                <input type="radio" name="startYear" value="5" disabled />
-                <span>Y5</span>
-              </label>
-              <label class="year-check">
-                <input type="radio" name="startYear" value="6" disabled />
-                <span>Y6</span>
-              </label>
+              ${startYears.map((year, index) => `
+                <label class="year-check">
+                  <input type="radio" name="startYear" value="${year}" ${index === 0 ? "checked" : ""} disabled />
+                  <span>${escapeHtml(formatSetupYearLabel(year))}</span>
+                </label>
+              `).join("")}
             </div>
           </div>
         </fieldset>
@@ -514,6 +616,9 @@ function renderSetup() {
   if (resumeBtn) {
     resumeBtn.addEventListener("click", () => {
       state.session = loadSessionFromStorage();
+      if (state.session?.phase_key && state.session.phase_key !== state.ui.current_phase) {
+        activatePhase(state.session.phase_key, { rerender: false });
+      }
       if (state.session.current_probe_section_id) {
         const probeRun = findCurrentProbeRun();
         if (probeRun) {
@@ -593,7 +698,7 @@ function syncSetupStartMode(form) {
     wrap.classList.toggle("disabled", !useSpecified);
   }
   if (useSpecified && !yearInputs.some((input) => input.checked) && yearInputs.length) {
-    const defaultYear = yearInputs.find((input) => input.value === "4") || yearInputs[0];
+    const defaultYear = yearInputs.find((input) => input.value === String(getCurrentPhaseConfig().specified_years[0])) || yearInputs[0];
     defaultYear.checked = true;
   }
 }
@@ -650,10 +755,11 @@ function onStartSession(event) {
     return;
   }
 
-  const startMode = String(form.get("startMode") || "from_pre_y4");
+  const phaseConfig = getCurrentPhaseConfig();
+  const startMode = String(form.get("startMode") || phaseConfig.default_start_mode);
   const requestedStartYear = startMode === "specified"
-    ? Number(form.get("startYear") || PHASE_MIN_YEAR)
-    : PHASE_MIN_YEAR - 1;
+    ? Number(form.get("startYear") || phaseConfig.specified_years[0])
+    : phaseConfig.default_start_year;
   const teacherName = String(form.get("teacherName") || "").trim();
   const studentName = String(form.get("studentName") || "").trim();
 
@@ -676,6 +782,7 @@ function onStartSession(event) {
     session_id: getSessionId(),
     teacher: { name: teacherName },
     student: { name: studentName },
+    phase_key: phaseConfig.key,
     start_year: requestedStartYear,
     start_mode: startMode,
     selected_section_ids: selectedSectionIds,
@@ -1229,9 +1336,8 @@ function renderTeacherProbe(run) {
 
   const section = state.sectionsById.get(run.section_id);
   const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
-  const teacherProbe = run.teacher_probe || buildTeacherProbePlan(section, run.summary, diagnosticSummary);
+  const teacherProbe = normalizeTeacherProbePlan(section, run.summary, diagnosticSummary, run.teacher_probe);
   const probeItems = teacherProbe.probe_items || [];
-  const languageChecks = teacherProbe.language_checks || [];
 
   run.diagnostic_summary = diagnosticSummary;
   run.teacher_probe = teacherProbe;
@@ -1248,49 +1354,22 @@ function renderTeacherProbe(run) {
             <article class="teacher-probe-card">
               <h3>Probe ${index + 1}</h3>
               <p class="teacher-probe-prompt">${escapeHtml(item.prompt)}</p>
-              <div class="teacher-probe-grid">
-                <label class="field-group-label">
-                  Response
-                  <select name="probeResponse__${escapeAttribute(item.probe_id)}">
-                    ${["not_attempted", "secure", "partial", "incorrect"]
-                      .map((value) => `<option value="${value}" ${item.response_mode === value ? "selected" : ""}>${escapeHtml(formatProbeResponseMode(value))}</option>`)
-                      .join("")}
-                  </select>
-                </label>
-                <label class="field-group-label">
-                  Evidence focus
-                  <input type="text" name="probeCode__${escapeAttribute(item.probe_id)}" value="${escapeAttribute(item.evidence_code || "")}" autocomplete="off" />
-                </label>
+              <div class="teacher-probe-options">
+                ${item.response_options.map((option) => `
+                  <label class="teacher-probe-option ${item.selected_option === option.id ? "is-selected" : ""}">
+                    <input
+                      type="radio"
+                      name="probeChoice__${escapeAttribute(item.probe_id)}"
+                      value="${escapeAttribute(option.id)}"
+                      ${item.selected_option === option.id ? "checked" : ""}
+                    />
+                    <span>${escapeHtml(option.label)}</span>
+                  </label>
+                `).join("")}
               </div>
-              <label class="field-group-label">
-                Teacher note
-                <textarea name="probeNote__${escapeAttribute(item.probe_id)}" rows="3" placeholder="What did the student do or say?">${escapeHtml(item.teacher_note || "")}</textarea>
-              </label>
             </article>
           `).join("")}
         </div>
-
-        <section class="teacher-language-check">
-          <h2>Language Comprehension</h2>
-          <p class="subtle">Use this when the wording may be part of the issue.</p>
-          <div class="teacher-language-grid">
-            ${languageChecks.map((item) => `
-              <label class="field-group-label teacher-language-item">
-                <span>${escapeHtml(item.term)}</span>
-                <select name="languageCheck__${escapeAttribute(item.term)}">
-                  ${["not_checked", "understood", "unclear", "not_understood"]
-                    .map((value) => `<option value="${value}" ${item.status === value ? "selected" : ""}>${escapeHtml(formatLanguageStatus(value))}</option>`)
-                    .join("")}
-                </select>
-              </label>
-            `).join("")}
-          </div>
-        </section>
-
-        <label class="field-group-label">
-          Teacher summary
-          <textarea name="teacherProbeSummary" rows="4" placeholder="Short summary of what this probe clarified.">${escapeHtml(teacherProbe.teacher_summary || "")}</textarea>
-        </label>
 
         <div class="actions-row">
           <button type="submit" class="btn-primary">Save Probe & Continue</button>
@@ -1320,15 +1399,10 @@ function onTeacherProbeSubmit(event) {
   const formData = new FormData(event.currentTarget);
   run.teacher_probe.probe_items = run.teacher_probe.probe_items.map((item) => ({
     ...item,
-    response_mode: String(formData.get(`probeResponse__${item.probe_id}`) || "not_attempted"),
-    evidence_code: String(formData.get(`probeCode__${item.probe_id}`) || "").trim(),
-    teacher_note: String(formData.get(`probeNote__${item.probe_id}`) || "").trim()
+    selected_option: String(formData.get(`probeChoice__${item.probe_id}`) || ""),
+    selected_label: getProbeOptionLabel(item, String(formData.get(`probeChoice__${item.probe_id}`) || ""))
   }));
-  run.teacher_probe.language_checks = (run.teacher_probe.language_checks || []).map((item) => ({
-    ...item,
-    status: String(formData.get(`languageCheck__${item.term}`) || "not_checked")
-  }));
-  run.teacher_probe.teacher_summary = String(formData.get("teacherProbeSummary") || "").trim();
+  run.teacher_probe.teacher_summary = buildTeacherProbeSummary(run.teacher_probe);
   run.teacher_probe.status = "completed";
   if (run.diagnostic_summary) {
     run.diagnostic_summary.teacher_probe_status = "completed";
@@ -2073,7 +2147,7 @@ function summarizeSection(section, attempts, targetYearVariant = null) {
     chosen = developing[developing.length - 1];
     observed_year_level = yearLabelForDisplay(chosen.year_level);
   } else if (sorted.length) {
-    observed_year_level = PRE_PHASE_LABEL;
+    observed_year_level = state.ui.current_phase === "phase2" ? getPrePhaseLabel() : yearLabelForDisplay(sorted[0]?.year_level ?? getPhaseMinYear());
   }
 
   const confidence = computeSectionConfidence(sorted, observed_year_level);
@@ -2247,7 +2321,6 @@ function buildTeacherProbePlan(section, summary, diagnosticSummary) {
     return {
       status: "not_run",
       probe_items: [],
-      language_checks: buildLanguageCheckItems(section),
       teacher_summary: ""
     };
   }
@@ -2258,82 +2331,683 @@ function buildTeacherProbePlan(section, summary, diagnosticSummary) {
     probe_items: prompts.map((prompt, index) => ({
       probe_id: `${section.section_id}_probe_${index + 1}`,
       prompt: prompt.prompt,
-      response_mode: "not_attempted",
       evidence_code: prompt.evidence_code,
-      teacher_note: ""
+      response_options: prompt.response_options,
+      selected_option: "",
+      selected_label: ""
     })),
-    language_checks: buildLanguageCheckItems(section),
     teacher_summary: ""
   };
 }
 
+function normalizeTeacherProbePlan(section, summary, diagnosticSummary, teacherProbe) {
+  if (!teacherProbe || !Array.isArray(teacherProbe.probe_items)) {
+    return buildTeacherProbePlan(section, summary, diagnosticSummary);
+  }
+
+  const hasModernItems = teacherProbe.probe_items.every(
+    (item) => Array.isArray(item.response_options)
+  );
+  if (!hasModernItems) {
+    return buildTeacherProbePlan(section, summary, diagnosticSummary);
+  }
+
+  return {
+    status: teacherProbe.status || (diagnosticSummary?.teacher_probe_needed ? "recommended" : "not_run"),
+    probe_items: teacherProbe.probe_items.map((item) => ({
+      ...item,
+      response_options: Array.isArray(item.response_options) ? item.response_options : [],
+      selected_option: String(item.selected_option || ""),
+      selected_label: String(item.selected_label || getProbeOptionLabel(item, item.selected_option || ""))
+    })),
+    teacher_summary: String(teacherProbe.teacher_summary || "")
+  };
+}
+
 function getTeacherProbePrompts(section, summary) {
-  if (section?.section_id === "sec_01") {
-    return [
-      { prompt: "Show me 409 with materials or a place-value chart.", evidence_code: "representation_check" },
-      { prompt: "What is 1 less than 409? How do you know?", evidence_code: "before_after_direction" },
-      { prompt: "What is 10 less than 409? Show me.", evidence_code: "regrouping_across_zero" },
-      { prompt: "Expand 759.", evidence_code: "partitioning" }
-    ];
-  }
-
-  if (section?.strand === "Number Operations") {
-    return [
-      { prompt: `Solve one similar ${summary.section_title.toLowerCase()} item aloud.`, evidence_code: "strategy_choice" },
-      { prompt: "Show the steps with a number line, place-value chart, or written method.", evidence_code: "representation_check" },
-      { prompt: "Explain why you chose that method.", evidence_code: "mathematical_language" }
-    ];
-  }
-
-  if (section?.strand === "Rational Numbers") {
-    return [
-      { prompt: "Show the idea with a diagram or materials before using symbols.", evidence_code: "representation_check" },
-      { prompt: "Explain what each part of the fraction or decimal means.", evidence_code: "concept_language" },
-      { prompt: "Solve one similar item and explain your thinking aloud.", evidence_code: "strategy_choice" }
-    ];
-  }
-
-  return [
-    { prompt: "Solve one similar item aloud and explain your thinking.", evidence_code: "thinking_explanation" },
-    { prompt: "Show the same idea with materials or a simple diagram.", evidence_code: "representation_check" },
-    { prompt: "Tell me which maths words in the question helped you.", evidence_code: "language_check" }
+  const phaseKey = state.ui.current_phase;
+  const makeOption = (id, label, misconceptionHint = "") => ({
+    id,
+    label,
+    ...(misconceptionHint ? { misconception_hint: misconceptionHint } : {})
+  });
+  const makePrompt = (prompt, evidenceCode, responseOptions) => ({
+    prompt,
+    evidence_code: evidenceCode,
+    response_options: responseOptions
+  });
+  const generic = [
+    makePrompt("What most likely sat behind the student errors in this section?", "likely_barrier", [
+      makeOption("concept_gap", "The core maths idea is not secure yet.", "The core concept is not secure enough at this level yet."),
+      makeOption("representation_only", "The student could explain it with materials but not with symbols.", "The written task may be overstating the gap because the student can show more understanding with materials."),
+      makeOption("language_load", "The wording looked more difficult than the maths.", "The maths language may be masking what the student actually understands."),
+      makeOption("not_clear", "It is still not clear from the short probe.")
+    ]),
+    makePrompt("Which support unlocked the most success?", "best_representation", [
+      makeOption("materials", "Concrete materials or acted examples."),
+      makeOption("diagram", "A diagram, chart, or number line."),
+      makeOption("oral", "Teacher talk-through and oral questioning."),
+      makeOption("none", "None yet; the student still seemed unsure.")
+    ]),
+    makePrompt("Which maths language still seemed shaky?", "language_comprehension", [
+      makeOption("secure", "The key section words seemed secure."),
+      makeOption("comparison", "Comparison / direction words such as before, after, more, less caused confusion.", "The student may need explicit teaching of comparison and direction language."),
+      makeOption("place_value", "Place-value words such as digit, tens, hundreds, tenths caused confusion.", "The student may need explicit teaching of the place-value vocabulary in this section."),
+      makeOption("task_words", "The task wording itself seemed to block the response.", "The wording load may be getting in the way of the maths thinking.")
+    ]),
+    makePrompt("Where would you start next?", "teaching_entry", [
+      makeOption("step_back", "Step back to an easier prerequisite in this section."),
+      makeOption("reteach_model", "Reteach the idea with modelling and think-aloud."),
+      makeOption("guided_practice", "Give short guided practice on the same idea."),
+      makeOption("not_sure", "Need one more observation before deciding.")
+    ])
   ];
-}
 
-function buildLanguageCheckItems(section) {
-  const baseTerms = ["digit", "number"];
-  const sectionTerms = section?.section_id === "sec_01"
-    ? ["less than", "more than", "before", "after", "tens", "hundreds", "expand", "how many tens are in"]
-    : section?.strand === "Number Structure"
-      ? ["less than", "more than", "before", "after", "tens", "hundreds", "expand"]
-      : section?.strand === "Rational Numbers"
-        ? ["fraction", "numerator", "denominator", "equivalent", "percentage"]
-        : ["add", "subtract", "multiply", "divide", "more than", "less than"];
-
-  return [...new Set(baseTerms.concat(sectionTerms))].map((term) => ({
-    term,
-    status: "not_checked"
-  }));
-}
-
-function formatProbeResponseMode(value) {
-  const labels = {
-    not_attempted: "Not yet checked",
-    secure: "Secure",
-    partial: "Partial",
-    incorrect: "Incorrect"
+  const promptSets = {
+    phase1: {
+      sec_01: [
+        makePrompt("What most likely caused the student to break in counting?", "likely_barrier", [
+          makeOption("sequence", "The counting sequence itself is not secure yet.", "The student is still building a stable counting sequence."),
+          makeOption("backward", "Forward counting is stronger than backward counting.", "The student may be relying on forward counting and not yet secure with counting backwards."),
+          makeOption("crossing", "Crossing decade or hundred boundaries caused the problem.", "The student may lose the count sequence when crossing decade or hundred boundaries."),
+          makeOption("attention", "The student knew some of it but lost attention or stamina.")
+        ]),
+        makePrompt("When the student was supported, what looked most secure?", "secure_floor", [
+          makeOption("small_range", "Counting in a small range only."),
+          makeOption("forward_only", "Counting forward only."),
+          makeOption("objects", "Counting objects was easier than number words alone."),
+          makeOption("not_secure", "Nothing reliable was secure enough yet.")
+        ]),
+        makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
+          makeOption("secure", "Words like before, after, next were secure."),
+          makeOption("before_after", "Before / after language caused confusion.", "The student may not yet connect before and after language to counting direction."),
+          makeOption("forwards_backwards", "Forwards / backwards language caused confusion.", "The student may need explicit teaching of forwards and backwards language."),
+          makeOption("task_words", "The question wording itself caused confusion.", "The task wording may be obscuring the counting concept.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("oral_count", "Short oral counting bursts with teacher prompting."),
+          makeOption("materials", "Count objects and move them while saying each number."),
+          makeOption("number_line", "Use a number line to practise counting on and back."),
+          makeOption("step_back", "Step back to a smaller counting range first.")
+        ])
+      ],
+      sec_02: [
+        makePrompt("What most likely caused the errors in identifying numbers?", "likely_barrier", [
+          makeOption("numeral_recognition", "Numeral recognition itself is not secure yet.", "The student may not yet recognise numerals quickly and reliably."),
+          makeOption("before_after", "The student could identify numerals but not the number before or after.", "The student may know the numeral but not yet connect it to the surrounding counting sequence."),
+          makeOption("matching", "Matching numeral to quantity was the main issue.", "The student may need stronger links between numerals and quantities."),
+          makeOption("attention", "The student appeared inconsistent rather than conceptually stuck.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("recognise_small", "Recognising smaller numerals only."),
+          makeOption("say_not_find", "Saying numbers was easier than finding them."),
+          makeOption("find_not_before_after", "Finding the numeral was easier than before/after tasks."),
+          makeOption("not_secure", "No secure floor was obvious yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Number words and number names were secure."),
+          makeOption("before_after", "Before / after was the main language issue.", "The student may need explicit teaching of before and after in number sequences."),
+          makeOption("digit_number", "Digit / number language seemed mixed up.", "The student may be mixing up the ideas of digit and number."),
+          makeOption("task_words", "The wording load itself seemed too high.", "The wording load may be affecting performance more than numeral knowledge.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("match_objects", "Match numerals to sets and spoken number words."),
+          makeOption("number_track", "Use a number track for before and after."),
+          makeOption("flash_cards", "Practise quick numeral recognition with cards."),
+          makeOption("step_back", "Step back to a smaller set of numerals first.")
+        ])
+      ],
+      sec_04: [
+        makePrompt("What most likely caused the place-value errors?", "likely_barrier", [
+          makeOption("grouping", "The student does not yet trust groups of ten and ones.", "The student may not yet see quantities as made of ones, tens, and hundreds."),
+          makeOption("digit_positions", "The student can read the number but not interpret the place values.", "The student may read the numeral without understanding what each place represents."),
+          makeOption("materials_only", "The student was stronger with materials than with written symbols.", "The student may show stronger understanding with concrete materials than with symbols."),
+          makeOption("not_clear", "The exact cause is still not fully clear.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("ones", "Counting single ones only."),
+          makeOption("tens", "Grouping in tens with support."),
+          makeOption("read_number", "Reading the number was easier than partitioning it."),
+          makeOption("not_secure", "No stable place-value floor was obvious yet.")
+        ]),
+        makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
+          makeOption("secure", "Words like ones, tens, hundreds seemed secure."),
+          makeOption("digit_number", "Digit / number was mixed up.", "The student may be mixing up digit names with the value of the whole number."),
+          makeOption("tens_hundreds", "Tens / hundreds language caused confusion.", "The student may need explicit teaching of tens and hundreds language."),
+          makeOption("task_words", "The wording itself was the main issue.", "The task wording may be obscuring the place-value idea.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("bundles", "Use bundled sticks or MAB with a place-value mat."),
+          makeOption("build_numbers", "Build and say numbers aloud before recording them."),
+          makeOption("partition", "Practise partitioning numbers into tens and ones."),
+          makeOption("step_back", "Step back to smaller quantities first.")
+        ])
+      ],
+      sec_05a: [
+        makePrompt("What most likely caused the breakdown in facts to 10?", "likely_barrier", [
+          makeOption("not_known", "The facts are not yet known securely.", "The student does not yet have these facts secure."),
+          makeOption("counting_all", "The student is still counting all rather than recalling or counting on.", "The student may still rely on counting-all strategies for facts to 10."),
+          makeOption("inverse", "The subtraction link to the addition fact is not secure.", "The connection between addition and subtraction facts may not yet be secure."),
+          makeOption("attention", "The student knew some facts but responses were inconsistent.")
+        ]),
+        makePrompt("What looked strongest?", "secure_floor", [
+          makeOption("addition", "Addition facts were stronger than subtraction."),
+          makeOption("subitised", "Visual / dot patterns were stronger than symbols."),
+          makeOption("count_on", "Counting on worked better than instant recall."),
+          makeOption("not_secure", "No fact strategy looked secure enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Add, take away, plus, minus seemed secure."),
+          makeOption("minus_takeaway", "Minus / take away language caused confusion.", "The student may need clearer links between subtraction language and action."),
+          makeOption("altogether", "Words like altogether / left caused confusion.", "The student may need explicit teaching of the problem-solving language used in fact questions."),
+          makeOption("task_words", "The wording load caused more trouble than the numbers.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("materials", "Use counters/ten-frames and say the facts aloud."),
+          makeOption("families", "Teach fact families and inverse pairs."),
+          makeOption("count_on", "Strengthen counting-on from the larger number."),
+          makeOption("daily_practice", "Use short daily recall practice in a smaller set.")
+        ])
+      ],
+      sec_05b: [
+        makePrompt("What most likely caused the breakdown in facts to 20?", "likely_barrier", [
+          makeOption("bridging", "Bridging through 10 is not secure yet.", "The student may not yet use bridging-through-10 strategies reliably."),
+          makeOption("recall", "The facts are not yet recalled quickly enough.", "The student does not yet recall these facts securely."),
+          makeOption("inverse", "The subtraction facts are much weaker than the addition facts.", "The student may not yet connect subtraction facts to related addition facts."),
+          makeOption("attention", "Inconsistency or stamina looked as important as the maths.")
+        ]),
+        makePrompt("What looked strongest?", "secure_floor", [
+          makeOption("within10", "Facts within 10 were stronger."),
+          makeOption("addition", "Addition was stronger than subtraction."),
+          makeOption("teen_numbers", "Teen-number structure was the issue."),
+          makeOption("not_secure", "No stable secure floor stood out.")
+        ]),
+        makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
+          makeOption("secure", "Plus, minus, make, left were secure."),
+          makeOption("make_ten", "Make / make ten language caused confusion.", "The student may need explicit language support around making and bridging ten."),
+          makeOption("difference", "Difference / how many more language caused confusion.", "The student may need explicit support with comparison language."),
+          makeOption("task_words", "The wording load itself seemed to block responses.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("ten_frames", "Use ten-frames and bridging-through-10 tasks."),
+          makeOption("fact_families", "Link related addition and subtraction facts."),
+          makeOption("teen_partition", "Partition teen numbers into ten and ones."),
+          makeOption("daily_practice", "Use a smaller daily fact set before extending.")
+        ])
+      ],
+      sec_06: [
+        makePrompt("What most likely caused the difficulty in add/sub operations?", "likely_barrier", [
+          makeOption("action_meaning", "The join/separate action in the story was not secure.", "The student may not yet connect the story action to the operation needed."),
+          makeOption("strategy", "The student chose an inefficient or unreliable strategy.", "The student may need more reliable counting or modelling strategies."),
+          makeOption("recording", "The student could show it with materials more than with symbols.", "The student may understand the action better than the written recording."),
+          makeOption("not_clear", "The exact source of difficulty is still unclear.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("join", "Joining amounts was stronger than separating."),
+          makeOption("materials", "Acting it out with materials was stronger than written work."),
+          makeOption("small_numbers", "Smaller number stories were stronger."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
+          makeOption("secure", "Add, subtract, more, left seemed secure."),
+          makeOption("more_less", "More / less / left language caused confusion.", "The student may need explicit support with comparison and removal language."),
+          makeOption("story_words", "The story wording caused more trouble than the calculation.", "The wording of the context may be masking the maths thinking."),
+          makeOption("difference", "Difference / how many more language caused confusion.", "The student may need clearer teaching of comparison problem language.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("act_it_out", "Act out join and separate stories with materials."),
+          makeOption("drawings", "Draw the story before writing the number sentence."),
+          makeOption("number_line", "Use a number line for counting on/back."),
+          makeOption("step_back", "Step back to smaller story problems first.")
+        ])
+      ],
+      sec_07a: [
+        makePrompt("What most likely caused the difficulty in multiplication/division facts?", "likely_barrier", [
+          makeOption("skip_count", "Skip counting is not secure enough yet.", "The student may not yet have a stable skip-counting base for these facts."),
+          makeOption("equal_groups", "Equal groups or sharing is not secure yet.", "The student may not yet understand multiplication/division as equal groups."),
+          makeOption("inverse", "The link between multiplication and division facts is weak.", "The inverse relationship between multiplication and division may not be secure."),
+          makeOption("attention", "Responses looked inconsistent rather than fully concept-based.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("counting_groups", "Counting groups with materials."),
+          makeOption("skip_count", "Skip counting aloud."),
+          makeOption("multiply_only", "Multiplication facts were stronger than division."),
+          makeOption("not_secure", "No reliable floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
+          makeOption("secure", "Times, groups of, shared into seemed secure."),
+          makeOption("groups_share", "Groups of / shared into caused confusion.", "The student may need explicit teaching of grouping and sharing language."),
+          makeOption("division_words", "Division wording was the main issue.", "The wording for division situations may be getting in the way of the maths."),
+          makeOption("task_words", "The overall wording load was too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("arrays", "Use arrays and equal-group materials."),
+          makeOption("skip_count", "Strengthen skip counting with rhythm and movement."),
+          makeOption("fact_families", "Teach multiplication/division fact families together."),
+          makeOption("step_back", "Step back to smaller equal-group numbers first.")
+        ])
+      ],
+      sec_08: [
+        makePrompt("What most likely caused the difficulty with fractions of sets?", "likely_barrier", [
+          makeOption("equal_parts", "Equal parts are not secure yet.", "The student may not yet understand that fractional parts must be equal."),
+          makeOption("unit_fraction", "The meaning of one-half / one-quarter is not secure.", "The student may not yet connect fraction names to the amount each part represents."),
+          makeOption("sharing", "Fair sharing with sets was the main barrier.", "The student may need stronger fair-sharing experiences before symbolic fraction tasks."),
+          makeOption("language", "The wording looked harder than the fraction idea.")
+        ]),
+        makePrompt("What looked strongest?", "secure_floor", [
+          makeOption("halves", "Halves were stronger than quarters."),
+          makeOption("shapes", "Shaded shapes were easier than sets."),
+          makeOption("materials", "Sharing objects was easier than writing the answer."),
+          makeOption("not_secure", "No secure fraction floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
+          makeOption("secure", "Half, quarter, whole, equal parts were secure."),
+          makeOption("equal_parts", "Equal parts language caused confusion.", "The student may need explicit teaching of equal parts language."),
+          makeOption("fraction_names", "Fraction names such as half / quarter caused confusion.", "The student may need explicit support with fraction vocabulary."),
+          makeOption("task_words", "The wording of the task caused more trouble than the maths.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("fair_share", "Use fair-sharing tasks with real objects."),
+          makeOption("folding", "Fold shapes into equal parts and name them."),
+          makeOption("fraction_sets", "Find halves and quarters of small sets."),
+          makeOption("step_back", "Step back to unit fractions in concrete contexts first.")
+        ])
+      ]
+    },
+    phase2: {
+      sec_01: [
+        makePrompt("What most likely caused the place-value errors?", "likely_barrier", [
+          makeOption("direction", "The student may be confusing 1/10/100 less with counting on.", "The student may be mixing up direction words such as less, before, and after."),
+          makeOption("structure", "The student does not yet see the number as hundreds, tens, and ones.", "The student may not yet see the whole number as structured hundreds, tens, and ones."),
+          makeOption("cross_zero", "Crossing through zero in a place-value column caused the issue.", "The student may not yet handle regrouping across zero in place-value changes."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What happened on partitioning and 'how many tens' type items?", "concept_detail", [
+          makeOption("digit_only", "The student recognised the tens digit but not the total number of tens.", "The student may recognise digit positions but not total groups of ten within a number."),
+          makeOption("materials_help", "The student could do it with materials or a chart but not with symbols.", "The student may understand the idea better with a place-value chart than in symbolic form."),
+          makeOption("partitioning", "Expanded form / partitioning itself was not secure.", "The student may not yet partition numbers flexibly into hundreds, tens, and ones."),
+          makeOption("not_checked", "This was not clear from the short check.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Less than, more than, before, after, tens, hundreds were secure."),
+          makeOption("direction_words", "Less than / before / after caused confusion.", "The student may need explicit teaching of comparison and direction language."),
+          makeOption("place_value_words", "Digit, number, tens, hundreds, expand caused confusion.", "The student may need explicit teaching of place-value vocabulary."),
+          makeOption("how_many_tens", "'How many tens are in...' wording caused confusion.", "The student may be mixing up the tens digit with the number of tens in the whole number.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("place_value_chart", "Use a place-value chart with MAB or bundled sticks."),
+          makeOption("before_after_oral", "Use short oral before/after prompts with materials."),
+          makeOption("cross_zero", "Practise 1 less / 10 less / 100 less across zero with materials."),
+          makeOption("step_back", "Step back to easier place-value tasks first.")
+        ])
+      ],
+      sec_02: [
+        makePrompt("What most likely caused the rounding errors?", "likely_barrier", [
+          makeOption("nearest", "The student does not yet understand what 'nearest' means.", "The student may not yet connect rounding to the nearest benchmark value."),
+          makeOption("midpoint", "The midpoint decision is the main issue.", "The student may not yet use the midpoint reliably when rounding."),
+          makeOption("place_value", "The target place value for rounding is not secure.", "The student may not yet know which place value to attend to when rounding."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("whole_tens", "Rounding to the nearest 10 was stronger."),
+          makeOption("whole_hundreds", "Rounding to the nearest 100 was stronger than decimals."),
+          makeOption("with_number_line", "A number line helped more than mental rounding."),
+          makeOption("not_secure", "No secure rounding floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Round, nearest, between, midpoint seemed secure."),
+          makeOption("nearest", "Nearest / between language caused confusion.", "The student may need explicit teaching of nearest and between language."),
+          makeOption("place_value_words", "Tens / hundreds / tenths language caused confusion.", "The student may need explicit support with place-value words in rounding tasks."),
+          makeOption("task_words", "The wording load itself seemed to block the response.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("number_line", "Use open number lines and benchmark numbers."),
+          makeOption("sort_examples", "Sort numbers that round up or down and explain why."),
+          makeOption("one_place", "Teach one rounding place at a time before mixing them."),
+          makeOption("step_back", "Step back to whole-number rounding first.")
+        ])
+      ],
+      sec_03: [
+        makePrompt("What most likely caused the add/subtract errors?", "likely_barrier", [
+          makeOption("operation_choice", "Choosing add or subtract in the question was the main issue.", "The student may not yet connect the wording of the task to the correct operation."),
+          makeOption("place_value", "Place-value alignment / regrouping caused the issue.", "The student may need stronger place-value alignment in written methods."),
+          makeOption("strategy", "The strategy chosen was inefficient or unreliable.", "The student may need a more reliable method for these calculations."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("mental", "Simple mental calculations were stronger."),
+          makeOption("written", "Written method with support was stronger."),
+          makeOption("addition", "Addition was stronger than subtraction."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Altogether, difference, more than, less than seemed secure."),
+          makeOption("comparison", "Difference / more than / less than caused confusion.", "The student may need explicit teaching of comparison language in operation questions."),
+          makeOption("story_words", "The story wording caused more trouble than the calculation.", "The context wording may be masking the operation choice."),
+          makeOption("task_words", "The general wording load seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("model_method", "Model one reliable written or mental method."),
+          makeOption("bar_models", "Use bar models or acted examples before equations."),
+          makeOption("place_value_grid", "Use place-value grids for regrouping."),
+          makeOption("step_back", "Step back to easier prerequisite calculations first.")
+        ])
+      ],
+      sec_04: [
+        makePrompt("What most likely caused the facts recall errors?", "likely_barrier", [
+          makeOption("not_recalled", "The facts are not yet retrieved quickly enough.", "The student does not yet retrieve these facts securely."),
+          makeOption("related_facts", "The student does not yet link related multiplication/division facts.", "The student may need stronger links between related facts."),
+          makeOption("grouping", "Equal-group meaning is weaker than rote recall.", "The student may not yet connect the facts to equal-group meaning."),
+          makeOption("attention", "Responses looked inconsistent rather than fully concept-based.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("multiply", "Multiplication facts were stronger than division."),
+          makeOption("skip_count", "Skip counting was stronger than instant recall."),
+          makeOption("array", "Arrays or groups helped more than symbols."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Times, groups of, divided by, share equally seemed secure."),
+          makeOption("times_groups", "Times / groups of caused confusion.", "The student may need explicit teaching of multiplication language."),
+          makeOption("division_words", "Divided by / shared equally caused confusion.", "The student may need explicit teaching of division language."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("arrays", "Use arrays and equal-group models."),
+          makeOption("fact_families", "Teach related multiplication/division facts together."),
+          makeOption("skip_count", "Strengthen skip counting first."),
+          makeOption("daily_practice", "Use a smaller daily fact set before extending.")
+        ])
+      ],
+      sec_05a: [
+        makePrompt("What most likely caused the multiplication errors?", "likely_barrier", [
+          makeOption("place_value", "Place-value structure in multi-digit multiplication was the main issue.", "The student may not yet hold place value securely within multiplication."),
+          makeOption("groups", "The student understands repeated groups only in simpler cases.", "The student may need stronger links between equal groups and written multiplication."),
+          makeOption("procedure", "The written procedure was not secure.", "The student may need a more secure written multiplication process."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("single_digit", "Single-digit multiplication was stronger."),
+          makeOption("materials", "Arrays or groups were stronger than written symbols."),
+          makeOption("partial_products", "Breaking the number apart helped."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Times, groups of, lots of, multiply by seemed secure."),
+          makeOption("groups", "Groups of / lots of caused confusion.", "The student may need explicit teaching of multiplicative language."),
+          makeOption("place_value_words", "Place-value words inside the method caused confusion.", "The student may need clearer place-value language during multiplication."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("arrays_area", "Use arrays or area models before the compact method."),
+          makeOption("partition", "Partition numbers and multiply each part."),
+          makeOption("written_steps", "Teach one written algorithm step by step."),
+          makeOption("step_back", "Step back to easier multiplication structures first.")
+        ])
+      ],
+      sec_05b: [
+        makePrompt("What most likely caused the division errors?", "likely_barrier", [
+          makeOption("equal_groups", "The equal-groups / sharing idea is not secure enough yet.", "The student may not yet understand division situations as equal groups or sharing."),
+          makeOption("remainders", "Remainders caused the main issue.", "The student may not yet understand what a remainder means."),
+          makeOption("place_value", "Place value inside the written division method caused the issue.", "The student may need stronger place-value support in written division."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("sharing", "Sharing equally was stronger than grouping."),
+          makeOption("grouping", "Grouping was stronger than the written algorithm."),
+          makeOption("no_remainder", "Questions without remainders were stronger."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Shared into, groups of, each, remainder seemed secure."),
+          makeOption("share_groups", "Shared into / groups of caused confusion.", "The student may need explicit support with division situation language."),
+          makeOption("remainder", "Remainder language caused confusion.", "The student may need explicit teaching of what a remainder means."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("materials", "Use counters or arrays to model equal groups."),
+          makeOption("remainders", "Teach remainders with concrete grouping tasks."),
+          makeOption("recording", "Link concrete grouping to the written recording."),
+          makeOption("step_back", "Step back to simpler division structures first.")
+        ])
+      ],
+      sec_06a: [
+        makePrompt("What most likely caused the decimal comparison errors?", "likely_barrier", [
+          makeOption("whole_number", "The student is treating decimals like whole numbers.", "The student may be comparing decimals as if the longest numeral is the largest."),
+          makeOption("place_value", "Tenths and hundredths place value is not secure.", "The student may not yet understand the place value of decimal digits."),
+          makeOption("number_line", "The student needs a magnitude model such as a number line.", "The student may need stronger sense of decimal size on a number line."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("tenths", "Tenths were stronger than hundredths."),
+          makeOption("same_whole", "Numbers with the same whole-number part were easier."),
+          makeOption("with_model", "A number line or place-value chart helped."),
+          makeOption("not_secure", "No secure decimal-comparison floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Tenths, hundredths, greater than, less than seemed secure."),
+          makeOption("decimal_words", "Tenths / hundredths language caused confusion.", "The student may need explicit teaching of decimal place-value words."),
+          makeOption("comparison_words", "Greater than / less than caused confusion.", "The student may need explicit teaching of comparison language with decimals."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("place_value_chart", "Use a decimal place-value chart."),
+          makeOption("number_line", "Place decimals on a number line."),
+          makeOption("compare_pairs", "Compare carefully chosen decimal pairs and explain why."),
+          makeOption("step_back", "Step back to tenths only first.")
+        ])
+      ],
+      sec_06b: [
+        makePrompt("What most likely caused the conversion errors?", "likely_barrier", [
+          makeOption("equivalence", "The student does not yet connect fractions, decimals, and percentages as equivalent forms.", "The student may not yet see fractions, decimals, and percentages as equivalent representations."),
+          makeOption("percent_100", "Percent as 'out of 100' is not secure.", "The student may not yet understand percentage as out of 100."),
+          makeOption("notation", "The notation change itself caused confusion.", "The student may understand one notation more than the others."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("fraction_decimal", "Fraction-decimal links were stronger than percentages."),
+          makeOption("benchmark", "Benchmark equivalents such as 1/2 = 0.5 = 50% were stronger."),
+          makeOption("visual", "Visual models were stronger than symbols."),
+          makeOption("not_secure", "No secure equivalence floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Equivalent, percent, decimal, fraction seemed secure."),
+          makeOption("equivalent", "Equivalent language caused confusion.", "The student may need explicit teaching of equivalent-as-same-value language."),
+          makeOption("percent", "Percent / out of 100 language caused confusion.", "The student may need explicit teaching of percentage language."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("visual_models", "Use grids, strips, or hundred squares."),
+          makeOption("benchmark", "Teach benchmark equivalents first."),
+          makeOption("match_cards", "Match cards across fraction, decimal, and percent forms."),
+          makeOption("step_back", "Step back to one representation pair first.")
+        ])
+      ],
+      sec_07: [
+        makePrompt("What most likely caused the x10 / x100 scaling errors?", "likely_barrier", [
+          makeOption("digit_shift", "The student may be using an over-simplified 'move the digits' rule.", "The student may be relying on a digits-shift rule instead of place-value reasoning."),
+          makeOption("place_value", "The student does not yet understand how each digit changes value.", "The student may not yet understand how digits change value when multiplying or dividing by powers of 10."),
+          makeOption("decimal_point", "The decimal point is being interpreted inconsistently.", "The student may need clearer understanding of how the decimal point anchors place value."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("multiply10", "Multiplying by 10 was stronger than dividing."),
+          makeOption("whole_numbers", "Whole numbers were stronger than decimals."),
+          makeOption("with_chart", "A place-value chart helped more than mental rules."),
+          makeOption("not_secure", "No secure scaling floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Times 10, divide by 10, tenths, hundredths seemed secure."),
+          makeOption("times_divide", "Times by / divide by language caused confusion.", "The student may need explicit support with multiplicative language."),
+          makeOption("decimal_words", "Tenths / hundredths language caused confusion.", "The student may need explicit teaching of decimal place-value words."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("place_value_chart", "Use a place-value chart and track digit values."),
+          makeOption("compare_pairs", "Compare original and scaled numbers side by side."),
+          makeOption("whole_then_decimal", "Teach whole numbers first, then decimals."),
+          makeOption("step_back", "Step back to one scaling factor at a time.")
+        ])
+      ],
+      sec_08: [
+        makePrompt("What most likely caused the decimal add/subtract errors?", "likely_barrier", [
+          makeOption("alignment", "Decimal alignment was the main issue.", "The student may not yet align place values correctly in decimal calculations."),
+          makeOption("place_value", "Tenths and hundredths values are not secure enough.", "The student may not yet understand the size of tenths and hundredths in calculation."),
+          makeOption("operation_choice", "The operation or strategy choice was the issue.", "The student may need a more reliable decimal calculation strategy."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("tenths", "Tenths only were stronger than hundredths."),
+          makeOption("addition", "Addition was stronger than subtraction."),
+          makeOption("grid_help", "A place-value grid helped more than lined-up digits alone."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Decimal point, tenths, hundredths, add, subtract seemed secure."),
+          makeOption("decimal_words", "Tenths / hundredths language caused confusion.", "The student may need explicit teaching of decimal place-value vocabulary."),
+          makeOption("operation_words", "Add / subtract wording caused confusion.", "The student may need clearer support with the operation language used in decimal tasks."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("grid", "Use a place-value grid for decimal calculations."),
+          makeOption("money_measure", "Use money or measurement contexts."),
+          makeOption("rename", "Rename decimals with equivalent tenths/hundredths."),
+          makeOption("step_back", "Step back to tenths only first.")
+        ])
+      ],
+      sec_09: [
+        makePrompt("What most likely caused the mixed/improper fraction errors?", "likely_barrier", [
+          makeOption("whole_part", "The whole-and-part relationship is not secure enough yet.", "The student may not yet understand how many parts make one whole."),
+          makeOption("equivalence", "Equivalent fractions needed for conversion are not secure.", "The student may not yet see the equivalence needed when converting mixed and improper fractions."),
+          makeOption("notation", "The notation change itself caused confusion.", "The student may understand one form better than the other."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("mixed", "Reading mixed numbers was stronger than converting them."),
+          makeOption("improper", "Improper fractions were easier when drawn."),
+          makeOption("visual", "Fraction models helped more than symbols."),
+          makeOption("not_secure", "No secure conversion floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Numerator, denominator, mixed number, improper fraction seemed secure."),
+          makeOption("fraction_terms", "Numerator / denominator caused confusion.", "The student may need explicit teaching of fraction-part vocabulary."),
+          makeOption("mixed_improper", "Mixed number / improper fraction caused confusion.", "The student may need explicit teaching of the names of the two forms."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("fraction_strips", "Use fraction strips or circles to build wholes."),
+          makeOption("build_wholes", "Build improper fractions into wholes and leftover parts."),
+          makeOption("record_pairs", "Record the visual model and symbolic pair together."),
+          makeOption("step_back", "Step back to unit and benchmark fractions first.")
+        ])
+      ],
+      sec_10: [
+        makePrompt("What most likely caused the fraction/percentage-of-number errors?", "likely_barrier", [
+          makeOption("of_means", "The meaning of 'of' as an operator is not secure.", "The student may not yet understand 'of' as acting on the quantity."),
+          makeOption("partition", "Partitioning the set or amount into equal parts was the issue.", "The student may not yet partition amounts reliably for fraction-of tasks."),
+          makeOption("percent", "Percentage-of-a-number is weaker than simple fraction-of.", "The student may not yet connect percentages to fraction/decimal operators."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("fractions", "Simple fractions of sets were stronger than percentages."),
+          makeOption("materials", "Using counters or diagrams was stronger than symbols."),
+          makeOption("benchmark", "Benchmark percentages such as 50% were stronger."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Of, half, quarter, percent, shared equally seemed secure."),
+          makeOption("of_word", "'Of' caused confusion.", "The student may need explicit teaching that 'of' means take that fraction or percent of the whole amount."),
+          makeOption("percent_words", "Percent / percentage language caused confusion.", "The student may need explicit teaching of percentage language."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("bar_model", "Use bar models or set models to show the fraction of the whole."),
+          makeOption("equal_parts", "Practise splitting amounts into equal parts."),
+          makeOption("benchmark_percent", "Teach benchmark percentages before harder ones."),
+          makeOption("step_back", "Step back to unit fractions of sets first.")
+        ])
+      ],
+      sec_11: [
+        makePrompt("What most likely caused the fraction comparison/simplifying errors?", "likely_barrier", [
+          makeOption("size", "The student does not yet reason about fraction size well enough.", "The student may not yet compare fractions by size with confidence."),
+          makeOption("equivalence", "Equivalent fractions are not secure enough yet.", "The student may not yet use equivalence reliably when comparing or simplifying fractions."),
+          makeOption("common_denominator", "Finding or using common denominators was the issue.", "The student may not yet use common denominators effectively."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("same_denom", "Fractions with the same denominator were stronger."),
+          makeOption("visual", "Fraction strips or drawings helped more than symbols."),
+          makeOption("simplify_only", "Simplifying familiar fractions was stronger than ordering them."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Equivalent, simplest form, greater than, denominator seemed secure."),
+          makeOption("equivalent", "Equivalent / simplest form language caused confusion.", "The student may need explicit teaching of equivalence and simplest-form language."),
+          makeOption("comparison", "Greater than / less than language caused confusion.", "The student may need explicit teaching of comparison language in fraction tasks."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("fraction_strips", "Use fraction strips or a fraction wall."),
+          makeOption("benchmark", "Compare fractions to one-half and one whole."),
+          makeOption("equivalence", "Teach equivalence before simplify/order tasks."),
+          makeOption("step_back", "Step back to same-denominator comparisons first.")
+        ])
+      ],
+      sec_12: [
+        makePrompt("What most likely caused the fraction add/subtract errors?", "likely_barrier", [
+          makeOption("denominator", "The student does not yet understand what happens to the denominator.", "The student may not yet understand why the denominator stays the same or when equivalent fractions are needed."),
+          makeOption("equivalence", "Equivalent fractions needed before calculating were not secure.", "The student may not yet use equivalent fractions reliably before adding or subtracting."),
+          makeOption("whole_parts", "The student is combining the numbers procedurally without understanding the parts.", "The student may be applying a rule without understanding the fraction parts."),
+          makeOption("not_clear", "The exact cause is still not clear enough.")
+        ]),
+        makePrompt("What looked most secure?", "secure_floor", [
+          makeOption("same_denom", "Same-denominator questions were stronger."),
+          makeOption("visual", "Visual models helped more than symbols."),
+          makeOption("addition", "Addition was stronger than subtraction."),
+          makeOption("not_secure", "No secure floor was obvious enough yet.")
+        ]),
+        makePrompt("Which language seemed to block the response?", "language_comprehension", [
+          makeOption("secure", "Numerator, denominator, equivalent, simplify seemed secure."),
+          makeOption("fraction_terms", "Numerator / denominator language caused confusion.", "The student may need explicit teaching of fraction-part vocabulary."),
+          makeOption("equivalent", "Equivalent fraction language caused confusion.", "The student may need explicit support with equivalent-fraction language."),
+          makeOption("task_words", "The wording load itself seemed too high.")
+        ]),
+        makePrompt("What is the best next teaching move?", "teaching_entry", [
+          makeOption("fraction_models", "Use fraction strips or diagrams to combine parts."),
+          makeOption("same_denom", "Rebuild same-denominator calculations first."),
+          makeOption("equivalent_first", "Teach equivalent fractions before mixed examples."),
+          makeOption("step_back", "Step back to simpler fraction-part tasks first.")
+        ])
+      ]
+    }
   };
-  return labels[value] || value;
+
+  const prompts = promptSets[phaseKey]?.[section?.section_id];
+  return prompts || generic;
 }
 
-function formatLanguageStatus(value) {
-  const labels = {
-    not_checked: "Not checked",
-    understood: "Understood",
-    unclear: "Unclear",
-    not_understood: "Not understood"
+function getProbeOptionLabel(item, choiceId) {
+  if (!choiceId || !Array.isArray(item?.response_options)) {
+    return "";
+  }
+  return item.response_options.find((option) => option.id === choiceId)?.label || "";
+}
+
+function buildTeacherProbeSummary(teacherProbe) {
+  const prefixByEvidenceCode = {
+    likely_barrier: "Likely barrier",
+    concept_detail: "Pattern seen",
+    secure_floor: "Secure floor",
+    best_representation: "Best support",
+    language_comprehension: "Language",
+    teaching_entry: "Next move"
   };
-  return labels[value] || value;
+
+  const parts = (teacherProbe?.probe_items || [])
+    .filter((item) => item.selected_label)
+    .map((item) => `${prefixByEvidenceCode[item.evidence_code] || "Probe"}: ${item.selected_label}`);
+
+  return parts.join(" ");
 }
 
 function formatTeacherProbeStatus(value) {
@@ -2347,24 +3021,13 @@ function formatTeacherProbeStatus(value) {
 }
 
 function refineMisconceptionFromProbe(fallback, teacherProbe) {
-  const items = teacherProbe?.probe_items || [];
-  const secureCount = items.filter((item) => item.response_mode === "secure").length;
-  const incorrectCount = items.filter((item) => item.response_mode === "incorrect").length;
-  const representationDifficulty = items.some(
-    (item) => item.evidence_code === "representation_check" && item.response_mode === "incorrect"
-  );
-  const languageDifficulty = items.some(
-    (item) => /language/.test(String(item.evidence_code || "")) && item.response_mode !== "secure"
-  );
+  const selectedOptions = (teacherProbe?.probe_items || [])
+    .map((item) => item.response_options?.find((option) => option.id === item.selected_option))
+    .filter(Boolean);
 
-  if (representationDifficulty) {
-    return "The student still struggled when the idea was shown with materials or diagrams, so the core concept likely needs reteaching.";
-  }
-  if (languageDifficulty) {
-    return "The student may know more than the written assessment showed, but the maths language still needs explicit teaching.";
-  }
-  if (secureCount >= 2 && incorrectCount === 0) {
-    return "The original written items may have overstated the gap; the student showed stronger understanding in the live probe.";
+  const hintedOption = selectedOptions.find((option) => option.misconception_hint);
+  if (hintedOption?.misconception_hint) {
+    return hintedOption.misconception_hint;
   }
   return fallback;
 }
@@ -2396,9 +3059,9 @@ function computeSectionConfidence(attempts, observedYearLabel) {
     return "Low";
   }
 
-  if (observedYearLabel === PRE_PHASE_LABEL) {
+  if (state.ui.current_phase === "phase2" && observedYearLabel === getPrePhaseLabel()) {
     const hasY4Boundary = attempts.some(
-      (attempt) => attempt.year_level === PHASE_MIN_YEAR && attempt.mastery_band !== "Secure"
+      (attempt) => attempt.year_level === getPhaseMinYear() && attempt.mastery_band !== "Secure"
     );
     return hasY4Boundary ? "Medium" : "Low";
   }
@@ -2528,14 +3191,6 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
                 <article class="teacher-probe-card">
                   <h3>${escapeHtml(sectionLabel(row.section))}</h3>
                   <p class="teacher-probe-prompt">${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed. See saved item-level notes in the exported session file.")}</p>
-                  ${row.run.teacher_probe.language_checks?.some((item) => item.status !== "not_checked")
-                    ? `<p><strong>Language:</strong> ${escapeHtml(
-                      row.run.teacher_probe.language_checks
-                        .filter((item) => item.status !== "not_checked")
-                        .map((item) => `${item.term} (${formatLanguageStatus(item.status)})`)
-                        .join(", ")
-                    )}</p>`
-                    : ""}
                 </article>
               `).join("")}
             </div>`
@@ -2626,8 +3281,8 @@ function buildStrandSummary(sectionSummaries) {
     let observedYear = "Insufficient Data";
     if (numericYears.length) {
       const averageYear = average(numericYears);
-      observedYear = averageYear < PHASE_MIN_YEAR
-        ? PRE_PHASE_LABEL
+      observedYear = averageYear < getPhaseMinYear()
+        ? getPrePhaseLabel()
         : `Y${Math.round(averageYear)}`;
     }
 
@@ -2657,8 +3312,8 @@ function buildOverallSummary(strandSummary) {
   }
 
   const observed_operating_year = totalWeight
-    ? ((weightedScore / totalWeight) < PHASE_MIN_YEAR
-      ? PRE_PHASE_LABEL
+    ? ((weightedScore / totalWeight) < getPhaseMinYear()
+      ? getPrePhaseLabel()
       : `Y${Math.round(weightedScore / totalWeight)}`)
     : "Insufficient Data";
 
@@ -2674,7 +3329,7 @@ function downloadSectionTeacherPdf(run) {
   const summary = run.summary;
   const decision = buildSectionDecision(summary);
   const evidence = buildSectionAllocationEvidence(summary);
-  const phase = state.bank?.assessment?.learning_phase || "Phase 2";
+  const phase = state.bank?.assessment?.learning_phase || getCurrentPhaseConfig().label;
   const nextSteps = getNextStepForSection(section, summary);
   const timestamp = formatReportTimestamp(new Date().toISOString());
 
@@ -2742,7 +3397,7 @@ function downloadSectionTeacherPdf(run) {
 }
 
 function downloadFinalTeacherPdf() {
-  const phase = state.bank?.assessment?.learning_phase || "Phase 2";
+  const phase = state.bank?.assessment?.learning_phase || getCurrentPhaseConfig().label;
   const sectionReportRows = buildSectionReportRows();
   const completedSections = sectionReportRows.filter((row) => !!row.summary).length;
   const summaryRows = sectionReportRows
@@ -2777,30 +3432,20 @@ function downloadFinalTeacherPdf() {
     .map((row) => `
       <h3>${escapeHtml(sectionLabel(row.section))} Probe</h3>
       <p>${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed with item-level notes only.")}</p>
-      ${row.run.teacher_probe.language_checks?.some((item) => item.status !== "not_checked")
-        ? `<p><strong>Language:</strong> ${escapeHtml(
-          row.run.teacher_probe.language_checks
-            .filter((item) => item.status !== "not_checked")
-            .map((item) => `${item.term} (${formatLanguageStatus(item.status)})`)
-            .join(", ")
-        )}</p>`
-        : ""}
       <table>
         <thead>
           <tr>
             <th>Prompt</th>
-            <th>Response</th>
+            <th>Teacher Choice</th>
             <th>Evidence Focus</th>
-            <th>Teacher Note</th>
           </tr>
         </thead>
         <tbody>
           ${row.run.teacher_probe.probe_items.map((item) => `
             <tr>
               <td>${escapeHtml(item.prompt)}</td>
-              <td>${escapeHtml(formatProbeResponseMode(item.response_mode))}</td>
+              <td>${escapeHtml(item.selected_label || "Not selected")}</td>
               <td>${escapeHtml(item.evidence_code)}</td>
-              <td>${escapeHtml(item.teacher_note || "")}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -2966,7 +3611,7 @@ function getNextStepForSection(section, summary) {
   }
 
   return [
-    summary.observed_year_level === PRE_PHASE_LABEL
+    state.ui.current_phase === "phase2" && summary.observed_year_level === getPrePhaseLabel()
       ? `Re-teach prerequisite skills for ${topic} prior to Year 4.`
       : `Re-teach prerequisite skills for ${topic} below ${bestFitYear}.`,
     "Use worked examples and guided practice before reassessment."
@@ -3019,7 +3664,6 @@ function buildSessionResult() {
         teacher_probe: state.session.section_runs.find((run) => run.section_id === summary.section_id)?.teacher_probe || {
           status: "not_run",
           probe_items: [],
-          language_checks: [],
           teacher_summary: ""
         },
         teacher_override: {
@@ -3280,9 +3924,36 @@ function loadSidebarPreference() {
   }
 }
 
+function loadCurrentPhasePreference() {
+  try {
+    const raw = localStorage.getItem(UI_STORAGE_KEY);
+    if (!raw) {
+      return "phase2";
+    }
+    const parsed = JSON.parse(raw);
+    return PHASE_CONFIGS[parsed.current_phase] ? parsed.current_phase : "phase2";
+  } catch (_) {
+    return "phase2";
+  }
+}
+
 function saveSidebarPreference(collapsed) {
   try {
-    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify({ sidebar_collapsed: !!collapsed }));
+    const raw = localStorage.getItem(UI_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed.sidebar_collapsed = !!collapsed;
+    parsed.current_phase = state.ui.current_phase;
+    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(parsed));
+  } catch (_) {}
+}
+
+function saveCurrentPhasePreference(phaseKey) {
+  try {
+    const raw = localStorage.getItem(UI_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed.sidebar_collapsed = !!state.ui.sidebar_collapsed;
+    parsed.current_phase = phaseKey;
+    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(parsed));
   } catch (_) {}
 }
 
@@ -3406,6 +4077,9 @@ function openHistorySession(sessionId) {
   }
 
   state.session = JSON.parse(JSON.stringify(entry.session_payload));
+  if (state.session?.phase_key && state.session.phase_key !== state.ui.current_phase) {
+    activatePhase(state.session.phase_key, { rerender: false });
+  }
   state.ui.review_section_id = findLatestSectionSummaryRun()?.section_id || null;
   saveSessionToStorage();
 
@@ -3458,8 +4132,8 @@ function saveReportNamesFromResults() {
 }
 
 function formatTeacherYearLabel(value) {
-  if (value === PRE_PHASE_LABEL) {
-    return `Below Y${PHASE_MIN_YEAR}`;
+  if (state.ui.current_phase === "phase2" && value === getPrePhaseLabel()) {
+    return `Below Y${getPhaseMinYear()}`;
   }
 
   if (typeof value === "number") {
@@ -3467,7 +4141,10 @@ function formatTeacherYearLabel(value) {
     if (!Number.isFinite(year)) {
       return "";
     }
-    return year < PHASE_MIN_YEAR ? `Y${year} question set` : `Y${year}`;
+    if (state.ui.current_phase === "phase1") {
+      return year === 0 ? "6 months" : `Y${year}`;
+    }
+    return year < getPhaseMinYear() ? `Y${year} question set` : `Y${year}`;
   }
 
   return String(value ?? "");
@@ -3634,7 +4311,7 @@ function buildSectionAllocationEvidence(summary) {
   }
 
   if (lowestAttempt) {
-    const phaseEntryYear = formatTeacherYearLabel(PHASE_MIN_YEAR);
+    const phaseEntryYear = formatTeacherYearLabel(getPhaseMinYear());
     return {
       allocationLines: [
         `${formatTeacherYearLabel(lowestAttempt.year_level)} was not met with ${lowestAttempt.correct}/${lowestAttempt.total} correct (${lowestAttempt.score_percent}%).`,
@@ -3711,7 +4388,7 @@ function buildSectionDecision(summary) {
     const lowestYearLabel = formatTeacherYearLabel(lowestAttempt.year_level);
     return {
       bestFitYear,
-      headline: `Working below Y${PHASE_MIN_YEAR} in this section.`,
+      headline: `Working below ${formatTeacherYearLabel(getPhaseMinYear())} in this section.`,
       evidence: `${lowestYearLabel} was not met (${lowestAttempt.correct}/${lowestAttempt.total}), so earlier prerequisite skills are still needed.`,
       shortReason: `${lowestYearLabel} not met (${lowestAttempt.correct}/${lowestAttempt.total}); needs earlier skills.`
     };
@@ -3780,6 +4457,9 @@ function reduceConfidence(levels) {
 }
 
 function parseYearLabel(value) {
+  if (String(value).trim().toLowerCase() === "6 months") {
+    return 0;
+  }
   const prePhaseMatch = String(value).match(/pre-y(\d+)/i);
   if (prePhaseMatch) {
     return Number(prePhaseMatch[1]) - 0.5;
@@ -3793,8 +4473,11 @@ function yearLabelForDisplay(yearLevel) {
   if (!Number.isFinite(year)) {
     return "";
   }
-  if (year < PHASE_MIN_YEAR) {
-    return PRE_PHASE_LABEL;
+  if (state.ui.current_phase === "phase1") {
+    return year === 0 ? "6 months" : `Y${year}`;
+  }
+  if (year < getPhaseMinYear()) {
+    return getPrePhaseLabel();
   }
   return `Y${year}`;
 }

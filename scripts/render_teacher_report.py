@@ -115,9 +115,8 @@ def build_probe_summary(payload: dict[str, Any]) -> str:
             f"""
             <tr>
               <td>{esc(item.get("prompt", ""))}</td>
-              <td>{esc(item.get("response_mode", ""))}</td>
+              <td>{esc(item.get("selected_label", ""))}</td>
               <td>{esc(item.get("evidence_code", ""))}</td>
-              <td>{esc(item.get("teacher_note", ""))}</td>
             </tr>
             """
             for item in items
@@ -135,12 +134,11 @@ def build_probe_summary(payload: dict[str, Any]) -> str:
                 <thead>
                   <tr>
                     <th>Prompt</th>
-                    <th>Response</th>
+                    <th>Teacher Choice</th>
                     <th>Evidence Code</th>
-                    <th>Teacher Note</th>
                   </tr>
                 </thead>
-                <tbody>{item_rows or '<tr><td colspan="4">No probe items recorded.</td></tr>'}</tbody>
+                <tbody>{item_rows or '<tr><td colspan="3">No probe items recorded.</td></tr>'}</tbody>
               </table>
             </article>
             """
