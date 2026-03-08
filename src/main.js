@@ -2485,7 +2485,7 @@ function buildDiagnosticSummary(section, summary) {
   const likelyMisconception = inferLikelyMisconception(section, summary, riskFlags);
   const lastSecureSkill = inferLastSecureSkill(section, summary);
   const recommendedRepresentation = inferRecommendedRepresentation(section, summary, riskFlags);
-  const teacher_probe_needed = summary.confidence !== "High" || riskFlags.length > 0;
+  const teacher_probe_needed = true;
 
   return {
     last_secure_skill: lastSecureSkill,
