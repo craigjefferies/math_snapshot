@@ -160,16 +160,28 @@ function renderPage(contentHtml, options = {}) {
         </div>
 
         <section class="phase-switcher" aria-label="Learning phase">
-          ${Object.values(PHASE_CONFIGS).map((config) => `
-            <button
-              type="button"
-              class="phase-switch ${config.key === phaseConfig.key ? "is-active" : ""}"
-              data-phase-switch="${config.key}"
-            >
-              <strong>${escapeHtml(config.label)}</strong>
-              <small>${escapeHtml(config.subtitle)}</small>
-            </button>
-          `).join("")}
+          <div class="phase-switcher-header">
+            <strong>Learning Phase</strong>
+            <small>${escapeHtml(phaseConfig.subtitle)}</small>
+          </div>
+          <button
+            type="button"
+            id="phaseToggleBtn"
+            class="phase-toggle ${phaseConfig.key === "phase2" ? "is-phase2" : "is-phase1"}"
+            role="switch"
+            aria-checked="${phaseConfig.key === "phase2" ? "true" : "false"}"
+            aria-label="Switch learning phase. Current phase ${escapeAttribute(phaseConfig.label)}"
+          >
+            <span class="phase-toggle-label phase-toggle-label-left">Phase 1</span>
+            <span class="phase-toggle-track" aria-hidden="true">
+              <span class="phase-toggle-thumb"></span>
+            </span>
+            <span class="phase-toggle-label phase-toggle-label-right">Phase 2</span>
+          </button>
+          <div class="phase-toggle-current" aria-live="polite">
+            <strong>${escapeHtml(phaseConfig.label)}</strong>
+            <small>${escapeHtml(phaseConfig.subtitle)}</small>
+          </div>
         </section>
 
         <nav class="sidebar-nav">
@@ -220,9 +232,12 @@ function renderPage(contentHtml, options = {}) {
 }
 
 function bindShellActions() {
-  const phaseButtons = document.querySelectorAll("[data-phase-switch]");
-  for (const button of phaseButtons) {
-    button.addEventListener("click", () => onPhaseToggle(button.dataset.phaseSwitch));
+  const phaseToggle = document.getElementById("phaseToggleBtn");
+  if (phaseToggle) {
+    phaseToggle.addEventListener("click", () => {
+      const nextPhaseKey = state.ui.current_phase === "phase1" ? "phase2" : "phase1";
+      onPhaseToggle(nextPhaseKey);
+    });
   }
 
   const sidebarToggle = document.getElementById("sidebarToggleBtn");
@@ -790,6 +805,7 @@ function onStartSession(event) {
     current_section_index: 0,
     current_attempt: null,
     current_probe_section_id: null,
+    current_probe_item_index: 0,
     generated_at: null,
     strand_summary: [],
     overall_summary: null,
@@ -1338,10 +1354,16 @@ function renderTeacherProbe(run) {
   const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
   const teacherProbe = normalizeTeacherProbePlan(section, run.summary, diagnosticSummary, run.teacher_probe);
   const probeItems = teacherProbe.probe_items || [];
+  const probeIndex = Math.min(
+    Math.max(Number(state.session.current_probe_item_index) || 0, 0),
+    Math.max(probeItems.length - 1, 0)
+  );
+  const currentItem = probeItems[probeIndex];
 
   run.diagnostic_summary = diagnosticSummary;
   run.teacher_probe = teacherProbe;
   state.session.current_probe_section_id = run.section_id;
+  state.session.current_probe_item_index = probeIndex;
   saveSessionToStorage();
 
   const content = `
@@ -1349,30 +1371,43 @@ function renderTeacherProbe(run) {
       <h1>${escapeHtml(sectionLabel(section))} — Short Teacher Probe</h1>
 
       <form id="teacherProbeForm" class="teacher-probe-form">
-        <div class="teacher-probe-list">
-          ${probeItems.map((item, index) => `
-            <article class="teacher-probe-card">
-              <h3>Probe ${index + 1}</h3>
-              <p class="teacher-probe-prompt">${escapeHtml(item.prompt)}</p>
-              <div class="teacher-probe-options">
-                ${item.response_options.map((option) => `
-                  <label class="teacher-probe-option ${item.selected_option === option.id ? "is-selected" : ""}">
-                    <input
-                      type="radio"
-                      name="probeChoice__${escapeAttribute(item.probe_id)}"
-                      value="${escapeAttribute(option.id)}"
-                      ${item.selected_option === option.id ? "checked" : ""}
-                    />
-                    <span>${escapeHtml(option.label)}</span>
-                  </label>
-                `).join("")}
-              </div>
-            </article>
-          `).join("")}
+        <div class="teacher-probe-progress">
+          <div class="teacher-probe-progress-copy">
+            <strong>Question ${probeIndex + 1} of ${probeItems.length}</strong>
+            <span>${probeItems.filter((item) => item.selected_option).length} answered</span>
+          </div>
+          <div class="teacher-probe-progress-track" aria-hidden="true">
+            ${probeItems.map((item, index) => `
+              <span class="teacher-probe-progress-dot ${index === probeIndex ? "is-current" : item.selected_option ? "is-complete" : ""}"></span>
+            `).join("")}
+          </div>
         </div>
 
+        ${currentItem ? `
+          <article class="teacher-probe-card">
+            <h3>Probe ${probeIndex + 1}</h3>
+            <p class="teacher-probe-prompt">${escapeHtml(currentItem.prompt)}</p>
+            <div class="teacher-probe-options">
+              ${currentItem.response_options.map((option) => `
+                <label class="teacher-probe-option ${currentItem.selected_option === option.id ? "is-selected" : ""}">
+                  <input
+                    type="radio"
+                    name="probeChoice"
+                    value="${escapeAttribute(option.id)}"
+                    ${currentItem.selected_option === option.id ? "checked" : ""}
+                  />
+                  <span>${escapeHtml(option.label)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </article>
+        ` : ""}
+
         <div class="actions-row">
-          <button type="submit" class="btn-primary">Save Probe & Continue</button>
+          <button type="submit" name="probeAction" value="back" ${probeIndex === 0 ? "disabled" : ""}>Back</button>
+          <button type="submit" name="probeAction" value="${probeIndex === probeItems.length - 1 ? "finish" : "next"}" class="btn-primary">
+            ${probeIndex === probeItems.length - 1 ? "Save Probe & Continue" : "Next Question"}
+          </button>
           <button type="button" id="skipTeacherProbeBtn">Skip Probe</button>
         </div>
       </form>
@@ -1397,19 +1432,41 @@ function onTeacherProbeSubmit(event) {
   }
 
   const formData = new FormData(event.currentTarget);
-  run.teacher_probe.probe_items = run.teacher_probe.probe_items.map((item) => ({
-    ...item,
-    selected_option: String(formData.get(`probeChoice__${item.probe_id}`) || ""),
-    selected_label: getProbeOptionLabel(item, String(formData.get(`probeChoice__${item.probe_id}`) || ""))
-  }));
+  const action = event.submitter?.value || "next";
+  const probeIndex = Math.min(
+    Math.max(Number(state.session.current_probe_item_index) || 0, 0),
+    Math.max(run.teacher_probe.probe_items.length - 1, 0)
+  );
+  const selectedOption = String(formData.get("probeChoice") || "");
+  const currentItem = run.teacher_probe.probe_items[probeIndex];
+
+  if (currentItem) {
+    currentItem.selected_option = selectedOption;
+    currentItem.selected_label = getProbeOptionLabel(currentItem, selectedOption);
+  }
+
+  if (action === "back") {
+    state.session.current_probe_item_index = Math.max(probeIndex - 1, 0);
+    saveSessionToStorage();
+    renderTeacherProbe(run);
+    return;
+  }
+
+  if (action === "next" && probeIndex < run.teacher_probe.probe_items.length - 1) {
+    state.session.current_probe_item_index = probeIndex + 1;
+    saveSessionToStorage();
+    renderTeacherProbe(run);
+    return;
+  }
+
   run.teacher_probe.teacher_summary = buildTeacherProbeSummary(run.teacher_probe);
   run.teacher_probe.status = "completed";
   if (run.diagnostic_summary) {
     run.diagnostic_summary.teacher_probe_status = "completed";
     run.diagnostic_summary.likely_misconception = refineMisconceptionFromProbe(run.diagnostic_summary.likely_misconception, run.teacher_probe);
   }
-
   state.session.current_probe_section_id = null;
+  state.session.current_probe_item_index = 0;
   saveSessionToStorage();
   startTeacherProbeFlowOrFinalize();
 }
@@ -1420,6 +1477,7 @@ function onTeacherProbeSkip() {
     run.teacher_probe.status = "recommended";
   }
   state.session.current_probe_section_id = null;
+  state.session.current_probe_item_index = 0;
   saveSessionToStorage();
   startTeacherProbeFlowOrFinalize();
 }
@@ -1580,7 +1638,85 @@ function matchesOption(item, response, expectedValue, kind = "literal") {
     return true;
   }
 
+  if (countSequenceMatch(item, response, expectedValue)) {
+    return true;
+  }
+
   return literalMatch(response, expectedValue);
+}
+
+function countSequenceMatch(item, response, expectedValue) {
+  if (item?.answer_type !== "short_text") {
+    return false;
+  }
+
+  const prompt = String(item?.prompt ?? "");
+  if (!/^count\s+(forwards|backwards)\s+from\b/i.test(prompt)) {
+    return false;
+  }
+
+  const expectedSequence = parseIntegerSequence(expectedValue);
+  const responseSequence = parseIntegerSequence(response);
+  if (!expectedSequence || !responseSequence) {
+    return false;
+  }
+
+  if (integerSequencesEqual(responseSequence, expectedSequence)) {
+    return true;
+  }
+
+  const startMatch = prompt.match(/count\s+(?:forwards|backwards)\s+from\s+(-?\d+)/i);
+  if (!startMatch) {
+    return false;
+  }
+
+  const startValue = Number(startMatch[1]);
+  if (!Number.isInteger(startValue)) {
+    return false;
+  }
+
+  if (integerSequencesEqual(responseSequence, [startValue, ...expectedSequence])) {
+    return true;
+  }
+
+  const compactResponse = compactDigitSequence(response);
+  if (!compactResponse) {
+    return false;
+  }
+
+  return compactResponse === joinIntegerSequence(expectedSequence)
+    || compactResponse === joinIntegerSequence([startValue, ...expectedSequence]);
+}
+
+function parseIntegerSequence(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
+    return null;
+  }
+
+  const matches = raw.match(/-?\d+/g);
+  if (!matches?.length) {
+    return null;
+  }
+
+  const sequence = matches.map((part) => Number(part));
+  return sequence.every((part) => Number.isInteger(part)) ? sequence : null;
+}
+
+function integerSequencesEqual(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+    return false;
+  }
+  return left.every((value, index) => value === right[index]);
+}
+
+function joinIntegerSequence(values) {
+  return values.map((value) => String(value)).join("");
+}
+
+function compactDigitSequence(value) {
+  const compact = String(value ?? "").replace(/[^\d-]+/g, "");
+  return compact.trim();
 }
 
 function numericMatch(a, b, tolerance) {
@@ -1834,6 +1970,8 @@ function detectFractionFormat(value) {
   const text = expandUnicodeFractions(String(value ?? ""))
     .trim()
     .replace(/,/g, "")
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\s+and\s+/g, " ")
     .replace(/\s+/g, " ");
 
   if (!text) {
@@ -1978,7 +2116,8 @@ function parseNumeric(value) {
     return null;
   }
 
-  const sanitized = value
+  const raw = value.trim();
+  const sanitized = raw
     .trim()
     .replace(/,/g, "")
     .replace(/%/g, "")
@@ -1989,7 +2128,16 @@ function parseNumeric(value) {
   }
 
   const parsed = Number(sanitized);
-  return Number.isFinite(parsed) ? parsed : null;
+  if (Number.isFinite(parsed)) {
+    return parsed;
+  }
+
+  const extracted = extractSingleNumericToken(raw);
+  if (extracted !== null) {
+    return extracted;
+  }
+
+  return parseSpokenNumber(raw);
 }
 
 function parseFractionLike(value) {
@@ -2036,6 +2184,8 @@ function parseFractionLike(value) {
   const expanded = expandUnicodeFractions(value)
     .trim()
     .replace(/,/g, "")
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\s+and\s+/g, " ")
     .replace(/\s+/g, " ");
 
   if (!expanded) {
@@ -2064,8 +2214,138 @@ function parseFractionLike(value) {
     return numerator / denominator;
   }
 
+  const spokenFraction = parseSpokenFraction(expanded);
+  if (spokenFraction !== null) {
+    return spokenFraction;
+  }
+
   const numeric = Number(expanded.replace(/\s+/g, ""));
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function extractSingleNumericToken(value) {
+  const matches = String(value ?? "")
+    .replace(/,/g, "")
+    .match(/-?\d+(?:\.\d+)?/g);
+
+  if (!matches?.length || matches.length > 1) {
+    return null;
+  }
+
+  const parsed = Number(matches[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseSpokenNumber(value) {
+  const normalized = String(value ?? "")
+    .toLowerCase()
+    .replace(/-/g, " ")
+    .replace(/\band\b/g, " ")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  const direct = {
+    zero: 0,
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    eleven: 11,
+    twelve: 12,
+    thirteen: 13,
+    fourteen: 14,
+    fifteen: 15,
+    sixteen: 16,
+    seventeen: 17,
+    eighteen: 18,
+    nineteen: 19
+  };
+  const tens = {
+    twenty: 20,
+    thirty: 30,
+    forty: 40,
+    fifty: 50,
+    sixty: 60,
+    seventy: 70,
+    eighty: 80,
+    ninety: 90
+  };
+
+  const tokens = normalized.split(" ");
+  let total = 0;
+  let current = 0;
+
+  for (const token of tokens) {
+    if (direct[token] !== undefined) {
+      current += direct[token];
+      continue;
+    }
+    if (tens[token] !== undefined) {
+      current += tens[token];
+      continue;
+    }
+    if (token === "hundred") {
+      current = current === 0 ? 100 : current * 100;
+      continue;
+    }
+    if (token === "thousand") {
+      current = current === 0 ? 1000 : current * 1000;
+      total += current;
+      current = 0;
+      continue;
+    }
+    return null;
+  }
+
+  return total + current;
+}
+
+function parseSpokenFraction(value) {
+  const normalized = String(value ?? "")
+    .toLowerCase()
+    .replace(/-/g, " ")
+    .replace(/[^\w\s/]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  const aliases = {
+    half: "1/2",
+    "one half": "1/2",
+    quarter: "1/4",
+    "one quarter": "1/4",
+    "one fourth": "1/4",
+    third: "1/3",
+    "one third": "1/3",
+    fifth: "1/5",
+    "one fifth": "1/5",
+    sixth: "1/6",
+    "one sixth": "1/6",
+    eighth: "1/8",
+    "one eighth": "1/8"
+  };
+
+  const alias = aliases[normalized];
+  if (!alias) {
+    return null;
+  }
+
+  const [numerator, denominator] = alias.split("/").map(Number);
+  return denominator ? numerator / denominator : null;
 }
 
 function expandUnicodeFractions(input) {
@@ -2982,8 +3262,8 @@ function getTeacherProbePrompts(section, summary) {
     }
   };
 
-  const prompts = promptSets[phaseKey]?.[section?.section_id];
-  return prompts || generic;
+  const prompts = promptSets[phaseKey]?.[section?.section_id] || generic;
+  return injectSectionLanguageOptions(section, prompts);
 }
 
 function getProbeOptionLabel(item, choiceId) {
@@ -2991,6 +3271,105 @@ function getProbeOptionLabel(item, choiceId) {
     return "";
   }
   return item.response_options.find((option) => option.id === choiceId)?.label || "";
+}
+
+function injectSectionLanguageOptions(section, prompts) {
+  const terms = getSectionLanguageTerms(section);
+  if (!terms.length) {
+    return prompts;
+  }
+
+  const secureTerms = terms.slice(0, 5).join(", ");
+  const focusedTerms = terms.slice(0, 3).join(", ");
+  const secondaryTerms = terms.slice(3, 6).join(", ") || focusedTerms;
+
+  return prompts.map((prompt) => {
+    if (prompt.evidence_code !== "language_comprehension") {
+      return prompt;
+    }
+
+    return {
+      ...prompt,
+      response_options: [
+        {
+          id: "secure",
+          label: `The key section words seemed secure: ${secureTerms}.`
+        },
+        {
+          id: "specific_terms",
+          label: `Words such as ${focusedTerms} caused confusion.`,
+          misconception_hint: `The student may need explicit teaching of section language such as ${focusedTerms}.`
+        },
+        {
+          id: "rewording_helped",
+          label: `The student understood better once words such as ${secondaryTerms} were reworded.`,
+          misconception_hint: `The student may understand more than they can show until the section language is unpacked and reworded.`
+        },
+        {
+          id: "task_words",
+          label: "The full wording of the question still seemed to block the response.",
+          misconception_hint: "The wording load may be getting in the way of the maths thinking."
+        }
+      ]
+    };
+  });
+}
+
+function getSectionLanguageTerms(section) {
+  if (!section?.section_id) {
+    return [];
+  }
+
+  const promptText = state.bank.items
+    .filter((item) => item.section_id === section.section_id)
+    .map((item) => `${item.prompt} ${section.topic} ${section.title}`)
+    .join(" ")
+    .toLowerCase();
+
+  const candidateTerms = [
+    "less than",
+    "more than",
+    "before",
+    "after",
+    "expand",
+    "digit",
+    "number",
+    "tens",
+    "hundreds",
+    "thousands",
+    "round",
+    "nearest",
+    "whole number",
+    "tenth",
+    "hundredth",
+    "decimal",
+    "larger",
+    "greater than",
+    "equal",
+    "add",
+    "subtract",
+    "difference",
+    "altogether",
+    "times",
+    "multiply",
+    "groups of",
+    "divide",
+    "divided by",
+    "shared equally",
+    "remainder",
+    "fraction",
+    "mixed number",
+    "improper fraction",
+    "numerator",
+    "denominator",
+    "equivalent",
+    "simplify",
+    "percentage",
+    "percent",
+    "of"
+  ];
+
+  return candidateTerms.filter((term) => promptText.includes(term)).slice(0, 6);
 }
 
 function buildTeacherProbeSummary(teacherProbe) {
@@ -3036,12 +3415,14 @@ function startTeacherProbeFlowOrFinalize() {
   const nextRun = findNextProbeRun();
   if (!nextRun) {
     state.session.current_probe_section_id = null;
+    state.session.current_probe_item_index = 0;
     state.notice = "";
     finalizeSession();
     return;
   }
 
   state.session.current_probe_section_id = nextRun.section_id;
+  state.session.current_probe_item_index = 0;
   saveSessionToStorage();
   renderTeacherProbe(nextRun);
 }
