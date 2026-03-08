@@ -603,6 +603,143 @@ fieldset {
   font-size: 0.78rem;
 }
 
+.section-card {
+  position: relative;
+  gap: 0.9rem;
+  align-items: stretch;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.95rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 8px 20px rgb(15 23 42 / 0.04);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.section-card:hover {
+  transform: translateY(-1px);
+  border-color: #93c5fd;
+  box-shadow: 0 12px 24px rgb(37 99 235 / 0.08);
+}
+
+.section-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.section-card-check {
+  display: inline-flex;
+  align-self: stretch;
+  width: 22px;
+  min-width: 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, #f1f5f9);
+  border: 1.5px solid #cbd5e1;
+  box-shadow: inset 0 1px 2px rgb(255 255 255 / 0.9);
+}
+
+.section-card-check::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin: auto;
+  border-radius: 999px;
+  background: transparent;
+  transform: scale(0.4);
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease;
+}
+
+.section-card-body {
+  display: grid;
+  min-width: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.section-card-top,
+.section-card-bottom {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 0.95rem;
+}
+
+.section-card-top {
+  background:
+    radial-gradient(circle at top right, rgb(191 219 254 / 0.5), transparent 42%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section-card-strand {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.24rem 0.55rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: var(--accent-strong);
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-card-top strong {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.section-card-bottom {
+  min-height: 78px;
+  align-content: start;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.section-card-topic {
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.section-card:has(input:checked) {
+  background:
+    linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #60a5fa;
+  box-shadow: 0 14px 28px rgb(37 99 235 / 0.12);
+}
+
+.section-card:has(input:checked) .section-card-check {
+  border-color: #2563eb;
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+}
+
+.section-card:has(input:checked) .section-card-check::after {
+  background: #fff;
+  transform: scale(1);
+}
+
+.section-card:has(input:checked) .section-card-body {
+  border-color: #bfdbfe;
+}
+
+.section-card:has(input:checked) .section-card-top {
+  background:
+    radial-gradient(circle at top right, rgb(147 197 253 / 0.5), transparent 44%),
+    linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+}
+
 .session-names-grid {
   display: grid;
   gap: 0.875rem;
@@ -826,10 +963,19 @@ fieldset {
   border-radius: 18px;
 }
 
+.mode-student .item-card {
+  min-height: 320px;
+  padding: 2rem;
+}
+
 .item-card h3 {
   color: #334155;
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
+}
+
+.mode-student .item-card h3 {
+  font-size: 1.15rem;
 }
 
 .item-card .item-prompt {
@@ -838,6 +984,12 @@ fieldset {
   font-size: clamp(1.5rem, 1.25rem + 0.9vw, 1.9rem);
   font-weight: 700;
   line-height: 1.35;
+}
+
+.mode-student .item-card .item-prompt {
+  margin-bottom: 1.4rem;
+  font-size: clamp(1.9rem, 1.55rem + 1.3vw, 2.5rem);
+  line-height: 1.28;
 }
 
 .inline-fraction {
@@ -871,9 +1023,27 @@ fieldset {
   font-size: 1.1rem;
 }
 
+.answer-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.mode-student .answer-input {
+  min-height: 60px;
+  font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.45rem);
+  padding: 0.9rem 1rem;
+}
+
 .field-group {
   display: grid;
   gap: 0.75rem;
+}
+
+.field-group-label {
+  display: grid;
+  gap: 0.45rem;
+  color: #334155;
+  font-weight: 700;
 }
 
 .expanded-boxes {
@@ -881,6 +1051,8 @@ fieldset {
   align-items: center;
   gap: 0.5rem;
   grid-template-columns: var(--expanded-columns, minmax(72px, 1fr) auto minmax(72px, 1fr) auto minmax(72px, 1fr));
+  width: 100%;
+  max-width: 100%;
 }
 
 .expanded-sep {
@@ -893,19 +1065,18 @@ fieldset {
   display: inline-grid;
   align-items: center;
   gap: 0.625rem;
-  width: min(320px, 100%);
+  width: min(480px, 100%);
 }
 
 .fraction-entry-mixed {
-  grid-template-columns: minmax(72px, 92px) auto minmax(84px, 120px);
+  grid-template-columns: minmax(96px, 132px) auto minmax(120px, 170px);
 }
 
 .fraction-entry-simple {
-  grid-template-columns: minmax(84px, 120px);
+  grid-template-columns: minmax(140px, 190px);
 }
 
 .fraction-whole {
-  min-height: 52px;
   text-align: center;
 }
 
@@ -919,6 +1090,7 @@ fieldset {
   justify-items: center;
   grid-template-rows: auto 2px auto;
   width: 100%;
+  min-width: 0;
 }
 
 .fraction-slot {
@@ -946,11 +1118,22 @@ fieldset {
   line-height: 1.35;
 }
 
+.mode-student .input-hint {
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
 .actions-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1rem;
+}
+
+.mode-student .actions-row button {
+  min-height: 58px;
+  font-size: 1.08rem;
+  padding: 0.9rem 1.2rem;
 }
 
 .actions-row-compact {
@@ -1185,6 +1368,42 @@ fieldset {
   margin: 0.75rem 0 1rem;
 }
 
+.section-report-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.section-report-card {
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.section-report-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.section-report-head h3 {
+  margin-bottom: 0.25rem;
+}
+
+.section-report-subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.section-report-card h4 {
+  margin: 1rem 0 0.625rem;
+  font-size: 0.92rem;
+}
+
 .section-summary-card h3 {
   margin-bottom: 0.25rem;
 }
@@ -1221,6 +1440,20 @@ fieldset {
 .teacher-note-card p {
   margin: 0;
   white-space: pre-wrap;
+}
+
+.teacher-notes-field {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.teacher-notes-field textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-weight: 400;
 }
 
 .table-wrap {
@@ -1371,6 +1604,14 @@ hr.section-divider {
 
   .fraction-whole-sep {
     display: none;
+  }
+
+  .mode-student .item-card {
+    padding: 1.35rem;
+  }
+
+  .mode-student .item-card .item-prompt {
+    font-size: clamp(1.6rem, 1.35rem + 1.6vw, 2rem);
   }
 
   .result-hero {

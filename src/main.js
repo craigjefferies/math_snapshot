@@ -196,7 +196,6 @@ function buildShellNavItems() {
   return [
     { key: "setup", label: "Setup", description: "Session options", enabled: true, icon: "setup" },
     { key: "assessment", label: "Assessment", description: "One question at a time", enabled: !!state.session?.current_attempt, icon: "assessment" },
-    { key: "section", label: "Section Summary", description: "Review one section", enabled: !!findReviewSectionRun(), icon: "section" },
     { key: "results", label: "Teacher Report", description: "Session outcomes and PDF", enabled: !!state.session?.generated_at, icon: "results" }
   ];
 }
@@ -363,9 +362,12 @@ function renderSetup() {
                         <td>${escapeHtml(entry.overall_year || "Insufficient Data")} (${escapeHtml(entry.confidence || "Low")})</td>
                         <td>${escapeHtml(String(entry.sections_completed || 0))}/${escapeHtml(String(entry.section_count || 0))}</td>
                         <td>
+                          ${entry.session_payload
+                            ? `<button type="button" data-history-open="${escapeAttribute(entry.session_id)}">Open report</button>`
+                            : `<span class="subtle">Legacy entry</span>`}
                           ${(!entry.student_name || !entry.teacher_name)
                             ? `<button type="button" data-history-save="${escapeAttribute(entry.session_id)}">Save</button>`
-                            : "—"}
+                            : ""}
                         </td>
                       </tr>
                     `)
@@ -430,11 +432,17 @@ function renderSetup() {
           <div class="section-grid">
             ${sections
               .map((section) => `
-                <label class="checkbox-row">
+                <label class="checkbox-row section-card">
                   <input type="checkbox" name="sectionId" value="${section.section_id}" />
-                  <span>
-                    <strong>${escapeHtml(sectionLabel(section))}</strong>
-                    <small>${escapeHtml(section.strand)}</small>
+                  <span class="section-card-check" aria-hidden="true"></span>
+                  <span class="section-card-body">
+                    <span class="section-card-top">
+                      <small class="section-card-strand">${escapeHtml(section.strand)}</small>
+                      <strong>${escapeHtml(sectionLabel(section))}</strong>
+                    </span>
+                    <span class="section-card-bottom">
+                      <span class="section-card-topic">${escapeHtml(section.topic || "Run this section to collect evidence in this area.")}</span>
+                    </span>
                   </span>
                 </label>
               `)
@@ -477,7 +485,12 @@ function renderSetup() {
       } else {
         const run = state.session.section_runs[state.session.current_section_index];
         if (run && run.summary) {
-          renderSectionSummary(run);
+          const hasNextSection = state.session.current_section_index < state.session.section_runs.length - 1;
+          if (hasNextSection) {
+            moveToNextSection();
+          } else {
+            finalizeSession();
+          }
         } else {
           beginCurrentSection();
         }
@@ -502,6 +515,11 @@ function renderSetup() {
   for (const button of document.querySelectorAll("[data-history-save]")) {
     button.addEventListener("click", () => {
       saveHistoryNames(button.dataset.historySave);
+    });
+  }
+  for (const button of document.querySelectorAll("[data-history-open]")) {
+    button.addEventListener("click", () => {
+      openHistorySession(button.dataset.historyOpen);
     });
   }
   const discardBtn = document.getElementById("discardSessionBtn");
@@ -762,6 +780,7 @@ function renderAssessment() {
 
 function renderItemInput(item, savedResponse) {
   const hint = getInputHint(item);
+  const defaultInputMode = getDefaultInputMode(item);
 
   if (isExpandedFormItem(item)) {
     const boxCount = expandedFormBoxCount(item);
@@ -770,7 +789,7 @@ function renderItemInput(item, savedResponse) {
     for (let index = 1; index <= boxCount; index += 1) {
       const fieldKey = `exp${index}`;
       parts.push(
-        `<input name="${item.item_id}__${fieldKey}" value="${escapeAttribute(savedResponse?.[fieldKey] ?? "")}" autocomplete="off" aria-label="Expanded part ${index} of ${boxCount}" />`
+        `<input class="answer-input answer-input-expanded" name="${item.item_id}__${fieldKey}" value="${escapeAttribute(savedResponse?.[fieldKey] ?? "")}" autocomplete="off" inputmode="numeric" aria-label="Expanded part ${index} of ${boxCount}" />`
       );
       if (index < boxCount) {
         parts.push(`<span class="expanded-sep">+</span>`);
@@ -792,29 +811,32 @@ function renderItemInput(item, savedResponse) {
       <div class="fraction-entry ${showWholeField ? "fraction-entry-mixed" : "fraction-entry-simple"}" aria-label="Fraction input">
         ${showWholeField ? `
         <input
-          class="fraction-whole"
+          class="answer-input fraction-whole"
           name="${item.item_id}__whole"
           value="${escapeAttribute(fractionResponse.whole)}"
           inputmode="numeric"
+          placeholder="whole"
           autocomplete="off"
           aria-label="Whole number"
         />
         <span class="fraction-whole-sep" aria-hidden="true"></span>` : ""}
         <div class="fraction-stack">
         <input
-          class="fraction-slot fraction-num"
+          class="answer-input fraction-slot fraction-num"
           name="${item.item_id}__num"
           value="${escapeAttribute(fractionResponse.numerator)}"
           inputmode="numeric"
+          placeholder="top"
           autocomplete="off"
           aria-label="Numerator"
         />
         <span class="fraction-line" aria-hidden="true"></span>
         <input
-          class="fraction-slot fraction-den"
+          class="answer-input fraction-slot fraction-den"
           name="${item.item_id}__den"
           value="${escapeAttribute(fractionResponse.denominator)}"
           inputmode="numeric"
+          placeholder="bottom"
           autocomplete="off"
           aria-label="Denominator"
         />
@@ -831,11 +853,13 @@ function renderItemInput(item, savedResponse) {
         ${fields
           .map(
             (field) => `
-              <label>
+              <label class="field-group-label">
                 ${escapeHtml(field.label)}
                 <input
+                  class="answer-input"
                   name="${item.item_id}__${field.field_id}"
                   value="${escapeAttribute(savedResponse?.[field.field_id] ?? "")}"
+                  inputmode="${escapeAttribute(getInputModeForAnswerType(field.answer_type))}"
                   autocomplete="off"
                 />
               </label>
@@ -848,9 +872,26 @@ function renderItemInput(item, savedResponse) {
   }
 
   return `
-    <input name="${item.item_id}" value="${escapeAttribute(savedResponse ?? "")}" autocomplete="off" />
+    <input class="answer-input" name="${item.item_id}" value="${escapeAttribute(savedResponse ?? "")}" inputmode="${escapeAttribute(defaultInputMode)}" autocomplete="off" />
     ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
   `;
+}
+
+function getDefaultInputMode(item) {
+  if (item?.answer_type === "multi_field") {
+    return "text";
+  }
+  return getInputModeForAnswerType(item?.answer_type);
+}
+
+function getInputModeForAnswerType(answerType) {
+  if (answerType === "integer") {
+    return "numeric";
+  }
+  if (answerType === "decimal" || answerType === "fraction") {
+    return "decimal";
+  }
+  return "text";
 }
 
 function getInputHint(item) {
@@ -997,11 +1038,19 @@ function finishCurrentAttempt() {
   }
 
   run.summary = summarizeSection(section, run.attempts, run.target_year_variant);
-  state.notice = "";
   state.session.current_attempt = null;
   setReviewSection(run.section_id);
   saveSessionToStorage();
-  renderSectionSummary(run);
+
+  const hasNextSection = state.session.current_section_index < state.session.section_runs.length - 1;
+  if (hasNextSection) {
+    state.notice = `${sectionLabel(section)} completed. Moving to the next section.`;
+    moveToNextSection();
+    return;
+  }
+
+  state.notice = "";
+  finalizeSession();
 }
 
 function moveToNextSection() {
@@ -1513,6 +1562,10 @@ function detectFractionFormat(value) {
     const whole = String(value.whole ?? "").trim();
     const numerator = String(value.numerator ?? "").trim();
     const denominator = String(value.denominator ?? "").trim();
+    const populatedValues = [whole, numerator, denominator].filter(Boolean);
+    if (populatedValues.length === 1) {
+      return detectFractionFormat(populatedValues[0]);
+    }
     if (whole && numerator && denominator) {
       return "mixed";
     }
@@ -1691,9 +1744,14 @@ function parseFractionLike(value) {
     const wholeRaw = String(value.whole ?? "").trim();
     const numeratorRaw = String(value.numerator ?? "").trim();
     const denominatorRaw = String(value.denominator ?? "").trim();
+    const populatedValues = [wholeRaw, numeratorRaw, denominatorRaw].filter(Boolean);
 
     if (!wholeRaw && !numeratorRaw && !denominatorRaw) {
       return null;
+    }
+
+    if (populatedValues.length === 1) {
+      return parseFractionLike(populatedValues[0]);
     }
 
     if (wholeRaw && !numeratorRaw && !denominatorRaw) {
@@ -1928,7 +1986,73 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   const sessionAnalytics = buildAnalyticsSummaryFromRuns(state.session.section_runs);
   const prioritySteps = buildFinalNextSteps(sectionSummaries);
   const totalCorrect = `${sessionAnalytics.correct_answers} / ${sessionAnalytics.questions_answered} answered correctly`;
-  const teacherNotes = state.session.section_runs.filter((run) => String(run.teacher_notes || "").trim());
+  const sectionDetailBlocks = sectionReportRows
+    .filter((row) => !!row.summary)
+    .map((row) => {
+      const decision = buildSectionDecision(row.summary);
+      const summary = row.summary;
+      const { attempts } = getSummaryAttemptContext(summary);
+
+      return `
+        <article class="section-report-card">
+          <div class="section-report-head">
+            <div>
+              <h3>${escapeHtml(sectionLabel(row.section))}</h3>
+              <p class="section-report-subtitle">${escapeHtml(decision.headline)}</p>
+            </div>
+            <div class="section-summary-actions">
+              <button type="button" data-print-section="${escapeAttribute(row.section.section_id)}">Print Section PDF</button>
+            </div>
+          </div>
+
+          <div class="result-hero">
+            <div class="result-hero-cell result-hero-primary">
+              <span class="result-hero-label">Best-Fit Year Level</span>
+              <span class="result-hero-value">${escapeHtml(decision.bestFitYear)}</span>
+            </div>
+            <div class="result-hero-cell">
+              <span class="result-hero-label">Score</span>
+              <span class="result-hero-value">${summary.correct_answers} / ${summary.total_questions}</span>
+            </div>
+            <div class="result-hero-cell">
+              <span class="result-hero-label">Confidence</span>
+              <span class="result-hero-value">${escapeHtml(summary.confidence)}</span>
+            </div>
+          </div>
+
+          <div class="summary-banner">
+            <strong>Why this year level:</strong> ${escapeHtml(decision.evidence)}
+          </div>
+
+          <h4>Assessment Path</h4>
+          <div class="attempt-path">
+            ${attempts.map((attempt) => {
+              const isObservedAttempt = yearLabelForDisplay(attempt.year_level) === summary.observed_year_level
+                && attempt.mastery_band === summary.mastery_band;
+              return `
+                <article class="attempt-card ${isObservedAttempt ? "attempt-card-observed" : ""}">
+                  <div class="attempt-card-head">
+                    <strong>${escapeHtml(formatTeacherYearLabel(attempt.year_level))}</strong>
+                    ${isObservedAttempt ? `<span class="attempt-card-flag">Observed level</span>` : ""}
+                  </div>
+                  <p class="attempt-card-metrics">${attempt.correct}/${attempt.total} correct${attempt.skipped ? ` · ${attempt.skipped} skipped` : ""}</p>
+                  <div class="attempt-card-outcome">
+                    <strong>${escapeHtml(describeAttemptBand(attempt.mastery_band))}</strong>
+                    <span class="attempt-card-copy">${escapeHtml(describeAttemptProgress(attempt.mastery_band))}</span>
+                  </div>
+                </article>
+              `;
+            }).join("")}
+          </div>
+
+          <label class="teacher-notes-field">
+            Teacher notes
+            <textarea data-section-notes="${escapeAttribute(row.section.section_id)}" rows="4" placeholder="Optional notes for this section.">${escapeHtml(getTeacherNotesForSection(row.section.section_id))}</textarea>
+          </label>
+        </article>
+      `;
+    })
+    .join("");
 
   const content = `
     <section class="panel">
@@ -1967,7 +2091,6 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
                 <p><strong>${escapeHtml(decision.bestFitYear)}</strong> · ${row.summary.correct_answers}/${row.summary.total_questions}</p>
                 <p>${escapeHtml(decision.shortReason)}</p>
                 <div class="section-summary-actions">
-                  <button type="button" data-review-section="${escapeAttribute(row.section.section_id)}">Review</button>
                   <button type="button" data-print-section="${escapeAttribute(row.section.section_id)}">Print PDF</button>
                 </div>
               </article>`;
@@ -2014,6 +2137,13 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
           </tbody>
         </table>
       </div>
+
+      ${sectionDetailBlocks
+        ? `<h2>Section Detail</h2>
+            <div class="section-report-list">
+              ${sectionDetailBlocks}
+            </div>`
+        : ""}
 
       <h2>Strand Summary</h2>
       <div class="table-wrap">
@@ -2062,18 +2192,6 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
         <button id="saveReportNamesBtn" type="button">Update Report Names</button>
       </div>
 
-      ${teacherNotes.length
-        ? `<h2>Teacher Notes</h2>
-            <div class="teacher-notes-list">
-              ${teacherNotes
-                .map((run) => `<article class="teacher-note-card">
-                    <h3>${escapeHtml(sectionLabel(state.sectionsById.get(run.section_id)))}</h3>
-                    <p>${escapeHtml(run.teacher_notes)}</p>
-                  </article>`)
-                .join("")}
-            </div>`
-        : ""}
-
       <div class="actions-row">
         <button id="downloadTeacherPdfBtn" class="btn-primary">Print / Save PDF</button>
         <button id="exportCsvBtn">Export CSV</button>
@@ -2083,19 +2201,21 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   `;
   renderPage(content, { homeEnabled: true, activeStep: "results", headerContextHtml: buildSessionHeaderContext() });
 
-  for (const button of document.querySelectorAll("[data-review-section]")) {
-    button.addEventListener("click", () => {
-      const run = state.session.section_runs.find((entry) => entry.section_id === button.dataset.reviewSection);
-      if (run?.summary) {
-        renderSectionSummary(run);
-      }
-    });
-  }
   for (const button of document.querySelectorAll("[data-print-section]")) {
     button.addEventListener("click", () => {
       const run = state.session.section_runs.find((entry) => entry.section_id === button.dataset.printSection);
       if (run?.summary) {
         downloadSectionTeacherPdf(run);
+      }
+    });
+  }
+  for (const textarea of document.querySelectorAll("[data-section-notes]")) {
+    textarea.addEventListener("change", () => {
+      const run = state.session.section_runs.find((entry) => entry.section_id === textarea.dataset.sectionNotes);
+      if (run) {
+        run.teacher_notes = textarea.value.trim();
+        saveSessionToStorage();
+        saveCompletedSessionToHistory();
       }
     });
   }
@@ -2820,7 +2940,8 @@ function buildStoredSessionSummary() {
     overall_year: state.session.overall_summary?.observed_operating_year || "Insufficient Data",
     confidence: state.session.overall_summary?.confidence || "Low",
     sections_completed: sectionSummaries.length,
-    section_count: state.session.section_runs.length
+    section_count: state.session.section_runs.length,
+    session_payload: JSON.parse(JSON.stringify(state.session))
   };
 }
 
@@ -2858,9 +2979,15 @@ function saveHistoryNames(sessionId) {
     }
     if (studentName) {
       entry.student_name = studentName;
+      if (entry.session_payload?.student) {
+        entry.session_payload.student.name = studentName;
+      }
     }
     if (teacherName) {
       entry.teacher_name = teacherName;
+      if (entry.session_payload?.teacher) {
+        entry.session_payload.teacher.name = teacherName;
+      }
     }
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 
@@ -2874,6 +3001,46 @@ function saveHistoryNames(sessionId) {
       saveSessionToStorage();
     }
   } catch (_) {
+    return;
+  }
+
+  renderSetup();
+}
+
+function openHistorySession(sessionId) {
+  if (!sessionId) {
+    return;
+  }
+
+  const history = loadSessionHistoryFromStorage();
+  const entry = history.find((item) => item.session_id === sessionId);
+  if (!entry?.session_payload) {
+    alert("This saved report was stored before reopen support was added, so only the summary row is available.");
+    return;
+  }
+
+  state.session = JSON.parse(JSON.stringify(entry.session_payload));
+  state.ui.review_section_id = findLatestSectionSummaryRun()?.section_id || null;
+  saveSessionToStorage();
+
+  if (state.session.generated_at) {
+    renderResultsFromSession();
+    return;
+  }
+
+  if (state.session.current_attempt) {
+    renderAssessment();
+    return;
+  }
+
+  const run = findReviewSectionRun();
+  if (run) {
+    const hasNextSection = state.session.current_section_index < state.session.section_runs.length - 1;
+    if (hasNextSection) {
+      moveToNextSection();
+      return;
+    }
+    finalizeSession();
     return;
   }
 
