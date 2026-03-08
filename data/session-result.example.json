@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "assessment_id": "nz_phase2_maths_snapshot_2025",
   "session_id": "session-example",
   "generated_at": "2026-03-05T00:00:00Z",
@@ -29,7 +29,8 @@
               "item_id": "itm_sec_03_y4_q1",
               "response": "449",
               "is_correct": true,
-              "is_skipped": false
+              "is_skipped": false,
+              "response_mode": "answered"
             }
           ]
         }
@@ -38,6 +39,20 @@
       "score_percent": 100,
       "mastery_band": "Secure",
       "confidence": "High",
+      "diagnostic_summary": {
+        "last_secure_skill": "Y4 addition and subtraction tasks in this section were secure.",
+        "likely_misconception": "No major misconception was detected in this section.",
+        "recommended_representation": "No extra representation was needed beyond the written task.",
+        "teacher_probe_needed": false,
+        "teacher_probe_status": "not_needed",
+        "confidence_risk_flags": [],
+        "rationale": "The section evidence was clear enough that no short teacher probe was needed."
+      },
+      "teacher_probe": {
+        "status": "not_run",
+        "probe_items": [],
+        "teacher_summary": ""
+      },
       "teacher_override": {
         "enabled": false,
         "reason": ""

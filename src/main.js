@@ -67,6 +67,7 @@ function renderPage(contentHtml, options = {}) {
     setup: "Session Setup",
     assessment: "Live Assessment",
     section: "Section Summary",
+    probe: "Teacher Probe",
     results: "Teacher Report"
   }[activeStep] || "Maths Snapshots";
 
@@ -187,6 +188,14 @@ function onShellNavigate(event) {
     return;
   }
 
+  if (target === "probe") {
+    const run = findNextProbeRun();
+    if (run) {
+      renderTeacherProbe(run);
+    }
+    return;
+  }
+
   if (target === "results" && state.session?.generated_at) {
     renderResultsFromSession();
   }
@@ -196,6 +205,7 @@ function buildShellNavItems() {
   return [
     { key: "setup", label: "Setup", description: "Session options", enabled: true, icon: "setup" },
     { key: "assessment", label: "Assessment", description: "One question at a time", enabled: !!state.session?.current_attempt, icon: "assessment" },
+    { key: "probe", label: "Teacher Probe", description: "Clarify ambiguous evidence", enabled: !!findNextProbeRun(), icon: "section" },
     { key: "results", label: "Teacher Report", description: "Session outcomes and PDF", enabled: !!state.session?.generated_at, icon: "results" }
   ];
 }
@@ -245,6 +255,30 @@ function findReviewSectionRun() {
   }
 
   return findLatestSectionSummaryRun();
+}
+
+function findCurrentProbeRun() {
+  if (!state.session?.current_probe_section_id) {
+    return null;
+  }
+  return state.session.section_runs.find((run) => run.section_id === state.session.current_probe_section_id) || null;
+}
+
+function findNextProbeRun() {
+  if (!state.session?.section_runs?.length) {
+    return null;
+  }
+
+  const currentRun = findCurrentProbeRun();
+  if (currentRun) {
+    return currentRun;
+  }
+
+  return state.session.section_runs.find((run) =>
+    run.summary
+    && run.diagnostic_summary?.teacher_probe_needed
+    && run.teacher_probe?.status !== "completed"
+  ) || null;
 }
 
 function setReviewSection(sectionId) {
@@ -480,6 +514,13 @@ function renderSetup() {
   if (resumeBtn) {
     resumeBtn.addEventListener("click", () => {
       state.session = loadSessionFromStorage();
+      if (state.session.current_probe_section_id) {
+        const probeRun = findCurrentProbeRun();
+        if (probeRun) {
+          renderTeacherProbe(probeRun);
+          return;
+        }
+      }
       if (state.session.current_attempt) {
         renderAssessment();
       } else {
@@ -489,7 +530,7 @@ function renderSetup() {
           if (hasNextSection) {
             moveToNextSection();
           } else {
-            finalizeSession();
+            startTeacherProbeFlowOrFinalize();
           }
         } else {
           beginCurrentSection();
@@ -623,7 +664,12 @@ function onStartSession(event) {
     attempts: [],
     summary: null,
     target_year_variant: requestedStartYear,
-    teacher_notes: ""
+    diagnostic_summary: null,
+    teacher_probe: {
+      status: "not_run",
+      probe_items: [],
+      teacher_summary: ""
+    }
   }));
 
   state.session = {
@@ -636,6 +682,7 @@ function onStartSession(event) {
     section_runs: sectionRuns,
     current_section_index: 0,
     current_attempt: null,
+    current_probe_section_id: null,
     generated_at: null,
     strand_summary: [],
     overall_summary: null,
@@ -1038,6 +1085,8 @@ function finishCurrentAttempt() {
   }
 
   run.summary = summarizeSection(section, run.attempts, run.target_year_variant);
+  run.diagnostic_summary = buildDiagnosticSummary(section, run.summary);
+  run.teacher_probe = buildTeacherProbePlan(section, run.summary, run.diagnostic_summary);
   state.session.current_attempt = null;
   setReviewSection(run.section_id);
   saveSessionToStorage();
@@ -1049,8 +1098,7 @@ function finishCurrentAttempt() {
     return;
   }
 
-  state.notice = "";
-  finalizeSession();
+  startTeacherProbeFlowOrFinalize();
 }
 
 function moveToNextSection() {
@@ -1173,6 +1221,134 @@ function renderSectionSummary(run) {
   }
 }
 
+function renderTeacherProbe(run) {
+  if (!run?.summary) {
+    startTeacherProbeFlowOrFinalize();
+    return;
+  }
+
+  const section = state.sectionsById.get(run.section_id);
+  const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
+  const teacherProbe = run.teacher_probe || buildTeacherProbePlan(section, run.summary, diagnosticSummary);
+  const probeItems = teacherProbe.probe_items || [];
+
+  run.diagnostic_summary = diagnosticSummary;
+  run.teacher_probe = teacherProbe;
+  state.session.current_probe_section_id = run.section_id;
+  saveSessionToStorage();
+
+  const content = `
+    <section class="panel">
+      <h1>${escapeHtml(sectionLabel(section))} — Short Teacher Probe</h1>
+      <p class="note">Use this only to clarify why the student broke, not to extend the assessment. Two to four quick prompts is enough.</p>
+
+      <div class="result-hero">
+        <div class="result-hero-cell result-hero-primary">
+          <span class="result-hero-label">NZC Best-Fit</span>
+          <span class="result-hero-value">${escapeHtml(formatTeacherYearLabel(run.summary.observed_year_level))}</span>
+        </div>
+        <div class="result-hero-cell">
+          <span class="result-hero-label">Confidence</span>
+          <span class="result-hero-value">${escapeHtml(run.summary.confidence)}</span>
+        </div>
+        <div class="result-hero-cell">
+          <span class="result-hero-label">Likely Issue</span>
+          <span class="result-hero-value result-hero-copy">${escapeHtml(diagnosticSummary.likely_misconception)}</span>
+        </div>
+      </div>
+
+      <div class="summary-banner">
+        <strong>Start here:</strong> ${escapeHtml(diagnosticSummary.last_secure_skill)}<br />
+        <strong>Best representation:</strong> ${escapeHtml(diagnosticSummary.recommended_representation)}
+      </div>
+
+      <form id="teacherProbeForm" class="teacher-probe-form">
+        <div class="teacher-probe-list">
+          ${probeItems.map((item, index) => `
+            <article class="teacher-probe-card">
+              <h3>Probe ${index + 1}</h3>
+              <p class="teacher-probe-prompt">${escapeHtml(item.prompt)}</p>
+              <div class="teacher-probe-grid">
+                <label class="field-group-label">
+                  Response
+                  <select name="probeResponse__${escapeAttribute(item.probe_id)}">
+                    ${["not_attempted", "secure", "partial", "incorrect"]
+                      .map((value) => `<option value="${value}" ${item.response_mode === value ? "selected" : ""}>${escapeHtml(formatProbeResponseMode(value))}</option>`)
+                      .join("")}
+                  </select>
+                </label>
+                <label class="field-group-label">
+                  Evidence focus
+                  <input type="text" name="probeCode__${escapeAttribute(item.probe_id)}" value="${escapeAttribute(item.evidence_code || "")}" autocomplete="off" />
+                </label>
+              </div>
+              <label class="field-group-label">
+                Teacher note
+                <textarea name="probeNote__${escapeAttribute(item.probe_id)}" rows="3" placeholder="What did the student do or say?">${escapeHtml(item.teacher_note || "")}</textarea>
+              </label>
+            </article>
+          `).join("")}
+        </div>
+
+        <label class="field-group-label">
+          Teacher summary
+          <textarea name="teacherProbeSummary" rows="4" placeholder="Short summary of what this probe clarified.">${escapeHtml(teacherProbe.teacher_summary || "")}</textarea>
+        </label>
+
+        <div class="actions-row">
+          <button type="submit" class="btn-primary">Save Probe & Continue</button>
+          <button type="button" id="skipTeacherProbeBtn">Skip Probe</button>
+        </div>
+      </form>
+    </section>
+  `;
+
+  renderPage(content, {
+    activeStep: "probe",
+    headerContextHtml: buildSessionHeaderContext()
+  });
+
+  document.getElementById("teacherProbeForm").addEventListener("submit", onTeacherProbeSubmit);
+  document.getElementById("skipTeacherProbeBtn").addEventListener("click", onTeacherProbeSkip);
+}
+
+function onTeacherProbeSubmit(event) {
+  event.preventDefault();
+  const run = findCurrentProbeRun();
+  if (!run?.teacher_probe) {
+    startTeacherProbeFlowOrFinalize();
+    return;
+  }
+
+  const formData = new FormData(event.currentTarget);
+  run.teacher_probe.probe_items = run.teacher_probe.probe_items.map((item) => ({
+    ...item,
+    response_mode: String(formData.get(`probeResponse__${item.probe_id}`) || "not_attempted"),
+    evidence_code: String(formData.get(`probeCode__${item.probe_id}`) || "").trim(),
+    teacher_note: String(formData.get(`probeNote__${item.probe_id}`) || "").trim()
+  }));
+  run.teacher_probe.teacher_summary = String(formData.get("teacherProbeSummary") || "").trim();
+  run.teacher_probe.status = "completed";
+  if (run.diagnostic_summary) {
+    run.diagnostic_summary.teacher_probe_status = "completed";
+    run.diagnostic_summary.likely_misconception = refineMisconceptionFromProbe(run.diagnostic_summary.likely_misconception, run.teacher_probe);
+  }
+
+  state.session.current_probe_section_id = null;
+  saveSessionToStorage();
+  startTeacherProbeFlowOrFinalize();
+}
+
+function onTeacherProbeSkip() {
+  const run = findCurrentProbeRun();
+  if (run?.teacher_probe) {
+    run.teacher_probe.status = "recommended";
+  }
+  state.session.current_probe_section_id = null;
+  saveSessionToStorage();
+  startTeacherProbeFlowOrFinalize();
+}
+
 function evaluateAttempt(section, attempt, items, responses) {
   let correct = 0;
   let skipped = 0;
@@ -1187,7 +1363,8 @@ function evaluateAttempt(section, attempt, items, responses) {
         item_id: item.item_id,
         response,
         is_correct: false,
-        is_skipped: true
+        is_skipped: true,
+        response_mode: "skipped"
       };
     }
 
@@ -1200,7 +1377,8 @@ function evaluateAttempt(section, attempt, items, responses) {
       item_id: item.item_id,
       response,
       is_correct,
-      is_skipped: false
+      is_skipped: false,
+      response_mode: "answered"
     };
   });
 
@@ -1915,6 +2093,267 @@ function summarizeSection(section, attempts, targetYearVariant = null) {
   };
 }
 
+function buildDiagnosticSummary(section, summary) {
+  const riskFlags = buildSectionRiskFlags(section, summary);
+  const likelyMisconception = inferLikelyMisconception(section, summary, riskFlags);
+  const lastSecureSkill = inferLastSecureSkill(section, summary);
+  const recommendedRepresentation = inferRecommendedRepresentation(section, summary, riskFlags);
+  const teacher_probe_needed = summary.confidence !== "High" || riskFlags.length > 0;
+
+  return {
+    last_secure_skill: lastSecureSkill,
+    likely_misconception: likelyMisconception,
+    recommended_representation: recommendedRepresentation,
+    teacher_probe_needed,
+    teacher_probe_status: teacher_probe_needed ? "recommended" : "not_needed",
+    confidence_risk_flags: riskFlags,
+    rationale: buildDiagnosticRationale(summary, riskFlags)
+  };
+}
+
+function buildSectionRiskFlags(section, summary) {
+  const attempts = summary?.attempts || [];
+  const total = attempts.reduce((sum, attempt) => sum + attempt.total, 0);
+  const skipped = attempts.reduce((sum, attempt) => sum + attempt.skipped, 0);
+  const skipRate = total ? skipped / total : 0;
+  const flags = [];
+
+  if (summary?.confidence === "Low") {
+    flags.push("low_confidence");
+  }
+  if (skipRate >= 0.3) {
+    flags.push("high_skip_rate");
+  }
+  if (attempts.length <= 1) {
+    flags.push("sparse_evidence");
+  }
+  if (summary?.confidence !== "High") {
+    flags.push("boundary_not_confirmed");
+  }
+
+  const prompts = attempts
+    .flatMap((attempt) => attempt.item_results || [])
+    .filter((result) => !result.is_correct)
+    .map((result) => String(state.itemsById.get(result.item_id)?.prompt || "").toLowerCase());
+
+  if (section?.section_id === "sec_01" && prompts.some((prompt) => prompt.includes("less than"))) {
+    flags.push("place_value_direction_risk");
+  }
+  if (prompts.some((prompt) => prompt.includes("how many tens are in"))) {
+    flags.push("grouping_language_risk");
+  }
+
+  return [...new Set(flags)];
+}
+
+function inferLikelyMisconception(section, summary, riskFlags) {
+  const attempts = summary?.attempts || [];
+  const wrongPrompts = attempts
+    .flatMap((attempt) => attempt.item_results || [])
+    .filter((result) => !result.is_correct)
+    .map((result) => String(state.itemsById.get(result.item_id)?.prompt || "").toLowerCase());
+
+  if (section?.section_id === "sec_01") {
+    if (wrongPrompts.some((prompt) => prompt.includes("how many tens are in"))) {
+      return "May recognise digit positions but not total groups of ten within a number.";
+    }
+    if (wrongPrompts.some((prompt) => prompt.includes("expand this number"))) {
+      return "May not yet partition numbers flexibly into hundreds, tens, and ones.";
+    }
+    if (riskFlags.includes("place_value_direction_risk")) {
+      return "May be confusing 'less than' with counting on, or may not yet see the number as structured hundreds, tens, and ones.";
+    }
+  }
+
+  if (section?.strand === "Number Structure") {
+    return "Place-value structure is not yet secure enough at this level.";
+  }
+  if (section?.strand === "Number Operations") {
+    return "Method choice and place-value alignment need checking at this level.";
+  }
+  if (section?.strand === "Rational Numbers") {
+    return "The relationship between fractions, decimals, or percentages is not yet secure enough at this level.";
+  }
+
+  return "The current evidence shows a gap, but the exact cause still needs a quick teacher check.";
+}
+
+function inferLastSecureSkill(section, summary) {
+  const { observedAttempt, lowerSecureAttempt, lowestAttempt } = getSummaryAttemptContext(summary);
+
+  if (lowerSecureAttempt) {
+    return `${formatTeacherYearLabel(lowerSecureAttempt.year_level)} tasks in ${section?.topic || summary.section_title} were secure.`;
+  }
+
+  if (summary?.mastery_band === "Secure" && observedAttempt) {
+    return `${formatTeacherYearLabel(observedAttempt.year_level)} tasks in ${section?.topic || summary.section_title} were secure.`;
+  }
+
+  if (lowestAttempt) {
+    return `Start just below ${formatTeacherYearLabel(lowestAttempt.year_level)} tasks in ${section?.topic || summary.section_title}.`;
+  }
+
+  return `Collect a few easier checks in ${section?.topic || summary.section_title} to find the secure floor.`;
+}
+
+function inferRecommendedRepresentation(section, summary, riskFlags) {
+  if (section?.section_id === "sec_01") {
+    return "Use a place-value chart with MAB or bundled sticks.";
+  }
+  if (riskFlags.includes("grouping_language_risk")) {
+    return "Use materials first, then restate the question aloud using simpler maths language.";
+  }
+  if (section?.strand === "Number Structure") {
+    return "Use place-value charts, materials, and short oral prompts.";
+  }
+  if (section?.strand === "Number Operations") {
+    return "Use worked examples, number lines, and place-value-aligned written methods.";
+  }
+  if (section?.strand === "Rational Numbers") {
+    return "Use visual fraction models, folding, and matching tasks before symbolic recording.";
+  }
+  return "Use concrete materials first, then shift to symbols.";
+}
+
+function buildDiagnosticRationale(summary, riskFlags) {
+  const parts = [];
+
+  if (summary?.confidence === "Low") {
+    parts.push("The current year-level placement is low-confidence");
+  } else if (summary?.confidence === "Medium") {
+    parts.push("The current year-level placement is usable but not fully confirmed");
+  }
+
+  if (riskFlags.includes("high_skip_rate")) {
+    parts.push("skips were high enough to blur whether the barrier was knowledge, language load, or shutdown");
+  }
+  if (riskFlags.includes("boundary_not_confirmed")) {
+    parts.push("the upper or lower boundary was not confirmed strongly enough");
+  }
+  if (riskFlags.includes("place_value_direction_risk")) {
+    parts.push("the error pattern suggests a possible before/after or place-value direction issue");
+  }
+
+  if (!parts.length) {
+    return "The section evidence is strong enough that no short teacher probe is needed.";
+  }
+
+  return `${parts.join("; ")}.`;
+}
+
+function buildTeacherProbePlan(section, summary, diagnosticSummary) {
+  if (!diagnosticSummary?.teacher_probe_needed) {
+    return {
+      status: "not_run",
+      probe_items: [],
+      teacher_summary: ""
+    };
+  }
+
+  const prompts = getTeacherProbePrompts(section, summary);
+  return {
+    status: "recommended",
+    probe_items: prompts.map((prompt, index) => ({
+      probe_id: `${section.section_id}_probe_${index + 1}`,
+      prompt: prompt.prompt,
+      response_mode: "not_attempted",
+      evidence_code: prompt.evidence_code,
+      teacher_note: ""
+    })),
+    teacher_summary: ""
+  };
+}
+
+function getTeacherProbePrompts(section, summary) {
+  if (section?.section_id === "sec_01") {
+    return [
+      { prompt: "Show me 409 with materials or a place-value chart.", evidence_code: "representation_check" },
+      { prompt: "What is 1 less than 409? How do you know?", evidence_code: "before_after_direction" },
+      { prompt: "What is 10 less than 409? Show me.", evidence_code: "regrouping_across_zero" },
+      { prompt: "Expand 759.", evidence_code: "partitioning" }
+    ];
+  }
+
+  if (section?.strand === "Number Operations") {
+    return [
+      { prompt: `Solve one similar ${summary.section_title.toLowerCase()} item aloud.`, evidence_code: "strategy_choice" },
+      { prompt: "Show the steps with a number line, place-value chart, or written method.", evidence_code: "representation_check" },
+      { prompt: "Explain why you chose that method.", evidence_code: "mathematical_language" }
+    ];
+  }
+
+  if (section?.strand === "Rational Numbers") {
+    return [
+      { prompt: "Show the idea with a diagram or materials before using symbols.", evidence_code: "representation_check" },
+      { prompt: "Explain what each part of the fraction or decimal means.", evidence_code: "concept_language" },
+      { prompt: "Solve one similar item and explain your thinking aloud.", evidence_code: "strategy_choice" }
+    ];
+  }
+
+  return [
+    { prompt: "Solve one similar item aloud and explain your thinking.", evidence_code: "thinking_explanation" },
+    { prompt: "Show the same idea with materials or a simple diagram.", evidence_code: "representation_check" },
+    { prompt: "Tell me which maths words in the question helped you.", evidence_code: "language_check" }
+  ];
+}
+
+function formatProbeResponseMode(value) {
+  const labels = {
+    not_attempted: "Not yet checked",
+    secure: "Secure",
+    partial: "Partial",
+    incorrect: "Incorrect"
+  };
+  return labels[value] || value;
+}
+
+function formatTeacherProbeStatus(value) {
+  const labels = {
+    not_needed: "Not needed",
+    not_run: "Not run",
+    recommended: "Recommended",
+    completed: "Completed"
+  };
+  return labels[value] || value;
+}
+
+function refineMisconceptionFromProbe(fallback, teacherProbe) {
+  const items = teacherProbe?.probe_items || [];
+  const secureCount = items.filter((item) => item.response_mode === "secure").length;
+  const incorrectCount = items.filter((item) => item.response_mode === "incorrect").length;
+  const representationDifficulty = items.some(
+    (item) => item.evidence_code === "representation_check" && item.response_mode === "incorrect"
+  );
+  const languageDifficulty = items.some(
+    (item) => /language/.test(String(item.evidence_code || "")) && item.response_mode !== "secure"
+  );
+
+  if (representationDifficulty) {
+    return "The student still struggled when the idea was shown with materials or diagrams, so the core concept likely needs reteaching.";
+  }
+  if (languageDifficulty) {
+    return "The student may know more than the written assessment showed, but the maths language still needs explicit teaching.";
+  }
+  if (secureCount >= 2 && incorrectCount === 0) {
+    return "The original written items may have overstated the gap; the student showed stronger understanding in the live probe.";
+  }
+  return fallback;
+}
+
+function startTeacherProbeFlowOrFinalize() {
+  const nextRun = findNextProbeRun();
+  if (!nextRun) {
+    state.session.current_probe_section_id = null;
+    state.notice = "";
+    finalizeSession();
+    return;
+  }
+
+  state.session.current_probe_section_id = nextRun.section_id;
+  saveSessionToStorage();
+  renderTeacherProbe(nextRun);
+}
+
 function computeSectionConfidence(attempts, observedYearLabel) {
   if (!attempts.length || attempts.length === 1) {
     return "Low";
@@ -1986,82 +2425,16 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   const sessionAnalytics = buildAnalyticsSummaryFromRuns(state.session.section_runs);
   const prioritySteps = buildFinalNextSteps(sectionSummaries);
   const totalCorrect = `${sessionAnalytics.correct_answers} / ${sessionAnalytics.questions_answered} answered correctly`;
-  const sectionDetailBlocks = sectionReportRows
-    .filter((row) => !!row.summary)
-    .map((row) => {
-      const decision = buildSectionDecision(row.summary);
-      const summary = row.summary;
-      const { attempts } = getSummaryAttemptContext(summary);
-
-      return `
-        <article class="section-report-card">
-          <div class="section-report-head">
-            <div>
-              <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-              <p class="section-report-subtitle">${escapeHtml(decision.headline)}</p>
-            </div>
-            <div class="section-summary-actions">
-              <button type="button" data-print-section="${escapeAttribute(row.section.section_id)}">Print Section PDF</button>
-            </div>
-          </div>
-
-          <div class="result-hero">
-            <div class="result-hero-cell result-hero-primary">
-              <span class="result-hero-label">Best-Fit Year Level</span>
-              <span class="result-hero-value">${escapeHtml(decision.bestFitYear)}</span>
-            </div>
-            <div class="result-hero-cell">
-              <span class="result-hero-label">Score</span>
-              <span class="result-hero-value">${summary.correct_answers} / ${summary.total_questions}</span>
-            </div>
-            <div class="result-hero-cell">
-              <span class="result-hero-label">Confidence</span>
-              <span class="result-hero-value">${escapeHtml(summary.confidence)}</span>
-            </div>
-          </div>
-
-          <div class="summary-banner">
-            <strong>Why this year level:</strong> ${escapeHtml(decision.evidence)}
-          </div>
-
-          <h4>Assessment Path</h4>
-          <div class="attempt-path">
-            ${attempts.map((attempt) => {
-              const isObservedAttempt = yearLabelForDisplay(attempt.year_level) === summary.observed_year_level
-                && attempt.mastery_band === summary.mastery_band;
-              return `
-                <article class="attempt-card ${isObservedAttempt ? "attempt-card-observed" : ""}">
-                  <div class="attempt-card-head">
-                    <strong>${escapeHtml(formatTeacherYearLabel(attempt.year_level))}</strong>
-                    ${isObservedAttempt ? `<span class="attempt-card-flag">Observed level</span>` : ""}
-                  </div>
-                  <p class="attempt-card-metrics">${attempt.correct}/${attempt.total} correct${attempt.skipped ? ` · ${attempt.skipped} skipped` : ""}</p>
-                  <div class="attempt-card-outcome">
-                    <strong>${escapeHtml(describeAttemptBand(attempt.mastery_band))}</strong>
-                    <span class="attempt-card-copy">${escapeHtml(describeAttemptProgress(attempt.mastery_band))}</span>
-                  </div>
-                </article>
-              `;
-            }).join("")}
-          </div>
-
-          <label class="teacher-notes-field">
-            Teacher notes
-            <textarea data-section-notes="${escapeAttribute(row.section.section_id)}" rows="4" placeholder="Optional notes for this section.">${escapeHtml(getTeacherNotesForSection(row.section.section_id))}</textarea>
-          </label>
-        </article>
-      `;
-    })
-    .join("");
+  const completedProbeRows = sectionReportRows.filter((row) => row.run?.teacher_probe?.status === "completed");
 
   const content = `
     <section class="panel">
-      <h1>Session Results</h1>
+      <h1>Teacher Report</h1>
       <p class="note">Formative snapshot evidence only. Use alongside teacher judgement.</p>
 
       <div class="result-hero result-hero-final">
         <div class="result-hero-cell result-hero-primary">
-          <span class="result-hero-label">Overall Best-Fit Year Level</span>
+          <span class="result-hero-label">Overall NZC Best-Fit</span>
           <span class="result-hero-value result-hero-xl">${escapeHtml(formatTeacherYearLabel(overallSummary.observed_operating_year))}</span>
         </div>
         <div class="result-hero-cell">
@@ -2074,38 +2447,17 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
         </div>
       </div>
 
-      <h2>Section Results</h2>
-      <div class="section-summary-grid">
-        ${sectionReportRows
-          .map((row) => {
-            if (!row.summary) {
-              return `<article class="section-summary-card section-summary-card-pending">
-                <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-                <p><strong>Not completed</strong></p>
-                <p>No evidence collected yet.</p>
-              </article>`;
-            }
-            const decision = buildSectionDecision(row.summary);
-            return `<article class="section-summary-card">
-                <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-                <p><strong>${escapeHtml(decision.bestFitYear)}</strong> · ${row.summary.correct_answers}/${row.summary.total_questions}</p>
-                <p>${escapeHtml(decision.shortReason)}</p>
-                <div class="section-summary-actions">
-                  <button type="button" data-print-section="${escapeAttribute(row.section.section_id)}">Print PDF</button>
-                </div>
-              </article>`;
-          })
-          .join("")}
-      </div>
+      <h2>Sections</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Section</th>
-              <th>Status</th>
-              <th>Best-Fit Year</th>
-              <th>Correct</th>
-              <th>Why This Year</th>
+              <th>NZC Best-Fit</th>
+              <th>Confidence</th>
+              <th>Likely Issue</th>
+              <th>Start Here</th>
+              <th>Probe</th>
             </tr>
           </thead>
           <tbody>
@@ -2115,21 +2467,23 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
                   return `
                     <tr>
                       <td>${escapeHtml(sectionLabel(row.section))}</td>
-                      <td>Not completed</td>
                       <td>—</td>
                       <td>—</td>
                       <td>No evidence collected yet.</td>
+                      <td>—</td>
+                      <td>—</td>
                     </tr>
                   `;
                 }
-                const decision = buildSectionDecision(row.summary);
+                const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
                 return `
                     <tr>
                       <td>${escapeHtml(sectionLabel(row.section))}</td>
-                      <td>Completed</td>
-                      <td>${escapeHtml(decision.bestFitYear)}</td>
-                      <td>${row.summary.correct_answers} / ${row.summary.total_questions}</td>
-                      <td>${escapeHtml(decision.shortReason)}</td>
+                      <td>${escapeHtml(formatTeacherYearLabel(row.summary.observed_year_level))}</td>
+                      <td>${escapeHtml(row.summary.confidence)}</td>
+                      <td>${escapeHtml(diagnosticSummary.likely_misconception)}</td>
+                      <td>${escapeHtml(diagnosticSummary.last_secure_skill)}</td>
+                      <td>${escapeHtml(formatTeacherProbeStatus(row.run?.teacher_probe?.status || diagnosticSummary.teacher_probe_status))}</td>
                     </tr>
                   `;
               })
@@ -2138,10 +2492,15 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
         </table>
       </div>
 
-      ${sectionDetailBlocks
-        ? `<h2>Section Detail</h2>
-            <div class="section-report-list">
-              ${sectionDetailBlocks}
+      ${completedProbeRows.length
+        ? `<h2>Probe Notes</h2>
+            <div class="teacher-probe-list">
+              ${completedProbeRows.map((row) => `
+                <article class="teacher-probe-card">
+                  <h3>${escapeHtml(sectionLabel(row.section))}</h3>
+                  <p class="teacher-probe-prompt">${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed. See saved item-level notes in the exported session file.")}</p>
+                </article>
+              `).join("")}
             </div>`
         : ""}
 
@@ -2201,24 +2560,6 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   `;
   renderPage(content, { homeEnabled: true, activeStep: "results", headerContextHtml: buildSessionHeaderContext() });
 
-  for (const button of document.querySelectorAll("[data-print-section]")) {
-    button.addEventListener("click", () => {
-      const run = state.session.section_runs.find((entry) => entry.section_id === button.dataset.printSection);
-      if (run?.summary) {
-        downloadSectionTeacherPdf(run);
-      }
-    });
-  }
-  for (const textarea of document.querySelectorAll("[data-section-notes]")) {
-    textarea.addEventListener("change", () => {
-      const run = state.session.section_runs.find((entry) => entry.section_id === textarea.dataset.sectionNotes);
-      if (run) {
-        run.teacher_notes = textarea.value.trim();
-        saveSessionToStorage();
-        saveCompletedSessionToHistory();
-      }
-    });
-  }
   document.getElementById("saveReportNamesBtn").addEventListener("click", saveReportNamesFromResults);
   document.getElementById("downloadTeacherPdfBtn").addEventListener("click", downloadFinalTeacherPdf);
   document.getElementById("exportCsvBtn").addEventListener("click", downloadCsvExport);
@@ -2373,58 +2714,53 @@ function downloadFinalTeacherPdf() {
         return `
           <tr>
             <td>${escapeHtml(sectionLabel(row.section))}</td>
-            <td>Not completed</td>
+            <td>—</td>
+            <td>—</td>
             <td>No evidence collected yet.</td>
-            <td>No evidence collected yet.</td>
-            <td>Complete this section to generate next steps.</td>
+            <td>—</td>
+            <td>—</td>
           </tr>
         `;
       }
-      const decision = buildSectionDecision(row.summary);
-      const evidence = buildSectionAllocationEvidence(row.summary);
-      const nextStep = getNextStepForSection(row.section, row.summary)[0] || "";
+      const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
       return `
         <tr>
           <td>${escapeHtml(sectionLabel(row.section))}</td>
-          <td>${escapeHtml(decision.bestFitYear)}</td>
-          <td>${escapeHtml(evidence.allocationLines.join(" "))}</td>
-          <td>${escapeHtml(evidence.barrierIntro)}</td>
-          <td>${escapeHtml(nextStep)}</td>
+          <td>${escapeHtml(formatTeacherYearLabel(row.summary.observed_year_level))}</td>
+          <td>${escapeHtml(row.summary.confidence)}</td>
+          <td>${escapeHtml(diagnosticSummary.likely_misconception)}</td>
+          <td>${escapeHtml(diagnosticSummary.last_secure_skill)}</td>
+          <td>${escapeHtml(formatTeacherProbeStatus(row.run?.teacher_probe?.status || diagnosticSummary.teacher_probe_status))}</td>
         </tr>
       `;
     })
     .join("");
-  const sectionEvidenceBlocks = sectionReportRows
-    .filter((row) => !!row.summary)
-    .map((row) => {
-      const decision = buildSectionDecision(row.summary);
-      const evidence = buildSectionAllocationEvidence(row.summary);
-      return `
-        <h3>${escapeHtml(sectionLabel(row.section))}</h3>
-        <p><strong>${escapeHtml(decision.bestFitYear)}</strong></p>
-        <p><strong>Evidence of allocation:</strong></p>
-        <ul>${evidence.allocationLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
-        <p><strong>${escapeHtml(evidence.barrierHeading)}:</strong> ${escapeHtml(evidence.barrierIntro)}</p>
-        ${evidence.barrierItems.length
-          ? `<table>
-              <thead>
-                <tr><th>Year</th><th>Prompt</th><th>Student Response</th><th>Expected</th><th>Issue</th></tr>
-              </thead>
-              <tbody>
-                ${evidence.barrierItems.map((item) => `
-                  <tr>
-                    <td>${escapeHtml(item.yearLabel)}</td>
-                    <td>${escapeHtml(item.prompt)}</td>
-                    <td>${escapeHtml(item.response)}</td>
-                    <td>${escapeHtml(item.expected)}</td>
-                    <td>${escapeHtml(item.issue)}</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>`
-          : `<p>No incorrect or skipped item detail is available for a boundary attempt.</p>`}
-      `;
-    })
+  const probeBlocks = sectionReportRows
+    .filter((row) => row.run?.teacher_probe?.status === "completed")
+    .map((row) => `
+      <h3>${escapeHtml(sectionLabel(row.section))} Probe</h3>
+      <p>${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed with item-level notes only.")}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th>Response</th>
+            <th>Evidence Focus</th>
+            <th>Teacher Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${row.run.teacher_probe.probe_items.map((item) => `
+            <tr>
+              <td>${escapeHtml(item.prompt)}</td>
+              <td>${escapeHtml(formatProbeResponseMode(item.response_mode))}</td>
+              <td>${escapeHtml(item.evidence_code)}</td>
+              <td>${escapeHtml(item.teacher_note || "")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `)
     .join("");
 
   const overall = state.session.overall_summary || { observed_operating_year: "Insufficient Data", confidence: "Low" };
@@ -2442,25 +2778,25 @@ function downloadFinalTeacherPdf() {
       ["Student", state.session.student.name],
       ["Phase", phase],
       ["Sections Completed", `${completedSections}/${sectionReportRows.length}`],
-      ["Overall Best-Fit Year Level", formatTeacherYearLabel(overall.observed_operating_year)],
+      ["Overall NZC Best-Fit", formatTeacherYearLabel(overall.observed_operating_year)],
       ["Confidence", overall.confidence]
     ],
     bodyHtml: `
-      <h3>Section Summary</h3>
+      <h3>Sections</h3>
       <table>
         <thead>
           <tr>
             <th>Section</th>
-            <th>Best-Fit Year</th>
-            <th>Evidence Of Allocation</th>
-            <th>What Stopped Next Step</th>
-            <th>Next Step</th>
+            <th>NZC Best-Fit</th>
+            <th>Confidence</th>
+            <th>Likely Issue</th>
+            <th>Start Here</th>
+            <th>Probe</th>
           </tr>
         </thead>
         <tbody>${summaryRows}</tbody>
       </table>
-      <h3>Section Evidence Detail</h3>
-      ${sectionEvidenceBlocks || "<p>No completed sections yet.</p>"}
+      ${probeBlocks ? `<h3>Teacher Probe Notes</h3>${probeBlocks}` : ""}
       <h3>Strand Summary</h3>
       <table>
         <thead>
@@ -2486,13 +2822,6 @@ function downloadFinalTeacherPdf() {
       </table>
       <h3>Priority Next Steps</h3>
       <ul>${nextSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ul>
-      ${state.session.section_runs.some((run) => String(run.teacher_notes || "").trim())
-        ? `<h3>Teacher Notes</h3>
-            ${state.session.section_runs
-              .filter((run) => String(run.teacher_notes || "").trim())
-              .map((run) => `<p><strong>${escapeHtml(sectionLabel(state.sectionsById.get(run.section_id)))}:</strong> ${escapeHtml(run.teacher_notes)}</p>`)
-              .join("")}`
-        : ""}
       <p style="font-size:0.82rem;color:#6b7280;margin-top:1.2rem;border-top:1px solid #e5e7eb;padding-top:0.8rem;"><strong>Confidence rating:</strong> High = student reached the observed level and also showed a non-secure result one level higher. Medium = usable evidence but without that upper boundary. Low = too few attempts or too many skips to be certain.</p>
     `
   });
@@ -2622,7 +2951,7 @@ function formatReportTimestamp(isoString) {
 
 function buildSessionResult() {
   return {
-    schema_version: "1.0.0",
+    schema_version: "1.1.0",
     assessment_id: state.bank.assessment.assessment_id,
     session_id: state.session.session_id,
     generated_at: state.session.generated_at,
@@ -2641,7 +2970,12 @@ function buildSessionResult() {
         score_percent: summary.score_percent,
         mastery_band: summary.mastery_band,
         confidence: summary.confidence,
-        teacher_notes: getTeacherNotesForSection(summary.section_id),
+        diagnostic_summary: state.session.section_runs.find((run) => run.section_id === summary.section_id)?.diagnostic_summary || null,
+        teacher_probe: state.session.section_runs.find((run) => run.section_id === summary.section_id)?.teacher_probe || {
+          status: "not_run",
+          probe_items: [],
+          teacher_summary: ""
+        },
         teacher_override: {
           enabled: false,
           reason: ""
@@ -2659,6 +2993,7 @@ function buildSessionResult() {
 function buildSectionReportRows() {
   const runs = state.session?.section_runs || [];
   return runs.map((run) => ({
+    run,
     section: state.sectionsById.get(run.section_id),
     summary: run.summary || null
   }));
@@ -2733,7 +3068,9 @@ function buildDetailedCsvExport() {
     "section_confidence",
     "section_correct_answers",
     "section_total_questions",
-    "teacher_notes",
+    "section_likely_misconception",
+    "section_last_secure_skill",
+    "section_probe_status",
     "attempt_year_level",
     "item_id",
     "prompt",
@@ -2750,6 +3087,7 @@ function buildDetailedCsvExport() {
     }
 
     const section = state.sectionsById.get(run.section_id);
+    const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
     for (const attempt of run.summary.attempts) {
       for (const itemResult of attempt.item_results) {
         const item = state.itemsById.get(itemResult.item_id);
@@ -2768,7 +3106,9 @@ function buildDetailedCsvExport() {
           section_confidence: run.summary.confidence,
           section_correct_answers: run.summary.correct_answers,
           section_total_questions: run.summary.total_questions,
-          teacher_notes: run.teacher_notes || "",
+          section_likely_misconception: diagnosticSummary.likely_misconception,
+          section_last_secure_skill: diagnosticSummary.last_secure_skill,
+          section_probe_status: run.teacher_probe?.status || diagnosticSummary.teacher_probe_status,
           attempt_year_level: yearLabelForDisplay(attempt.year_level),
           item_id: itemResult.item_id,
           prompt: item?.prompt ?? "",
@@ -3033,6 +3373,14 @@ function openHistorySession(sessionId) {
     return;
   }
 
+  if (state.session.current_probe_section_id) {
+    const probeRun = findCurrentProbeRun();
+    if (probeRun) {
+      renderTeacherProbe(probeRun);
+      return;
+    }
+  }
+
   const run = findReviewSectionRun();
   if (run) {
     const hasNextSection = state.session.current_section_index < state.session.section_runs.length - 1;
@@ -3040,20 +3388,11 @@ function openHistorySession(sessionId) {
       moveToNextSection();
       return;
     }
-    finalizeSession();
+    startTeacherProbeFlowOrFinalize();
     return;
   }
 
   renderSetup();
-}
-
-// ── Teacher helpers ───────────────────────────────────────────────────────────
-function saveTeacherNotes(run) {
-  const textarea = document.getElementById("teacherNotesInput");
-  if (textarea) {
-    run.teacher_notes = textarea.value.trim();
-    saveSessionToStorage();
-  }
 }
 
 function saveReportNamesFromResults() {
@@ -3070,11 +3409,6 @@ function saveReportNamesFromResults() {
     saveCompletedSessionToHistory();
   }
   renderResultsFromSession();
-}
-
-function getTeacherNotesForSection(sectionId) {
-  const run = state.session?.section_runs?.find((entry) => entry.section_id === sectionId);
-  return run?.teacher_notes || "";
 }
 
 function formatTeacherYearLabel(value) {

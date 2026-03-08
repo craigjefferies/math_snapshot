@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://maths-snapshots.local/schemas/session-result.schema.json",
-  "title": "Phase 2 Maths Snapshot Session Result",
+  "$id": "https://maths-snapshots.local/schemas/session-result-diagnostic.schema.json",
+  "title": "Phase 2 Maths Snapshot Session Result With Diagnostic Extensions",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -93,7 +93,7 @@
                   "items": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["item_id", "response", "is_correct", "is_skipped", "response_mode"],
+                    "required": ["item_id", "response", "is_correct", "is_skipped"],
                     "properties": {
                       "item_id": { "type": "string" },
                       "response": {
@@ -134,7 +134,7 @@
             "enum": ["High", "Medium", "Low"]
           },
           "diagnostic_summary": {
-            "type": ["object", "null"],
+            "type": "object",
             "additionalProperties": false,
             "required": [
               "last_secure_skill",
@@ -162,7 +162,7 @@
             }
           },
           "teacher_probe": {
-            "type": ["object", "null"],
+            "type": "object",
             "additionalProperties": false,
             "required": ["status", "probe_items", "teacher_summary"],
             "properties": {
@@ -181,7 +181,7 @@
                     "prompt": { "type": "string" },
                     "response_mode": {
                       "type": "string",
-                      "enum": ["not_attempted", "secure", "partial", "incorrect"]
+                      "enum": ["secure", "partial", "incorrect", "not_attempted"]
                     },
                     "evidence_code": { "type": "string" },
                     "teacher_note": { "type": "string" }

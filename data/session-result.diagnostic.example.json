@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.1.0",
+  "assessment_id": "nz_phase2_maths_snapshot_2025",
+  "session_id": "session-diagnostic-example",
+  "generated_at": "2026-03-09T00:00:00Z",
+  "teacher": {
+    "name": "Example Teacher"
+  },
+  "student": {
+    "name": "Example Student"
+  },
+  "section_year_levels": [
+    {
+      "section_id": "sec_01",
+      "section_title": "Place Value",
+      "strand": "Number Structure",
+      "target_year_variant": 4,
+      "attempts": [
+        {
+          "variant_id": "var_sec_01_y4",
+          "year_level": 4,
+          "score_percent": 40,
+          "correct": 4,
+          "total": 10,
+          "skipped": 2,
+          "mastery_band": "Not Yet",
+          "item_results": [
+            {
+              "item_id": "itm_sec_01_y4_q01",
+              "response": "410",
+              "is_correct": false,
+              "is_skipped": false,
+              "response_mode": "answered"
+            },
+            {
+              "item_id": "itm_sec_01_y4_q02",
+              "response": "",
+              "is_correct": false,
+              "is_skipped": true,
+              "response_mode": "skipped"
+            }
+          ]
+        }
+      ],
+      "observed_year_level": "Below Y4",
+      "score_percent": 40,
+      "mastery_band": "Not Yet",
+      "confidence": "Low",
+      "diagnostic_summary": {
+        "last_secure_skill": "Reads and partitions some 2-digit numbers reliably.",
+        "likely_misconception": "May not yet see 3-digit numbers as structured hundreds, tens, and ones; possible confusion with the direction of 'less than'.",
+        "recommended_representation": "Place-value chart with MAB or bundled sticks.",
+        "teacher_probe_needed": true,
+        "teacher_probe_status": "recommended",
+        "confidence_risk_flags": [
+          "high_skip_rate",
+          "possible_language_load",
+          "boundary_not_confirmed"
+        ],
+        "rationale": "The pattern suggests more than one possible cause: place-value structure, before/after direction, or task shutdown."
+      },
+      "teacher_probe": {
+        "status": "recommended",
+        "probe_items": [
+          {
+            "probe_id": "pv_409_materials",
+            "prompt": "Show me 409 with materials.",
+            "response_mode": "not_attempted",
+            "evidence_code": "representation_check",
+            "teacher_note": ""
+          },
+          {
+            "probe_id": "pv_10_less_409",
+            "prompt": "What is 10 less than 409? Show me how you know.",
+            "response_mode": "not_attempted",
+            "evidence_code": "regrouping_across_zero",
+            "teacher_note": ""
+          }
+        ],
+        "teacher_summary": ""
+      },
+      "teacher_override": {
+        "enabled": false,
+        "reason": ""
+      }
+    }
+  ],
+  "strand_summary": [
+    {
+      "strand_name": "Number Structure",
+      "observed_year_level": "Below Y4",
+      "confidence": "Low",
+      "supporting_sections": [
+        "1. Place Value"
+      ]
+    }
+  ],
+  "overall_summary": {
+    "observed_operating_year": "Below Y4",
+    "confidence": "Low",
+    "method": "Overall level calculated from section results"
+  },
+  "notes": [
+    "Formative snapshot evidence only.",
+    "Not standardised or norm referenced."
+  ]
+}
