@@ -149,7 +149,7 @@ function renderPage(contentHtml, options = {}) {
   }[activeStep] || "Maths Snapshots";
 
   app.innerHTML = `
-    <div class="teacher-shell ${shellModeClass} ${collapsedClass}">
+    <div class="teacher-shell ${shellModeClass} ${collapsedClass} phase-${escapeAttribute(phaseConfig.key)}">
       <aside class="teacher-sidebar" aria-label="Teacher navigation">
         <div class="sidebar-brand">
           <span class="brand-mark" aria-hidden="true">${iconSvg("logo")}</span>
@@ -805,7 +805,7 @@ function onStartSession(event) {
     current_section_index: 0,
     current_attempt: null,
     current_probe_section_id: null,
-    current_probe_item_index: 0,
+    current_probe_item_index: -1,
     generated_at: null,
     strand_summary: [],
     overall_summary: null,
@@ -1354,8 +1354,10 @@ function renderTeacherProbe(run) {
   const diagnosticSummary = run.diagnostic_summary || buildDiagnosticSummary(section, run.summary);
   const teacherProbe = normalizeTeacherProbePlan(section, run.summary, diagnosticSummary, run.teacher_probe);
   const probeItems = teacherProbe.probe_items || [];
+  const currentProbeIndex = Number(state.session.current_probe_item_index);
+  const showingIntro = currentProbeIndex < 0;
   const probeIndex = Math.min(
-    Math.max(Number(state.session.current_probe_item_index) || 0, 0),
+    Math.max(currentProbeIndex || 0, 0),
     Math.max(probeItems.length - 1, 0)
   );
   const currentItem = probeItems[probeIndex];
@@ -1363,7 +1365,7 @@ function renderTeacherProbe(run) {
   run.diagnostic_summary = diagnosticSummary;
   run.teacher_probe = teacherProbe;
   state.session.current_probe_section_id = run.section_id;
-  state.session.current_probe_item_index = probeIndex;
+  state.session.current_probe_item_index = showingIntro ? -1 : probeIndex;
   saveSessionToStorage();
 
   const content = `
@@ -1371,43 +1373,63 @@ function renderTeacherProbe(run) {
       <h1>${escapeHtml(sectionLabel(section))} — Short Teacher Probe</h1>
 
       <form id="teacherProbeForm" class="teacher-probe-form">
-        <div class="teacher-probe-progress">
-          <div class="teacher-probe-progress-copy">
-            <strong>Question ${probeIndex + 1} of ${probeItems.length}</strong>
-            <span>${probeItems.filter((item) => item.selected_option).length} answered</span>
-          </div>
-          <div class="teacher-probe-progress-track" aria-hidden="true">
-            ${probeItems.map((item, index) => `
-              <span class="teacher-probe-progress-dot ${index === probeIndex ? "is-current" : item.selected_option ? "is-complete" : ""}"></span>
-            `).join("")}
-          </div>
-        </div>
-
-        ${currentItem ? `
-          <article class="teacher-probe-card">
-            <h3>Probe ${probeIndex + 1}</h3>
-            <p class="teacher-probe-prompt">${escapeHtml(currentItem.prompt)}</p>
-            <div class="teacher-probe-options">
-              ${currentItem.response_options.map((option) => `
-                <label class="teacher-probe-option ${currentItem.selected_option === option.id ? "is-selected" : ""}">
-                  <input
-                    type="radio"
-                    name="probeChoice"
-                    value="${escapeAttribute(option.id)}"
-                    ${currentItem.selected_option === option.id ? "checked" : ""}
-                  />
-                  <span>${escapeHtml(option.label)}</span>
-                </label>
-              `).join("")}
+        ${showingIntro
+          ? `
+            <article class="teacher-probe-intro">
+              <p class="teacher-probe-intro-kicker">Teacher-only follow-up</p>
+              <h2>Why this short probe appears</h2>
+              <p>This section result needs a quick teacher check before the final report is locked in.</p>
+              <ul class="teacher-probe-intro-list">
+                <li>You will answer ${probeItems.length} short multiple-choice questions.</li>
+                <li>This does not extend the student assessment.</li>
+                <li>It helps separate maths misunderstanding from language load or task wording.</li>
+                <li>Your choices feed directly into the final teacher report.</li>
+              </ul>
+            </article>
+          `
+          : `
+            <div class="teacher-probe-progress">
+              <div class="teacher-probe-progress-copy">
+                <strong>Question ${probeIndex + 1} of ${probeItems.length}</strong>
+                <span>${probeItems.filter((item) => item.selected_option).length} answered</span>
+              </div>
+              <div class="teacher-probe-progress-track" aria-hidden="true">
+                ${probeItems.map((item, index) => `
+                  <span class="teacher-probe-progress-dot ${index === probeIndex ? "is-current" : item.selected_option ? "is-complete" : ""}"></span>
+                `).join("")}
+              </div>
             </div>
-          </article>
-        ` : ""}
+
+            ${currentItem ? `
+              <article class="teacher-probe-card">
+                <h3>Probe ${probeIndex + 1}</h3>
+                <p class="teacher-probe-prompt">${escapeHtml(currentItem.prompt)}</p>
+                <div class="teacher-probe-options">
+                  ${currentItem.response_options.map((option) => `
+                    <label class="teacher-probe-option ${currentItem.selected_option === option.id ? "is-selected" : ""}">
+                      <input
+                        type="radio"
+                        name="probeChoice"
+                        value="${escapeAttribute(option.id)}"
+                        ${currentItem.selected_option === option.id ? "checked" : ""}
+                      />
+                      <span>${escapeHtml(option.label)}</span>
+                    </label>
+                  `).join("")}
+                </div>
+              </article>
+            ` : ""}
+          `}
 
         <div class="actions-row">
-          <button type="submit" name="probeAction" value="back" ${probeIndex === 0 ? "disabled" : ""}>Back</button>
-          <button type="submit" name="probeAction" value="${probeIndex === probeItems.length - 1 ? "finish" : "next"}" class="btn-primary">
-            ${probeIndex === probeItems.length - 1 ? "Save Probe & Continue" : "Next Question"}
-          </button>
+          ${showingIntro
+            ? `<button type="submit" name="probeAction" value="start" class="btn-primary btn-probe-start">Start Short Teacher Probe</button>`
+            : `
+              <button type="submit" name="probeAction" value="back" ${probeIndex === 0 ? "disabled" : ""}>Back</button>
+              <button type="submit" name="probeAction" value="${probeIndex === probeItems.length - 1 ? "finish" : "next"}" class="btn-primary">
+                ${probeIndex === probeItems.length - 1 ? "Save Probe & Continue" : "Next Question"}
+              </button>
+            `}
           <button type="button" id="skipTeacherProbeBtn">Skip Probe</button>
         </div>
       </form>
@@ -1433,6 +1455,13 @@ function onTeacherProbeSubmit(event) {
 
   const formData = new FormData(event.currentTarget);
   const action = event.submitter?.value || "next";
+  if (action === "start") {
+    state.session.current_probe_item_index = 0;
+    saveSessionToStorage();
+    renderTeacherProbe(run);
+    return;
+  }
+
   const probeIndex = Math.min(
     Math.max(Number(state.session.current_probe_item_index) || 0, 0),
     Math.max(run.teacher_probe.probe_items.length - 1, 0)
@@ -1447,6 +1476,9 @@ function onTeacherProbeSubmit(event) {
 
   if (action === "back") {
     state.session.current_probe_item_index = Math.max(probeIndex - 1, 0);
+    if (probeIndex === 0) {
+      state.session.current_probe_item_index = -1;
+    }
     saveSessionToStorage();
     renderTeacherProbe(run);
     return;
@@ -1466,7 +1498,7 @@ function onTeacherProbeSubmit(event) {
     run.diagnostic_summary.likely_misconception = refineMisconceptionFromProbe(run.diagnostic_summary.likely_misconception, run.teacher_probe);
   }
   state.session.current_probe_section_id = null;
-  state.session.current_probe_item_index = 0;
+  state.session.current_probe_item_index = -1;
   saveSessionToStorage();
   startTeacherProbeFlowOrFinalize();
 }
@@ -1477,7 +1509,7 @@ function onTeacherProbeSkip() {
     run.teacher_probe.status = "recommended";
   }
   state.session.current_probe_section_id = null;
-  state.session.current_probe_item_index = 0;
+  state.session.current_probe_item_index = -1;
   saveSessionToStorage();
   startTeacherProbeFlowOrFinalize();
 }
@@ -2663,7 +2695,7 @@ function getTeacherProbePrompts(section, summary) {
       makeOption("language_load", "The wording looked more difficult than the maths.", "The maths language may be masking what the student actually understands."),
       makeOption("not_clear", "It is still not clear from the short probe.")
     ]),
-    makePrompt("Which support unlocked the most success?", "best_representation", [
+    makePrompt("Which support helped the student most?", "best_representation", [
       makeOption("materials", "Concrete materials or acted examples."),
       makeOption("diagram", "A diagram, chart, or number line."),
       makeOption("oral", "Teacher talk-through and oral questioning."),
@@ -2692,11 +2724,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("crossing", "Crossing decade or hundred boundaries caused the problem.", "The student may lose the count sequence when crossing decade or hundred boundaries."),
           makeOption("attention", "The student knew some of it but lost attention or stamina.")
         ]),
-        makePrompt("When the student was supported, what looked most secure?", "secure_floor", [
+        makePrompt("When the student was supported, what looked strongest?", "secure_floor", [
           makeOption("small_range", "Counting in a small range only."),
           makeOption("forward_only", "Counting forward only."),
           makeOption("objects", "Counting objects was easier than number words alone."),
-          makeOption("not_secure", "Nothing reliable was secure enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
           makeOption("secure", "Words like before, after, next were secure."),
@@ -2713,42 +2745,42 @@ function getTeacherProbePrompts(section, summary) {
       ],
       sec_02: [
         makePrompt("What most likely caused the errors in identifying numbers?", "likely_barrier", [
-          makeOption("numeral_recognition", "Numeral recognition itself is not secure yet.", "The student may not yet recognise numerals quickly and reliably."),
-          makeOption("before_after", "The student could identify numerals but not the number before or after.", "The student may know the numeral but not yet connect it to the surrounding counting sequence."),
-          makeOption("matching", "Matching numeral to quantity was the main issue.", "The student may need stronger links between numerals and quantities."),
+          makeOption("numeral_recognition", "Reading number symbols is not secure yet.", "The student may not yet read written numbers quickly and reliably."),
+          makeOption("before_after", "The student could read the number but not the number before or after.", "The student may know the written number but not yet connect it to the surrounding counting sequence."),
+          makeOption("matching", "Matching the written number to the amount was the main issue.", "The student may need stronger links between written numbers and quantities."),
           makeOption("attention", "The student appeared inconsistent rather than conceptually stuck.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
-          makeOption("recognise_small", "Recognising smaller numerals only."),
+        makePrompt("What looked strongest?", "secure_floor", [
+          makeOption("recognise_small", "Reading smaller numbers only."),
           makeOption("say_not_find", "Saying numbers was easier than finding them."),
-          makeOption("find_not_before_after", "Finding the numeral was easier than before/after tasks."),
-          makeOption("not_secure", "No secure floor was obvious yet.")
+          makeOption("find_not_before_after", "Finding the number was easier than before/after tasks."),
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Number words and number names were secure."),
           makeOption("before_after", "Before / after was the main language issue.", "The student may need explicit teaching of before and after in number sequences."),
           makeOption("digit_number", "Digit / number language seemed mixed up.", "The student may be mixing up the ideas of digit and number."),
-          makeOption("task_words", "The wording load itself seemed too high.", "The wording load may be affecting performance more than numeral knowledge.")
+          makeOption("task_words", "The wording load itself seemed too high.", "The wording load may be affecting performance more than number knowledge.")
         ]),
         makePrompt("What is the best next teaching move?", "teaching_entry", [
-          makeOption("match_objects", "Match numerals to sets and spoken number words."),
+          makeOption("match_objects", "Match written numbers to sets and spoken number words."),
           makeOption("number_track", "Use a number track for before and after."),
-          makeOption("flash_cards", "Practise quick numeral recognition with cards."),
-          makeOption("step_back", "Step back to a smaller set of numerals first.")
+          makeOption("flash_cards", "Practise quick number reading with cards."),
+          makeOption("step_back", "Step back to a smaller set of numbers first.")
         ])
       ],
       sec_04: [
         makePrompt("What most likely caused the place-value errors?", "likely_barrier", [
           makeOption("grouping", "The student does not yet trust groups of ten and ones.", "The student may not yet see quantities as made of ones, tens, and hundreds."),
-          makeOption("digit_positions", "The student can read the number but not interpret the place values.", "The student may read the numeral without understanding what each place represents."),
+          makeOption("digit_positions", "The student can read the number but not tell what each place means.", "The student may read the number without understanding what each place represents."),
           makeOption("materials_only", "The student was stronger with materials than with written symbols.", "The student may show stronger understanding with concrete materials than with symbols."),
           makeOption("not_clear", "The exact cause is still not fully clear.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("ones", "Counting single ones only."),
           makeOption("tens", "Grouping in tens with support."),
           makeOption("read_number", "Reading the number was easier than partitioning it."),
-          makeOption("not_secure", "No stable place-value floor was obvious yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
           makeOption("secure", "Words like ones, tens, hundreds seemed secure."),
@@ -2774,7 +2806,7 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("addition", "Addition facts were stronger than subtraction."),
           makeOption("subitised", "Visual / dot patterns were stronger than symbols."),
           makeOption("count_on", "Counting on worked better than instant recall."),
-          makeOption("not_secure", "No fact strategy looked secure enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Add, take away, plus, minus seemed secure."),
@@ -2800,7 +2832,7 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("within10", "Facts within 10 were stronger."),
           makeOption("addition", "Addition was stronger than subtraction."),
           makeOption("teen_numbers", "Teen-number structure was the issue."),
-          makeOption("not_secure", "No stable secure floor stood out.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
           makeOption("secure", "Plus, minus, make, left were secure."),
@@ -2822,11 +2854,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("recording", "The student could show it with materials more than with symbols.", "The student may understand the action better than the written recording."),
           makeOption("not_clear", "The exact source of difficulty is still unclear.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("join", "Joining amounts was stronger than separating."),
           makeOption("materials", "Acting it out with materials was stronger than written work."),
           makeOption("small_numbers", "Smaller number stories were stronger."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
           makeOption("secure", "Add, subtract, more, left seemed secure."),
@@ -2848,11 +2880,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("inverse", "The link between multiplication and division facts is weak.", "The inverse relationship between multiplication and division may not be secure."),
           makeOption("attention", "Responses looked inconsistent rather than fully concept-based.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("counting_groups", "Counting groups with materials."),
           makeOption("skip_count", "Skip counting aloud."),
           makeOption("multiply_only", "Multiplication facts were stronger than division."),
-          makeOption("not_secure", "No reliable floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause the most trouble?", "language_comprehension", [
           makeOption("secure", "Times, groups of, shared into seemed secure."),
@@ -2878,7 +2910,7 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("halves", "Halves were stronger than quarters."),
           makeOption("shapes", "Shaded shapes were easier than sets."),
           makeOption("materials", "Sharing objects was easier than writing the answer."),
-          makeOption("not_secure", "No secure fraction floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to cause trouble?", "language_comprehension", [
           makeOption("secure", "Half, quarter, whole, equal parts were secure."),
@@ -2928,11 +2960,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("place_value", "The target place value for rounding is not secure.", "The student may not yet know which place value to attend to when rounding."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("whole_tens", "Rounding to the nearest 10 was stronger."),
           makeOption("whole_hundreds", "Rounding to the nearest 100 was stronger than decimals."),
           makeOption("with_number_line", "A number line helped more than mental rounding."),
-          makeOption("not_secure", "No secure rounding floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Round, nearest, between, midpoint seemed secure."),
@@ -2954,11 +2986,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("strategy", "The strategy chosen was inefficient or unreliable.", "The student may need a more reliable method for these calculations."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("mental", "Simple mental calculations were stronger."),
           makeOption("written", "Written method with support was stronger."),
           makeOption("addition", "Addition was stronger than subtraction."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Altogether, difference, more than, less than seemed secure."),
@@ -2980,11 +3012,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("grouping", "Equal-group meaning is weaker than rote recall.", "The student may not yet connect the facts to equal-group meaning."),
           makeOption("attention", "Responses looked inconsistent rather than fully concept-based.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("multiply", "Multiplication facts were stronger than division."),
           makeOption("skip_count", "Skip counting was stronger than instant recall."),
           makeOption("array", "Arrays or groups helped more than symbols."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Times, groups of, divided by, share equally seemed secure."),
@@ -3006,11 +3038,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("procedure", "The written procedure was not secure.", "The student may need a more secure written multiplication process."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("single_digit", "Single-digit multiplication was stronger."),
           makeOption("materials", "Arrays or groups were stronger than written symbols."),
           makeOption("partial_products", "Breaking the number apart helped."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Times, groups of, lots of, multiply by seemed secure."),
@@ -3032,11 +3064,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("place_value", "Place value inside the written division method caused the issue.", "The student may need stronger place-value support in written division."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("sharing", "Sharing equally was stronger than grouping."),
           makeOption("grouping", "Grouping was stronger than the written algorithm."),
           makeOption("no_remainder", "Questions without remainders were stronger."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Shared into, groups of, each, remainder seemed secure."),
@@ -3058,11 +3090,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("number_line", "The student needs a magnitude model such as a number line.", "The student may need stronger sense of decimal size on a number line."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("tenths", "Tenths were stronger than hundredths."),
           makeOption("same_whole", "Numbers with the same whole-number part were easier."),
           makeOption("with_model", "A number line or place-value chart helped."),
-          makeOption("not_secure", "No secure decimal-comparison floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Tenths, hundredths, greater than, less than seemed secure."),
@@ -3084,11 +3116,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("notation", "The notation change itself caused confusion.", "The student may understand one notation more than the others."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("fraction_decimal", "Fraction-decimal links were stronger than percentages."),
           makeOption("benchmark", "Benchmark equivalents such as 1/2 = 0.5 = 50% were stronger."),
           makeOption("visual", "Visual models were stronger than symbols."),
-          makeOption("not_secure", "No secure equivalence floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Equivalent, percent, decimal, fraction seemed secure."),
@@ -3110,11 +3142,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("decimal_point", "The decimal point is being interpreted inconsistently.", "The student may need clearer understanding of how the decimal point anchors place value."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("multiply10", "Multiplying by 10 was stronger than dividing."),
           makeOption("whole_numbers", "Whole numbers were stronger than decimals."),
           makeOption("with_chart", "A place-value chart helped more than mental rules."),
-          makeOption("not_secure", "No secure scaling floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Times 10, divide by 10, tenths, hundredths seemed secure."),
@@ -3136,11 +3168,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("operation_choice", "The operation or strategy choice was the issue.", "The student may need a more reliable decimal calculation strategy."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("tenths", "Tenths only were stronger than hundredths."),
           makeOption("addition", "Addition was stronger than subtraction."),
           makeOption("grid_help", "A place-value grid helped more than lined-up digits alone."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Decimal point, tenths, hundredths, add, subtract seemed secure."),
@@ -3162,11 +3194,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("notation", "The notation change itself caused confusion.", "The student may understand one form better than the other."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("mixed", "Reading mixed numbers was stronger than converting them."),
           makeOption("improper", "Improper fractions were easier when drawn."),
           makeOption("visual", "Fraction models helped more than symbols."),
-          makeOption("not_secure", "No secure conversion floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Numerator, denominator, mixed number, improper fraction seemed secure."),
@@ -3188,11 +3220,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("percent", "Percentage-of-a-number is weaker than simple fraction-of.", "The student may not yet connect percentages to fraction/decimal operators."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("fractions", "Simple fractions of sets were stronger than percentages."),
           makeOption("materials", "Using counters or diagrams was stronger than symbols."),
           makeOption("benchmark", "Benchmark percentages such as 50% were stronger."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Of, half, quarter, percent, shared equally seemed secure."),
@@ -3214,11 +3246,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("common_denominator", "Finding or using common denominators was the issue.", "The student may not yet use common denominators effectively."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("same_denom", "Fractions with the same denominator were stronger."),
           makeOption("visual", "Fraction strips or drawings helped more than symbols."),
           makeOption("simplify_only", "Simplifying familiar fractions was stronger than ordering them."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Equivalent, simplest form, greater than, denominator seemed secure."),
@@ -3240,11 +3272,11 @@ function getTeacherProbePrompts(section, summary) {
           makeOption("whole_parts", "The student is combining the numbers procedurally without understanding the parts.", "The student may be applying a rule without understanding the fraction parts."),
           makeOption("not_clear", "The exact cause is still not clear enough.")
         ]),
-        makePrompt("What looked most secure?", "secure_floor", [
+        makePrompt("What looked strongest?", "secure_floor", [
           makeOption("same_denom", "Same-denominator questions were stronger."),
           makeOption("visual", "Visual models helped more than symbols."),
           makeOption("addition", "Addition was stronger than subtraction."),
-          makeOption("not_secure", "No secure floor was obvious enough yet.")
+          makeOption("not_secure", "No clear starting point yet.")
         ]),
         makePrompt("Which language seemed to block the response?", "language_comprehension", [
           makeOption("secure", "Numerator, denominator, equivalent, simplify seemed secure."),
@@ -3376,7 +3408,7 @@ function buildTeacherProbeSummary(teacherProbe) {
   const prefixByEvidenceCode = {
     likely_barrier: "Likely barrier",
     concept_detail: "Pattern seen",
-    secure_floor: "Secure floor",
+    secure_floor: "Strongest so far",
     best_representation: "Best support",
     language_comprehension: "Language",
     teaching_entry: "Next move"
@@ -3415,14 +3447,14 @@ function startTeacherProbeFlowOrFinalize() {
   const nextRun = findNextProbeRun();
   if (!nextRun) {
     state.session.current_probe_section_id = null;
-    state.session.current_probe_item_index = 0;
+    state.session.current_probe_item_index = -1;
     state.notice = "";
     finalizeSession();
     return;
   }
 
   state.session.current_probe_section_id = nextRun.section_id;
-  state.session.current_probe_item_index = 0;
+  state.session.current_probe_item_index = -1;
   saveSessionToStorage();
   renderTeacherProbe(nextRun);
 }
@@ -3499,6 +3531,10 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   const prioritySteps = buildFinalNextSteps(sectionSummaries);
   const totalCorrect = `${sessionAnalytics.correct_answers} / ${sessionAnalytics.questions_answered} answered correctly`;
   const completedProbeRows = sectionReportRows.filter((row) => row.run?.teacher_probe?.status === "completed");
+  const completedSectionCards = sectionReportRows
+    .filter((row) => !!row.summary)
+    .map((row) => buildTeacherSectionCard(row))
+    .join("");
 
   const content = `
     <section class="panel">
@@ -3520,58 +3556,37 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
         </div>
       </div>
 
-      <h2>Sections</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Section</th>
-              <th>NZC Best-Fit</th>
-              <th>Confidence</th>
-              <th>Likely Issue</th>
-              <th>Start Here</th>
-              <th>Probe</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sectionReportRows
-              .map((row) => {
-                if (!row.summary) {
-                  return `
-                    <tr>
-                      <td>${escapeHtml(sectionLabel(row.section))}</td>
-                      <td>—</td>
-                      <td>—</td>
-                      <td>No evidence collected yet.</td>
-                      <td>—</td>
-                      <td>—</td>
-                    </tr>
-                  `;
-                }
-                const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
-                return `
-                    <tr>
-                      <td>${escapeHtml(sectionLabel(row.section))}</td>
-                      <td>${escapeHtml(formatTeacherYearLabel(row.summary.observed_year_level))}</td>
-                      <td>${escapeHtml(row.summary.confidence)}</td>
-                      <td>${escapeHtml(diagnosticSummary.likely_misconception)}</td>
-                      <td>${escapeHtml(diagnosticSummary.last_secure_skill)}</td>
-                      <td>${escapeHtml(formatTeacherProbeStatus(row.run?.teacher_probe?.status || diagnosticSummary.teacher_probe_status))}</td>
-                    </tr>
-                  `;
-              })
-              .join("")}
-          </tbody>
-        </table>
+      <h2>Section Summary</h2>
+      <div class="section-summary-grid section-summary-grid-teacher-report">
+        ${completedSectionCards || `<article class="section-summary-card section-summary-card-pending"><h3>No completed sections yet</h3><p>No teacher-facing summary is available until at least one section has been completed.</p></article>`}
       </div>
 
       ${completedProbeRows.length
-        ? `<h2>Probe Notes</h2>
+        ? `<h2>Diagnostic Appendix</h2>
+            <p class="subtle">Use this section when you want the detailed record behind the summary above.</p>
             <div class="teacher-probe-list">
               ${completedProbeRows.map((row) => `
                 <article class="teacher-probe-card">
                   <h3>${escapeHtml(sectionLabel(row.section))}</h3>
                   <p class="teacher-probe-prompt">${escapeHtml(row.run.teacher_probe.teacher_summary || "Probe completed. See saved item-level notes in the exported session file.")}</p>
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Prompt</th>
+                          <th>Teacher Choice</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${row.run.teacher_probe.probe_items.map((item) => `
+                          <tr>
+                            <td>${escapeHtml(item.prompt)}</td>
+                            <td>${escapeHtml(item.selected_label || "Not selected")}</td>
+                          </tr>
+                        `).join("")}
+                      </tbody>
+                    </table>
+                  </div>
                 </article>
               `).join("")}
             </div>`
@@ -3781,32 +3796,9 @@ function downloadFinalTeacherPdf() {
   const phase = state.bank?.assessment?.learning_phase || getCurrentPhaseConfig().label;
   const sectionReportRows = buildSectionReportRows();
   const completedSections = sectionReportRows.filter((row) => !!row.summary).length;
-  const summaryRows = sectionReportRows
-    .map((row) => {
-      if (!row.summary) {
-        return `
-          <tr>
-            <td>${escapeHtml(sectionLabel(row.section))}</td>
-            <td>—</td>
-            <td>—</td>
-            <td>No evidence collected yet.</td>
-            <td>—</td>
-            <td>—</td>
-          </tr>
-        `;
-      }
-      const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
-      return `
-        <tr>
-          <td>${escapeHtml(sectionLabel(row.section))}</td>
-          <td>${escapeHtml(formatTeacherYearLabel(row.summary.observed_year_level))}</td>
-          <td>${escapeHtml(row.summary.confidence)}</td>
-          <td>${escapeHtml(diagnosticSummary.likely_misconception)}</td>
-          <td>${escapeHtml(diagnosticSummary.last_secure_skill)}</td>
-          <td>${escapeHtml(formatTeacherProbeStatus(row.run?.teacher_probe?.status || diagnosticSummary.teacher_probe_status))}</td>
-        </tr>
-      `;
-    })
+  const sectionSummaryBlocks = sectionReportRows
+    .filter((row) => !!row.summary)
+    .map((row) => buildTeacherSectionPdfBlock(row))
     .join("");
   const probeBlocks = sectionReportRows
     .filter((row) => row.run?.teacher_probe?.status === "completed")
@@ -3853,21 +3845,9 @@ function downloadFinalTeacherPdf() {
       ["Confidence", overall.confidence]
     ],
     bodyHtml: `
-      <h3>Sections</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Section</th>
-            <th>NZC Best-Fit</th>
-            <th>Confidence</th>
-            <th>Likely Issue</th>
-            <th>Start Here</th>
-            <th>Probe</th>
-          </tr>
-        </thead>
-        <tbody>${summaryRows}</tbody>
-      </table>
-      ${probeBlocks ? `<h3>Teacher Probe Notes</h3>${probeBlocks}` : ""}
+      <h3>Section Summary</h3>
+      <div class="summary-grid">${sectionSummaryBlocks || "<p>No completed sections yet.</p>"}</div>
+      ${probeBlocks ? `<h3>Diagnostic Appendix</h3><p class="pdf-note">Detailed teacher-check evidence is included below for reference.</p>${probeBlocks}` : ""}
       <h3>Strand Summary</h3>
       <table>
         <thead>
@@ -3893,7 +3873,7 @@ function downloadFinalTeacherPdf() {
       </table>
       <h3>Priority Next Steps</h3>
       <ul>${nextSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ul>
-      <p style="font-size:0.82rem;color:#6b7280;margin-top:1.2rem;border-top:1px solid #e5e7eb;padding-top:0.8rem;"><strong>Confidence rating:</strong> High = student reached the observed level and also showed a non-secure result one level higher. Medium = usable evidence but without that upper boundary. Low = too few attempts or too many skips to be certain.</p>
+      <p class="pdf-note"><strong>Confidence rating:</strong> High = student reached the observed level and also showed a non-secure result one level higher. Medium = usable evidence but without that upper boundary. Low = too few attempts or too many skips to be certain.</p>
     `
   });
 
@@ -3936,6 +3916,13 @@ function buildTeacherReportHtml({ title, subtitle, metaRows, bodyHtml }) {
           h3 { margin: 18px 0 8px; font-size: 1rem; }
           .meta { display: grid; gap: 6px; margin: 10px 0 14px; }
           .meta-row { font-size: 0.93rem; }
+          .summary-grid { display: grid; gap: 12px; margin: 10px 0 16px; }
+          .summary-card { border: 1px solid #d8e1db; border-radius: 14px; padding: 12px; background: #fbfdfb; page-break-inside: avoid; }
+          .summary-card h4 { margin: 0 0 8px; font-size: 1rem; }
+          .summary-kv { margin: 6px 0 0; font-size: 0.92rem; }
+          .summary-kv strong { color: #20313c; }
+          .summary-paragraph { margin: 10px 0 0; font-size: 0.94rem; line-height: 1.45; }
+          .pdf-note { font-size: 0.82rem; color: #6b7280; margin-top: 1rem; border-top: 1px solid #e5e7eb; padding-top: 0.8rem; }
           table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
           th, td { border: 1px solid #c9d0ca; text-align: left; padding: 7px; vertical-align: top; }
           th { background: #eef3ef; }
@@ -3997,6 +3984,74 @@ function getNextStepForSection(section, summary) {
       : `Re-teach prerequisite skills for ${topic} below ${bestFitYear}.`,
     "Use worked examples and guided practice before reassessment."
   ];
+}
+
+function getTeacherProbeChoice(run, evidenceCode) {
+  return run?.teacher_probe?.probe_items?.find((item) => item.evidence_code === evidenceCode)?.selected_label || "";
+}
+
+function simplifyLastSecureSkillText(text) {
+  const raw = String(text || "").trim();
+  if (!raw) {
+    return "";
+  }
+  return raw
+    .replace(/^Start just below\s+/i, "Start just below ")
+    .replace(/\s+tasks in\s+/i, " work in ")
+    .replace(/\s+were secure\.$/i, " was more secure.")
+    .replace(/^Collect a few easier checks.*$/i, "A clearer starting point still needs to be checked.");
+}
+
+function buildTeacherSectionSummary(row) {
+  const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
+  const bestFit = formatTeacherYearLabel(row.summary.observed_year_level);
+  const language = getTeacherProbeChoice(row.run, "language_comprehension") || "No specific language issue was confirmed.";
+  const nextMove = getTeacherProbeChoice(row.run, "teaching_entry") || getNextStepForSection(row.section, row.summary)[0] || "";
+  const strongest = getTeacherProbeChoice(row.run, "secure_floor") || simplifyLastSecureSkillText(diagnosticSummary.last_secure_skill);
+  const whatThisSuggests = diagnosticSummary.likely_misconception;
+  const teacherCheck = row.run?.teacher_probe?.status === "completed" ? "Used" : "Not used";
+  const narrative = `This student is working around ${bestFit} in ${sectionLabel(row.section)}. ${whatThisSuggests} ${language === "No specific language issue was confirmed." ? "" : `Language to watch: ${language}`} ${nextMove ? `Best next move: ${nextMove}` : ""}`.replace(/\s+/g, " ").trim();
+
+  return {
+    bestFit,
+    confidence: row.summary.confidence,
+    whatThisSuggests,
+    strongest,
+    language,
+    nextMove,
+    teacherCheck,
+    narrative
+  };
+}
+
+function buildTeacherSectionCard(row) {
+  const summary = buildTeacherSectionSummary(row);
+  return `
+    <article class="section-summary-card teacher-report-card">
+      <h3>${escapeHtml(sectionLabel(row.section))}</h3>
+      <p><strong>Best-fit:</strong> ${escapeHtml(summary.bestFit)} <span class="teacher-report-divider">|</span> <strong>Confidence:</strong> ${escapeHtml(summary.confidence)} <span class="teacher-report-divider">|</span> <strong>Teacher check:</strong> ${escapeHtml(summary.teacherCheck)}</p>
+      <p><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
+      <p><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
+      <p><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
+      <p><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
+      <p class="teacher-report-narrative">${escapeHtml(summary.narrative)}</p>
+    </article>
+  `;
+}
+
+function buildTeacherSectionPdfBlock(row) {
+  const summary = buildTeacherSectionSummary(row);
+  return `
+    <article class="summary-card">
+      <h4>${escapeHtml(sectionLabel(row.section))}</h4>
+      <p class="summary-kv"><strong>Best-fit:</strong> ${escapeHtml(summary.bestFit)} | <strong>Confidence:</strong> ${escapeHtml(summary.confidence)} | <strong>Teacher check:</strong> ${escapeHtml(summary.teacherCheck)}</p>
+      <p class="summary-kv"><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
+      <p class="summary-kv"><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
+      <p class="summary-kv"><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
+      <p class="summary-kv"><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
+      <p class="summary-paragraph">${escapeHtml(summary.narrative)}</p>
+    </article>
+  `;
 }
 
 function buildFinalNextSteps(sectionSummaries) {
