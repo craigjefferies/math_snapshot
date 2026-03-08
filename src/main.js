@@ -2175,6 +2175,7 @@ function downloadSectionTeacherPdf(run) {
   const section = state.sectionsById.get(run.section_id);
   const summary = run.summary;
   const decision = buildSectionDecision(summary);
+  const evidence = buildSectionAllocationEvidence(summary);
   const phase = state.bank?.assessment?.learning_phase || "Phase 2";
   const nextSteps = getNextStepForSection(section, summary);
   const timestamp = formatReportTimestamp(new Date().toISOString());
@@ -2197,12 +2198,35 @@ function downloadSectionTeacherPdf(run) {
       ["Teacher", state.session.teacher.name],
       ["Student", state.session.student.name],
       ["Section", sectionLabel(section)],
+      ["Phase", phase],
       ["Best-Fit Year Level (Section)", decision.bestFitYear],
       ["Correct", `${summary.correct_answers}/${summary.total_questions}`]
     ],
     bodyHtml: `
       <h3>Year-Level Decision</h3>
       <p><strong>${escapeHtml(decision.headline)}</strong> ${escapeHtml(decision.evidence)}</p>
+      <h3>Evidence Of Year / Phase Allocation</h3>
+      <ul>${evidence.allocationLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+      <h3>${escapeHtml(evidence.barrierHeading)}</h3>
+      <p>${escapeHtml(evidence.barrierIntro)}</p>
+      ${evidence.barrierItems.length
+        ? `<table>
+            <thead>
+              <tr><th>Year</th><th>Prompt</th><th>Student Response</th><th>Expected</th><th>Issue</th></tr>
+            </thead>
+            <tbody>
+              ${evidence.barrierItems.map((item) => `
+                <tr>
+                  <td>${escapeHtml(item.yearLabel)}</td>
+                  <td>${escapeHtml(item.prompt)}</td>
+                  <td>${escapeHtml(item.response)}</td>
+                  <td>${escapeHtml(item.expected)}</td>
+                  <td>${escapeHtml(item.issue)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`
+        : `<p>No incorrect or skipped item detail is available for a boundary attempt.</p>`}
       <h3>Next Steps</h3>
       <ul>${nextSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ul>
       <h3>Attempt History</h3>
@@ -2230,21 +2254,55 @@ function downloadFinalTeacherPdf() {
           <tr>
             <td>${escapeHtml(sectionLabel(row.section))}</td>
             <td>Not completed</td>
-            <td>—</td>
-            <td>—</td>
+            <td>No evidence collected yet.</td>
+            <td>No evidence collected yet.</td>
             <td>Complete this section to generate next steps.</td>
           </tr>
         `;
       }
       const decision = buildSectionDecision(row.summary);
+      const evidence = buildSectionAllocationEvidence(row.summary);
       const nextStep = getNextStepForSection(row.section, row.summary)[0] || "";
       return `
         <tr>
           <td>${escapeHtml(sectionLabel(row.section))}</td>
           <td>${escapeHtml(decision.bestFitYear)}</td>
-          <td>${escapeHtml(decision.shortReason)}</td>
+          <td>${escapeHtml(evidence.allocationLines.join(" "))}</td>
+          <td>${escapeHtml(evidence.barrierIntro)}</td>
           <td>${escapeHtml(nextStep)}</td>
         </tr>
+      `;
+    })
+    .join("");
+  const sectionEvidenceBlocks = sectionReportRows
+    .filter((row) => !!row.summary)
+    .map((row) => {
+      const decision = buildSectionDecision(row.summary);
+      const evidence = buildSectionAllocationEvidence(row.summary);
+      return `
+        <h3>${escapeHtml(sectionLabel(row.section))}</h3>
+        <p><strong>${escapeHtml(decision.bestFitYear)}</strong></p>
+        <p><strong>Evidence of allocation:</strong></p>
+        <ul>${evidence.allocationLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+        <p><strong>${escapeHtml(evidence.barrierHeading)}:</strong> ${escapeHtml(evidence.barrierIntro)}</p>
+        ${evidence.barrierItems.length
+          ? `<table>
+              <thead>
+                <tr><th>Year</th><th>Prompt</th><th>Student Response</th><th>Expected</th><th>Issue</th></tr>
+              </thead>
+              <tbody>
+                ${evidence.barrierItems.map((item) => `
+                  <tr>
+                    <td>${escapeHtml(item.yearLabel)}</td>
+                    <td>${escapeHtml(item.prompt)}</td>
+                    <td>${escapeHtml(item.response)}</td>
+                    <td>${escapeHtml(item.expected)}</td>
+                    <td>${escapeHtml(item.issue)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>`
+          : `<p>No incorrect or skipped item detail is available for a boundary attempt.</p>`}
       `;
     })
     .join("");
@@ -2256,7 +2314,7 @@ function downloadFinalTeacherPdf() {
   const timestamp = formatReportTimestamp(state.session.generated_at || new Date().toISOString());
 
   const html = buildTeacherReportHtml({
-    title: "Phase 2 Snapshot Teacher Report",
+    title: `${phase} Snapshot Teacher Report`,
     subtitle: `${phase} | Full Session`,
     metaRows: [
       ["Generated", timestamp],
@@ -2274,12 +2332,15 @@ function downloadFinalTeacherPdf() {
           <tr>
             <th>Section</th>
             <th>Best-Fit Year</th>
-            <th>Why This Year</th>
+            <th>Evidence Of Allocation</th>
+            <th>What Stopped Next Step</th>
             <th>Next Step</th>
           </tr>
         </thead>
         <tbody>${summaryRows}</tbody>
       </table>
+      <h3>Section Evidence Detail</h3>
+      ${sectionEvidenceBlocks || "<p>No completed sections yet.</p>"}
       <h3>Strand Summary</h3>
       <table>
         <thead>
@@ -2885,19 +2946,9 @@ function describeAttemptProgress(band) {
   return "Moved down or stopped because earlier skills are still needed.";
 }
 
-function buildSectionDecision(summary) {
-  if (!summary || summary.observed_year_level === "Not Attempted") {
-    return {
-      bestFitYear: "Not attempted",
-      headline: "No year-level decision yet.",
-      evidence: "No questions were completed in this section.",
-      shortReason: "No evidence collected yet."
-    };
-  }
-
-  const attempts = [...summary.attempts].sort((a, b) => a.year_level - b.year_level);
-  const bestFitYear = formatTeacherYearLabel(summary.observed_year_level);
-  const observedYear = parseYearLabel(summary.observed_year_level);
+function getSummaryAttemptContext(summary) {
+  const attempts = [...(summary?.attempts || [])].sort((a, b) => a.year_level - b.year_level);
+  const observedYear = parseYearLabel(summary?.observed_year_level);
   const observedAttempt = Number.isFinite(observedYear)
     ? attempts.find((attempt) => attempt.year_level === observedYear) ?? null
     : null;
@@ -2913,6 +2964,161 @@ function buildSectionDecision(summary) {
       ?? null
     : null;
   const lowestAttempt = attempts[0] ?? null;
+
+  return {
+    attempts,
+    observedAttempt,
+    upperAttempt,
+    lowerSecureAttempt,
+    lowestAttempt
+  };
+}
+
+function formatStudentResponseForReport(response) {
+  const formatted = formatAnswerForExport(response);
+  return String(formatted || "").trim() ? formatted : "No response";
+}
+
+function buildBlockingItemEvidence(attempt, limit = 6) {
+  if (!attempt?.item_results?.length) {
+    return [];
+  }
+
+  return attempt.item_results
+    .filter((itemResult) => !itemResult.is_correct)
+    .slice(0, limit)
+    .map((itemResult) => {
+      const item = state.itemsById.get(itemResult.item_id);
+      return {
+        yearLabel: formatTeacherYearLabel(attempt.year_level),
+        prompt: item?.prompt ?? itemResult.item_id,
+        expected: formatAnswerForExport(item?.answer),
+        response: formatStudentResponseForReport(itemResult.response),
+        issue: itemResult.is_skipped ? "Skipped" : "Incorrect"
+      };
+    });
+}
+
+function getNextAvailableYearLabel(summary, currentYearLevel) {
+  const section = state.sectionsById.get(summary?.section_id);
+  const nextYear = availableYears(section).find((year) => year > currentYearLevel);
+  return nextYear ? formatTeacherYearLabel(nextYear) : null;
+}
+
+function buildSectionAllocationEvidence(summary) {
+  if (!summary || summary.observed_year_level === "Not Attempted") {
+    return {
+      allocationLines: ["No questions were completed in this section."],
+      barrierHeading: "What stopped progress",
+      barrierIntro: "No boundary evidence is available yet.",
+      barrierItems: []
+    };
+  }
+
+  const bestFitYear = formatTeacherYearLabel(summary.observed_year_level);
+  const {
+    observedAttempt,
+    upperAttempt,
+    lowerSecureAttempt,
+    lowestAttempt
+  } = getSummaryAttemptContext(summary);
+
+  if (summary.mastery_band === "Secure" && observedAttempt) {
+    const allocationLines = [
+      `${bestFitYear} was secured with ${observedAttempt.correct}/${observedAttempt.total} correct (${observedAttempt.score_percent}%).`
+    ];
+
+    if (upperAttempt) {
+      allocationLines.push(
+        `${formatTeacherYearLabel(upperAttempt.year_level)} was then not secured with ${upperAttempt.correct}/${upperAttempt.total} correct (${upperAttempt.score_percent}%), which confirms ${bestFitYear} as the current boundary in this section.`
+      );
+    } else {
+      allocationLines.push(`No higher year-level evidence was collected after ${bestFitYear}, so this is the highest secure evidence in this section.`);
+    }
+
+    return {
+      allocationLines,
+      barrierHeading: upperAttempt
+        ? `What stopped movement beyond ${bestFitYear}`
+        : `What still needs checking beyond ${bestFitYear}`,
+      barrierIntro: upperAttempt
+        ? `${formatTeacherYearLabel(upperAttempt.year_level)} was the next year-level in the phase. The items below were incorrect or skipped and stopped the student from progressing further in this section.`
+        : "A higher year level was not attempted, so there is no direct blocking evidence yet.",
+      barrierItems: upperAttempt ? buildBlockingItemEvidence(upperAttempt) : []
+    };
+  }
+
+  if (summary.mastery_band === "Developing" && observedAttempt) {
+    const allocationLines = [];
+
+    if (lowerSecureAttempt) {
+      allocationLines.push(
+        `${formatTeacherYearLabel(lowerSecureAttempt.year_level)} was secured with ${lowerSecureAttempt.correct}/${lowerSecureAttempt.total} correct (${lowerSecureAttempt.score_percent}%).`
+      );
+    }
+
+    allocationLines.push(
+      `${bestFitYear} was only partly met with ${observedAttempt.correct}/${observedAttempt.total} correct (${observedAttempt.score_percent}%), so the student is working within ${bestFitYear} but is not yet secure there.`
+    );
+
+    if (upperAttempt) {
+      allocationLines.push(
+        `${formatTeacherYearLabel(upperAttempt.year_level)} was not met with ${upperAttempt.correct}/${upperAttempt.total} correct (${upperAttempt.score_percent}%), which supports keeping the allocation at ${bestFitYear}.`
+      );
+    }
+
+    const barrierAttempt = upperAttempt ?? observedAttempt;
+    const nextYear = upperAttempt
+      ? formatTeacherYearLabel(upperAttempt.year_level)
+      : getNextAvailableYearLabel(summary, observedAttempt.year_level);
+
+    return {
+      allocationLines,
+      barrierHeading: nextYear
+        ? `What stopped movement to ${nextYear}`
+        : `What still needs securing at ${bestFitYear}`,
+      barrierIntro: upperAttempt
+        ? `The next year-level evidence came from ${nextYear}. These incorrect or skipped responses prevented the student from moving up.`
+        : nextYear
+          ? `The student was not yet secure at ${bestFitYear}. These incorrect or skipped responses show what needs to be fixed before moving to ${nextYear}.`
+          : `The student is still not secure at ${bestFitYear}. These incorrect or skipped responses explain why the allocation remains there.`,
+      barrierItems: buildBlockingItemEvidence(barrierAttempt)
+    };
+  }
+
+  if (lowestAttempt) {
+    const phaseEntryYear = formatTeacherYearLabel(PHASE_MIN_YEAR);
+    return {
+      allocationLines: [
+        `${formatTeacherYearLabel(lowestAttempt.year_level)} was not met with ${lowestAttempt.correct}/${lowestAttempt.total} correct (${lowestAttempt.score_percent}%).`,
+        `This indicates prerequisite knowledge below ${phaseEntryYear}, so the student is currently working below the phase entry point in this section.`
+      ],
+      barrierHeading: `What stopped entry into ${phaseEntryYear}`,
+      barrierIntro: `These incorrect or skipped responses show why the student could not yet move into ${phaseEntryYear} in this phase.`,
+      barrierItems: buildBlockingItemEvidence(lowestAttempt)
+    };
+  }
+
+  return {
+    allocationLines: ["Use the attempt history below as the current evidence for this allocation."],
+    barrierHeading: "What stopped progress",
+    barrierIntro: "No blocking item evidence is available.",
+    barrierItems: []
+  };
+}
+
+function buildSectionDecision(summary) {
+  if (!summary || summary.observed_year_level === "Not Attempted") {
+    return {
+      bestFitYear: "Not attempted",
+      headline: "No year-level decision yet.",
+      evidence: "No questions were completed in this section.",
+      shortReason: "No evidence collected yet."
+    };
+  }
+
+  const { attempts, observedAttempt, upperAttempt, lowerSecureAttempt, lowestAttempt } = getSummaryAttemptContext(summary);
+  const bestFitYear = formatTeacherYearLabel(summary.observed_year_level);
 
   if (summary.mastery_band === "Secure" && observedAttempt) {
     const observedYearLabel = formatTeacherYearLabel(observedAttempt.year_level);
