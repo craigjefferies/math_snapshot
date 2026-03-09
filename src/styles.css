@@ -99,7 +99,7 @@ button {
   appearance: none;
   background: #fff;
   border: 1px solid var(--line-strong);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #1e293b;
   cursor: pointer;
   font-weight: 600;
@@ -211,7 +211,7 @@ fieldset {
   padding: 1rem;
   background: var(--panel-muted);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .subtle {
@@ -220,7 +220,7 @@ fieldset {
 
 .note,
 .notice {
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 0.875rem 1rem;
 }
 
@@ -611,7 +611,7 @@ fieldset {
   padding: 0.9rem 1rem;
   background: rgb(255 255 255 / 0.92);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(10px);
 }
@@ -1331,7 +1331,7 @@ fieldset {
   padding: 1.5rem;
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .mode-student .item-card {
@@ -1373,14 +1373,14 @@ fieldset {
   width: min(100%, 420px);
   height: auto;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: #fff;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 .mode-student .item-media-image {
   width: min(100%, 520px);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .inline-fraction {
@@ -1462,7 +1462,7 @@ fieldset {
   padding: 1.25rem;
   background: linear-gradient(180deg, #ffffff 0%, var(--accent-soft) 100%);
   border: 1px solid var(--accent-line);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .teacher-probe-intro-kicker {
@@ -1541,7 +1541,7 @@ fieldset {
   padding: 1rem;
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .teacher-probe-card h3 {
@@ -1566,7 +1566,7 @@ fieldset {
   gap: 0.75rem;
   padding: 0.85rem 0.95rem;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #f8fafc;
   cursor: pointer;
   transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -1790,7 +1790,7 @@ fieldset {
   overflow: hidden;
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .result-hero-cell {
@@ -1849,7 +1849,7 @@ fieldset {
   padding: 1rem;
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .attempt-card-observed {
