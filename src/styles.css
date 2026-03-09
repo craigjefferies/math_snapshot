@@ -824,10 +824,6 @@ fieldset {
   border-color: var(--accent-line);
 }
 
-.radio-row:has(input[name="startMode"]:focus-visible) {
-  box-shadow: 0 0 0 3px var(--accent-outline);
-}
-
 .radio-choice {
   display: grid;
   gap: 0.5rem;
@@ -884,10 +880,6 @@ fieldset {
   color: var(--accent-strong);
 }
 
-.year-check:has(input:focus-visible) span {
-  box-shadow: 0 0 0 3px var(--accent-outline);
-}
-
 .selection-tools {
   display: flex;
   flex-wrap: wrap;
@@ -932,10 +924,12 @@ fieldset {
   align-items: stretch;
   grid-template-columns: auto minmax(0, 1fr);
   padding: 0.8rem 0;
+  border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     transform 140ms ease,
     border-color 140ms ease,
@@ -1888,6 +1882,22 @@ fieldset {
 .section-summary-card p,
 .teacher-note-card p {
   color: var(--muted);
+}
+
+.teacher-report-difficulty {
+  margin-top: 0.5rem;
+}
+
+.teacher-report-difficulty-list,
+.pdf-difficulty-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+}
+
+.teacher-report-difficulty-list li,
+.pdf-difficulty-list li {
+  margin: 0.2rem 0;
 }
 
 .attempt-card-metrics {

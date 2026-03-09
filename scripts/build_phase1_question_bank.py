@@ -149,7 +149,7 @@ add_section(
             spec("Count backwards from 84. Type the next eight numbers.", "short_text", "83 82 81 80 79 78 77 76", 1, accepted_answers=sequence_answers([83, 82, 81, 80, 79, 78, 77, 76])),
         ],
         3: [
-            spec("Count forwards from 387. Type the next numbers: 388, 389, 390, 391, then continue to 399, 400, 401, 402.", "short_text", "388 389 390 391 392 393 394 395 396 397 398 399 400 401 402", 1, accepted_answers=sequence_answers([388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402])),
+            spec("Count forwards from 387. Type the next numbers up to 402.", "short_text", "388 389 390 391 392 393 394 395 396 397 398 399 400 401 402", 1, accepted_answers=sequence_answers([388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402])),
             spec("Count backwards from 604. Type the next seven numbers.", "short_text", "603 602 601 600 599 598 597", 1, accepted_answers=sequence_answers([603, 602, 601, 600, 599, 598, 597])),
         ],
     },

@@ -423,6 +423,7 @@ function findNextProbeRun() {
     run.summary
     && run.diagnostic_summary?.teacher_probe_needed
     && run.teacher_probe?.status !== "completed"
+    && run.teacher_probe?.status !== "skipped"
   ) || null;
 }
 
@@ -1640,7 +1641,10 @@ function onTeacherProbeSubmit(event) {
 function onTeacherProbeSkip(runArg = null) {
   const run = runArg || findCurrentProbeRun();
   if (run?.teacher_probe) {
-    run.teacher_probe.status = "recommended";
+    run.teacher_probe.status = "skipped";
+  }
+  if (run?.diagnostic_summary) {
+    run.diagnostic_summary.teacher_probe_status = "skipped";
   }
   state.session.current_probe_section_id = null;
   state.session.current_probe_item_index = -1;
@@ -2958,7 +2962,8 @@ function formatTeacherProbeStatus(value) {
     not_needed: "Not needed",
     not_run: "Not run",
     recommended: "Recommended",
-    completed: "Completed"
+    completed: "Completed",
+    skipped: "Skipped"
   };
   return labels[value] || value;
 }
@@ -3542,11 +3547,13 @@ function simplifyLastSecureSkillText(text) {
 
 function buildTeacherSectionSummary(row) {
   const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
+  const allocationEvidence = buildSectionAllocationEvidence(row.summary);
   const bestFit = formatTeacherYearLabel(row.summary.observed_year_level);
   const language = getTeacherProbeChoice(row.run, "language_comprehension") || "No specific language issue was confirmed.";
   const strongest = getTeacherProbeChoice(row.run, "secure_floor") || simplifyLastSecureSkillText(diagnosticSummary.last_secure_skill);
   const whatThisSuggests = diagnosticSummary.likely_misconception;
   const teacherCheck = row.run?.teacher_probe?.status === "completed" ? "Used" : "Not used";
+  const difficultyQuestions = allocationEvidence.barrierItems.slice(0, 3);
   const narrative = `This student is working around ${bestFit} in ${sectionLabel(row.section)}. ${whatThisSuggests} ${language === "No specific language issue was confirmed." ? "" : `Language to watch: ${language}`}`.replace(/\s+/g, " ").trim();
 
   return {
@@ -3556,6 +3563,7 @@ function buildTeacherSectionSummary(row) {
     strongest,
     language,
     teacherCheck,
+    difficultyQuestions,
     narrative
   };
 }
@@ -3569,6 +3577,16 @@ function buildTeacherSectionCard(row) {
       <p><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
+      ${summary.difficultyQuestions.length
+        ? `<div class="teacher-report-difficulty">
+            <p><strong>Questions that caused difficulty:</strong></p>
+            <ul class="teacher-report-difficulty-list">
+              ${summary.difficultyQuestions.map((item) => `
+                <li>${escapeHtml(item.prompt)}${item.issue ? ` (${escapeHtml(item.issue)})` : ""}</li>
+              `).join("")}
+            </ul>
+          </div>`
+        : ""}
       <p class="teacher-report-narrative">${escapeHtml(summary.narrative)}</p>
     </article>
   `;
@@ -3583,6 +3601,16 @@ function buildTeacherSectionPdfBlock(row) {
       <p class="summary-kv"><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p class="summary-kv"><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p class="summary-kv"><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
+      ${summary.difficultyQuestions.length
+        ? `<div class="summary-kv">
+            <strong>Questions that caused difficulty:</strong>
+            <ul class="pdf-difficulty-list">
+              ${summary.difficultyQuestions.map((item) => `
+                <li>${escapeHtml(item.prompt)}${item.issue ? ` (${escapeHtml(item.issue)})` : ""}</li>
+              `).join("")}
+            </ul>
+          </div>`
+        : ""}
       <p class="summary-paragraph">${escapeHtml(summary.narrative)}</p>
     </article>
   `;

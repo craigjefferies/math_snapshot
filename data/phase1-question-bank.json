@@ -573,7 +573,7 @@
       "item_id": "itm_sec_01_y3_q01",
       "section_id": "sec_01",
       "variant_id": "var_sec_01_y3",
-      "prompt": "Count forwards from 387. Type the next numbers: 388, 389, 390, 391, then continue to 399, 400, 401, 402.",
+      "prompt": "Count forwards from 387. Type the next numbers up to 402.",
       "answer_type": "short_text",
       "answer": "388 389 390 391 392 393 394 395 396 397 398 399 400 401 402",
       "source_page": 1,
