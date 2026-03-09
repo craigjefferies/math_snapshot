@@ -909,11 +909,10 @@ fieldset {
   gap: 0.9rem;
   align-items: stretch;
   grid-template-columns: auto minmax(0, 1fr);
-  padding: 0.95rem;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-  box-shadow: 0 8px 20px rgb(15 23 42 / 0.04);
+  padding: 0.8rem 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   transition:
     transform 140ms ease,
@@ -923,9 +922,9 @@ fieldset {
 }
 
 .section-card:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent-mid);
-  box-shadow: 0 12px 24px var(--accent-shadow);
+  transform: none;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .section-card input {
@@ -961,23 +960,19 @@ fieldset {
 .section-card-body {
   display: grid;
   min-width: 0;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  background: #fff;
+  border-radius: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .section-card-top {
   display: grid;
   gap: 0.3rem;
-  padding: 0.85rem 0.95rem;
-}
-
-.section-card-top {
-  background:
-    radial-gradient(circle at top right, var(--accent-soft-strong), transparent 42%),
-    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-bottom: 1px solid #e2e8f0;
+  padding: 0.1rem 0 0.8rem;
+  background: transparent;
+  border-bottom: 0;
 }
 
 .section-card-strand {
@@ -994,18 +989,18 @@ fieldset {
   text-transform: uppercase;
 }
 
-.section-card-top strong {
+.section-card-title {
   margin: 0;
   font-size: 0.98rem;
   line-height: 1.25;
   color: #0f172a;
+  font-weight: 500;
 }
 
 .section-card:has(input:checked) {
-  background:
-    linear-gradient(180deg, var(--accent-soft) 0%, var(--accent-soft-strong) 100%);
-  border-color: var(--accent-mid);
-  box-shadow: 0 14px 28px var(--accent-shadow-strong);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .section-card:has(input:checked) .section-card-check {
@@ -1023,9 +1018,7 @@ fieldset {
 }
 
 .section-card:has(input:checked) .section-card-top {
-  background:
-    radial-gradient(circle at top right, var(--accent-mid), transparent 44%),
-    linear-gradient(180deg, #ffffff 0%, var(--accent-soft) 100%);
+  background: transparent;
 }
 
 .session-names-grid {

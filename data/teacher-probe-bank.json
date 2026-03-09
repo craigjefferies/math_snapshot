@@ -1,0 +1,1842 @@
+{
+  "generic": [
+    {
+      "prompt": "What most likely sat behind the student errors in this section?",
+      "evidence_code": "likely_barrier",
+      "response_options": [
+        {
+          "id": "concept_gap",
+          "label": "The core maths idea is not secure yet.",
+          "misconception_hint": "The core concept is not secure enough at this level yet."
+        },
+        {
+          "id": "representation_only",
+          "label": "The student could explain it with materials but not with symbols.",
+          "misconception_hint": "The written task may be overstating the gap because the student can show more understanding with materials."
+        },
+        {
+          "id": "language_load",
+          "label": "The wording looked more difficult than the maths.",
+          "misconception_hint": "The maths language may be masking what the student actually understands."
+        },
+        {
+          "id": "not_clear",
+          "label": "It's still not clear from this short probe."
+        }
+      ]
+    },
+    {
+      "prompt": "Which support helped the student most?",
+      "evidence_code": "best_representation",
+      "response_options": [
+        {
+          "id": "materials",
+          "label": "Concrete materials or acted examples."
+        },
+        {
+          "id": "diagram",
+          "label": "A diagram, chart, or number line."
+        },
+        {
+          "id": "oral",
+          "label": "Teacher talk-through and oral questioning."
+        },
+        {
+          "id": "none",
+          "label": "None yet; the student still seemed unsure."
+        }
+      ]
+    },
+    {
+      "prompt": "Which maths language still seemed shaky?",
+      "evidence_code": "language_comprehension",
+      "response_options": [
+        {
+          "id": "secure",
+          "label": "The key section words seemed secure."
+        },
+        {
+          "id": "comparison",
+          "label": "Comparison / direction words such as before, after, more, less caused confusion.",
+          "misconception_hint": "The student may need explicit teaching of comparison and direction language."
+        },
+        {
+          "id": "place_value",
+          "label": "Place-value words such as digit, tens, hundreds, tenths caused confusion.",
+          "misconception_hint": "The student may need explicit teaching of the place-value vocabulary in this section."
+        },
+        {
+          "id": "task_words",
+          "label": "The task wording itself seemed to block the response.",
+          "misconception_hint": "The wording load may be getting in the way of the maths thinking."
+        }
+      ]
+    }
+  ],
+  "phases": {
+    "phase1": {
+      "sec_01": [
+        {
+          "prompt": "What most likely caused the student to struggle in counting?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "sequence",
+              "label": "The counting sequence itself is not secure yet.",
+              "misconception_hint": "The student is still building a stable counting sequence."
+            },
+            {
+              "id": "backward",
+              "label": "Forward counting is stronger than backward counting.",
+              "misconception_hint": "The student may be relying on forward counting and not yet secure with counting backwards."
+            },
+            {
+              "id": "crossing",
+              "label": "Crossing decade or hundred boundaries caused the problem.",
+              "misconception_hint": "The student may lose the count sequence when crossing decade or hundred boundaries."
+            },
+            {
+              "id": "attention",
+              "label": "The student seemed to lose focus rather than get stuck on the maths."
+            }
+          ]
+        },
+        {
+          "prompt": "When the student was supported, what looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "small_range",
+              "label": "Counting in a small range only."
+            },
+            {
+              "id": "forward_only",
+              "label": "Counting forward only."
+            },
+            {
+              "id": "objects",
+              "label": "Counting objects was easier than number words alone."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause the most trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Words like before, after, next were secure."
+            },
+            {
+              "id": "before_after",
+              "label": "Before / after language caused confusion.",
+              "misconception_hint": "The student may not yet connect before and after language to counting direction."
+            },
+            {
+              "id": "forwards_backwards",
+              "label": "Forwards / backwards language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of forwards and backwards language."
+            },
+            {
+              "id": "task_words",
+              "label": "The question wording itself caused confusion.",
+              "misconception_hint": "The task wording may be obscuring the counting concept."
+            }
+          ]
+        }
+      ],
+      "sec_02": [
+        {
+          "prompt": "What most likely caused the errors in identifying numbers?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "numeral_recognition",
+              "label": "Reading number symbols is not secure yet.",
+              "misconception_hint": "The student may not yet read written numbers quickly and reliably."
+            },
+            {
+              "id": "before_after",
+              "label": "The student could read the number but not the number before or after.",
+              "misconception_hint": "The student may know the written number but not yet connect it to the surrounding counting sequence."
+            },
+            {
+              "id": "matching",
+              "label": "Matching the written number to the amount was the main issue.",
+              "misconception_hint": "The student may need stronger links between written numbers and quantities."
+            },
+            {
+              "id": "attention",
+              "label": "The student seemed inconsistent rather than clearly stuck on the maths."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "recognise_small",
+              "label": "Reading smaller numbers only."
+            },
+            {
+              "id": "say_not_find",
+              "label": "Saying numbers was easier than finding them."
+            },
+            {
+              "id": "find_not_before_after",
+              "label": "Finding the number was easier than before/after tasks."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Number words and number names were secure."
+            },
+            {
+              "id": "before_after",
+              "label": "Before / after was the main language issue.",
+              "misconception_hint": "The student may need explicit teaching of before and after in number sequences."
+            },
+            {
+              "id": "digit_number",
+              "label": "Digit / number language seemed mixed up.",
+              "misconception_hint": "The student may be mixing up the ideas of digit and number."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high.",
+              "misconception_hint": "The wording load may be affecting performance more than number knowledge."
+            }
+          ]
+        }
+      ],
+      "sec_03": [
+        {
+          "prompt": "What most likely caused the difficulty with subitising?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "instant_recognition",
+              "label": "The student still needed to count each dot or object one by one.",
+              "misconception_hint": "The student may not yet recognise small quantities instantly."
+            },
+            {
+              "id": "larger_patterns",
+              "label": "Small patterns were easier, but larger patterns quickly became too hard.",
+              "misconception_hint": "The student may only be secure with very small visual quantities."
+            },
+            {
+              "id": "pattern_type",
+              "label": "Familiar patterns were easier than scattered arrangements.",
+              "misconception_hint": "The student may rely on familiar visual patterns rather than flexible quantity recognition."
+            },
+            {
+              "id": "attention",
+              "label": "Focus or stamina may also have affected responses."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "very_small",
+              "label": "Very small groups only."
+            },
+            {
+              "id": "familiar_patterns",
+              "label": "Familiar dot patterns such as dice or ten-frames."
+            },
+            {
+              "id": "talk_it_through",
+              "label": "Talking through what was seen helped."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause the most trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Words like more, fewer, same, altogether seemed secure."
+            },
+            {
+              "id": "compare_words",
+              "label": "More / fewer / same language caused confusion.",
+              "misconception_hint": "The student may need clearer support with comparison language."
+            },
+            {
+              "id": "group_words",
+              "label": "Group / altogether language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of the words used to talk about small groups."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording may have been too much."
+            }
+          ]
+        }
+      ],
+      "sec_04": [
+        {
+          "prompt": "What most likely caused the place-value errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "grouping",
+              "label": "The student does not yet see tens and ones as reliable groups.",
+              "misconception_hint": "The student may not yet see quantities as made of ones, tens, and hundreds."
+            },
+            {
+              "id": "digit_positions",
+              "label": "The student can read the number but not tell what each place means.",
+              "misconception_hint": "The student may read the number without understanding what each place represents."
+            },
+            {
+              "id": "materials_only",
+              "label": "The student was stronger with materials than with written symbols.",
+              "misconception_hint": "The student may show stronger understanding with concrete materials than with symbols."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "ones",
+              "label": "Counting single ones only."
+            },
+            {
+              "id": "tens",
+              "label": "Grouping in tens with support."
+            },
+            {
+              "id": "read_number",
+              "label": "Reading the number was easier than partitioning it."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause the most trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Words like ones, tens, hundreds seemed secure."
+            },
+            {
+              "id": "digit_number",
+              "label": "Digit / number was mixed up.",
+              "misconception_hint": "The student may be mixing up digit names with the value of the whole number."
+            },
+            {
+              "id": "tens_hundreds",
+              "label": "Tens / hundreds language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of tens and hundreds language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording itself was the main issue.",
+              "misconception_hint": "The task wording may be obscuring the place-value idea."
+            }
+          ]
+        }
+      ],
+      "sec_05a": [
+        {
+          "prompt": "What most likely caused the breakdown in facts to 10?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "not_known",
+              "label": "The facts are not yet known securely.",
+              "misconception_hint": "The student does not yet have these facts secure."
+            },
+            {
+              "id": "counting_all",
+              "label": "The student is still counting all rather than recalling or counting on.",
+              "misconception_hint": "The student may still rely on counting-all strategies for facts to 10."
+            },
+            {
+              "id": "inverse",
+              "label": "The subtraction link to the addition fact is not secure.",
+              "misconception_hint": "The connection between addition and subtraction facts may not yet be secure."
+            },
+            {
+              "id": "attention",
+              "label": "Focus or stamina may also have affected responses."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "addition",
+              "label": "Addition facts were stronger than subtraction."
+            },
+            {
+              "id": "subitised",
+              "label": "Visual / dot patterns were stronger than symbols."
+            },
+            {
+              "id": "count_on",
+              "label": "Counting on worked better than instant recall."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Add, take away, plus, minus seemed secure."
+            },
+            {
+              "id": "minus_takeaway",
+              "label": "Minus / take away language caused confusion.",
+              "misconception_hint": "The student may need clearer links between subtraction language and action."
+            },
+            {
+              "id": "altogether",
+              "label": "Words like altogether / left caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of the problem-solving language used in fact questions."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording may have been too much."
+            }
+          ]
+        }
+      ],
+      "sec_05b": [
+        {
+          "prompt": "What most likely caused the breakdown in facts to 20?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "bridging",
+              "label": "Bridging through 10 is not secure yet.",
+              "misconception_hint": "The student may not yet use bridging-through-10 strategies reliably."
+            },
+            {
+              "id": "recall",
+              "label": "The facts are not yet recalled quickly enough.",
+              "misconception_hint": "The student does not yet recall these facts securely."
+            },
+            {
+              "id": "inverse",
+              "label": "The subtraction facts are much weaker than the addition facts.",
+              "misconception_hint": "The student may not yet connect subtraction facts to related addition facts."
+            },
+            {
+              "id": "attention",
+              "label": "Focus or stamina may also have affected responses."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "within10",
+              "label": "Facts within 10 were stronger."
+            },
+            {
+              "id": "addition",
+              "label": "Addition was stronger than subtraction."
+            },
+            {
+              "id": "teen_numbers",
+              "label": "Teen-number structure was the issue."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Plus, minus, make, left were secure."
+            },
+            {
+              "id": "make_ten",
+              "label": "Make / make ten language caused confusion.",
+              "misconception_hint": "The student may need explicit language support around making and bridging ten."
+            },
+            {
+              "id": "difference",
+              "label": "Difference / how many more language caused confusion.",
+              "misconception_hint": "The student may need explicit support with comparison language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording may have been too much."
+            }
+          ]
+        }
+      ],
+      "sec_06": [
+        {
+          "prompt": "What most likely caused the difficulty in add/sub operations?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "action_meaning",
+              "label": "The join/separate action in the story was not secure.",
+              "misconception_hint": "The student may not yet connect the story action to the operation needed."
+            },
+            {
+              "id": "strategy",
+              "label": "The student chose an inefficient or unreliable strategy.",
+              "misconception_hint": "The student may need more reliable counting or modelling strategies."
+            },
+            {
+              "id": "recording",
+              "label": "The student could show it with materials more than with symbols.",
+              "misconception_hint": "The student may understand the action better than the written recording."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "join",
+              "label": "Joining amounts was stronger than separating."
+            },
+            {
+              "id": "materials",
+              "label": "Acting it out with materials was stronger than written work."
+            },
+            {
+              "id": "small_numbers",
+              "label": "Smaller number stories were stronger."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Add, subtract, more, left seemed secure."
+            },
+            {
+              "id": "more_less",
+              "label": "More / less / left language caused confusion.",
+              "misconception_hint": "The student may need explicit support with comparison and removal language."
+            },
+            {
+              "id": "story_words",
+              "label": "The story wording seemed harder than the actual maths.",
+              "misconception_hint": "The wording of the context may be masking the maths thinking."
+            },
+            {
+              "id": "difference",
+              "label": "Difference / how many more language caused confusion.",
+              "misconception_hint": "The student may need clearer teaching of comparison problem language."
+            }
+          ]
+        }
+      ],
+      "sec_07a": [
+        {
+          "prompt": "What most likely caused the difficulty in multiplication/division facts?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "skip_count",
+              "label": "Skip counting is not secure enough yet.",
+              "misconception_hint": "The student may not yet have a stable skip-counting base for these facts."
+            },
+            {
+              "id": "equal_groups",
+              "label": "Equal groups or sharing is not secure yet.",
+              "misconception_hint": "The student may not yet understand multiplication/division as equal groups."
+            },
+            {
+              "id": "inverse",
+              "label": "The link between multiplication and division facts is weak.",
+              "misconception_hint": "The inverse relationship between multiplication and division may not be secure."
+            },
+            {
+              "id": "attention",
+              "label": "Responses looked uneven rather than showing one clear problem."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "counting_groups",
+              "label": "Counting groups with materials."
+            },
+            {
+              "id": "skip_count",
+              "label": "Skip counting aloud."
+            },
+            {
+              "id": "multiply_only",
+              "label": "Multiplication facts were stronger than division."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause the most trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Times, groups of, shared into seemed secure."
+            },
+            {
+              "id": "groups_share",
+              "label": "Groups of / shared into caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of grouping and sharing language."
+            },
+            {
+              "id": "division_words",
+              "label": "Division wording was the main issue.",
+              "misconception_hint": "The wording for division situations may be getting in the way of the maths."
+            },
+            {
+              "id": "task_words",
+              "label": "The overall wording load was too high."
+            }
+          ]
+        }
+      ],
+      "sec_07b": [
+        {
+          "prompt": "What most likely caused the difficulty in multiplication/division operations?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "story_meaning",
+              "label": "The student did not yet connect the story to the correct operation.",
+              "misconception_hint": "The student may not yet connect multiplication or division stories to the right action."
+            },
+            {
+              "id": "equal_groups",
+              "label": "Equal groups or sharing was not secure enough yet.",
+              "misconception_hint": "The student may not yet understand the equal-groups structure inside these problems."
+            },
+            {
+              "id": "materials_only",
+              "label": "The student could show it with materials more than with symbols.",
+              "misconception_hint": "The student may understand the action better with materials than in written form."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "multiply_stories",
+              "label": "Multiplication stories were stronger than division stories."
+            },
+            {
+              "id": "act_it_out",
+              "label": "Acting it out with materials was stronger than written work."
+            },
+            {
+              "id": "small_numbers",
+              "label": "Smaller numbers were easier to manage."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause the most trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Times, groups of, share equally, each seemed secure."
+            },
+            {
+              "id": "groups_share",
+              "label": "Groups of / share equally caused confusion.",
+              "misconception_hint": "The student may need clearer teaching of grouping and sharing language."
+            },
+            {
+              "id": "each_leftover",
+              "label": "Each / leftover language caused confusion.",
+              "misconception_hint": "The student may need clearer support with the words used in division situations."
+            },
+            {
+              "id": "task_words",
+              "label": "The story wording seemed harder than the actual maths."
+            }
+          ]
+        }
+      ],
+      "sec_08": [
+        {
+          "prompt": "What most likely caused the difficulty with fractions of sets?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "equal_parts",
+              "label": "Equal parts are not secure yet.",
+              "misconception_hint": "The student may not yet understand that fractional parts must be equal."
+            },
+            {
+              "id": "unit_fraction",
+              "label": "The meaning of one-half / one-quarter is not secure.",
+              "misconception_hint": "The student may not yet connect fraction names to the amount each part represents."
+            },
+            {
+              "id": "sharing",
+              "label": "Fair sharing with sets was the main barrier.",
+              "misconception_hint": "The student may need stronger fair-sharing experiences before symbolic fraction tasks."
+            },
+            {
+              "id": "language",
+              "label": "The wording seemed harder than the fraction idea."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "halves",
+              "label": "Halves were stronger than quarters."
+            },
+            {
+              "id": "shapes",
+              "label": "Shaded shapes were easier than sets."
+            },
+            {
+              "id": "materials",
+              "label": "Sharing objects was easier than writing the answer."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to cause trouble?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Half, quarter, whole, equal parts were secure."
+            },
+            {
+              "id": "equal_parts",
+              "label": "Equal parts language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of equal parts language."
+            },
+            {
+              "id": "fraction_names",
+              "label": "Fraction names such as half / quarter caused confusion.",
+              "misconception_hint": "The student may need explicit support with fraction vocabulary."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording of the task caused more trouble than the maths."
+            }
+          ]
+        }
+      ]
+    },
+    "phase2": {
+      "sec_01": [
+        {
+          "prompt": "What most likely caused the place-value errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "direction",
+              "label": "The student may be confusing 1/10/100 less with counting on.",
+              "misconception_hint": "The student may be mixing up direction words such as less, before, and after."
+            },
+            {
+              "id": "structure",
+              "label": "The student does not yet see the number as hundreds, tens, and ones.",
+              "misconception_hint": "The student may not yet see the whole number as structured hundreds, tens, and ones."
+            },
+            {
+              "id": "cross_zero",
+              "label": "Crossing through zero in a place-value column caused the issue.",
+              "misconception_hint": "The student may not yet handle regrouping across zero in place-value changes."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What happened on partitioning and 'how many tens' type items?",
+          "evidence_code": "concept_detail",
+          "response_options": [
+            {
+              "id": "digit_only",
+              "label": "The student recognised the tens digit but not the total number of tens.",
+              "misconception_hint": "The student may recognise digit positions but not total groups of ten within a number."
+            },
+            {
+              "id": "materials_help",
+              "label": "The student could do it with materials or a chart but not with symbols.",
+              "misconception_hint": "The student may understand the idea better with a place-value chart than in symbolic form."
+            },
+            {
+              "id": "partitioning",
+              "label": "Expanded form / partitioning itself was not secure.",
+              "misconception_hint": "The student may not yet partition numbers flexibly into hundreds, tens, and ones."
+            },
+            {
+              "id": "not_checked",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Less than, more than, before, after, tens, hundreds were secure."
+            },
+            {
+              "id": "direction_words",
+              "label": "Less than / before / after caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of comparison and direction language."
+            },
+            {
+              "id": "place_value_words",
+              "label": "Digit / number / tens / hundreds language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of place-value vocabulary."
+            },
+            {
+              "id": "how_many_tens",
+              "label": "'How many tens are in...' wording caused confusion.",
+              "misconception_hint": "The student may be mixing up the tens digit with the number of tens in the whole number."
+            }
+          ]
+        }
+      ],
+      "sec_02": [
+        {
+          "prompt": "What most likely caused the rounding errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "nearest",
+              "label": "The student does not yet understand what 'nearest' means.",
+              "misconception_hint": "The student may not yet connect rounding to the nearest benchmark value."
+            },
+            {
+              "id": "midpoint",
+              "label": "The midpoint decision is the main issue.",
+              "misconception_hint": "The student may not yet use the midpoint reliably when rounding."
+            },
+            {
+              "id": "place_value",
+              "label": "The target place value for rounding is not secure.",
+              "misconception_hint": "The student may not yet know which place value to attend to when rounding."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "whole_tens",
+              "label": "Rounding to the nearest 10 was stronger."
+            },
+            {
+              "id": "whole_hundreds",
+              "label": "Rounding to the nearest 100 was stronger than decimals."
+            },
+            {
+              "id": "with_number_line",
+              "label": "A number line helped more than mental rounding."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Round, nearest, between, midpoint seemed secure."
+            },
+            {
+              "id": "nearest",
+              "label": "Nearest / between language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of nearest and between language."
+            },
+            {
+              "id": "place_value_words",
+              "label": "Tens / hundreds / tenths language caused confusion.",
+              "misconception_hint": "The student may need explicit support with place-value words in rounding tasks."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording may have been too much."
+            }
+          ]
+        }
+      ],
+      "sec_03": [
+        {
+          "prompt": "What most likely caused the add/subtract errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "operation_choice",
+              "label": "Choosing whether to add or subtract was the main difficulty.",
+              "misconception_hint": "The student may not yet connect the wording of the task to the correct operation."
+            },
+            {
+              "id": "place_value",
+              "label": "Place-value alignment / regrouping caused the issue.",
+              "misconception_hint": "The student may need stronger place-value alignment in written methods."
+            },
+            {
+              "id": "strategy",
+              "label": "The strategy chosen was inefficient or unreliable.",
+              "misconception_hint": "The student may need a more reliable method for these calculations."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "mental",
+              "label": "Simple mental calculations were stronger."
+            },
+            {
+              "id": "written",
+              "label": "Written method with support was stronger."
+            },
+            {
+              "id": "addition",
+              "label": "Addition was stronger than subtraction."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Altogether, difference, more than, less than seemed secure."
+            },
+            {
+              "id": "comparison",
+              "label": "Difference / more than / less than caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of comparison language in operation questions."
+            },
+            {
+              "id": "story_words",
+              "label": "The story wording seemed harder than the actual maths.",
+              "misconception_hint": "The context wording may be masking the operation choice."
+            },
+            {
+              "id": "task_words",
+              "label": "The general wording load seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_04": [
+        {
+          "prompt": "What most likely caused the facts recall errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "not_recalled",
+              "label": "The facts are not yet retrieved quickly enough.",
+              "misconception_hint": "The student does not yet retrieve these facts securely."
+            },
+            {
+              "id": "related_facts",
+              "label": "The student does not yet link related multiplication/division facts.",
+              "misconception_hint": "The student may need stronger links between related facts."
+            },
+            {
+              "id": "grouping",
+              "label": "Equal-group meaning is weaker than rote recall.",
+              "misconception_hint": "The student may not yet connect the facts to equal-group meaning."
+            },
+            {
+              "id": "attention",
+              "label": "Responses looked uneven rather than showing one clear problem."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "multiply",
+              "label": "Multiplication facts were stronger than division."
+            },
+            {
+              "id": "skip_count",
+              "label": "Skip counting was stronger than instant recall."
+            },
+            {
+              "id": "array",
+              "label": "Arrays or groups helped more than symbols."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Times, groups of, divided by, share equally seemed secure."
+            },
+            {
+              "id": "times_groups",
+              "label": "Times / groups of caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of multiplication language."
+            },
+            {
+              "id": "division_words",
+              "label": "Divided by / shared equally caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of division language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_05a": [
+        {
+          "prompt": "What most likely caused the multiplication errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "place_value",
+              "label": "Place-value structure in multi-digit multiplication was the main issue.",
+              "misconception_hint": "The student may not yet hold place value securely within multiplication."
+            },
+            {
+              "id": "groups",
+              "label": "The student understands repeated groups only in simpler cases.",
+              "misconception_hint": "The student may need stronger links between equal groups and written multiplication."
+            },
+            {
+              "id": "procedure",
+              "label": "The written method was not secure.",
+              "misconception_hint": "The student may need a more secure written multiplication process."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "single_digit",
+              "label": "Single-digit multiplication was stronger."
+            },
+            {
+              "id": "materials",
+              "label": "Arrays or groups were stronger than written symbols."
+            },
+            {
+              "id": "partial_products",
+              "label": "Breaking the number apart helped."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Times, groups of, lots of, multiply by seemed secure."
+            },
+            {
+              "id": "groups",
+              "label": "Groups of / lots of caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of multiplicative language."
+            },
+            {
+              "id": "place_value_words",
+              "label": "Place-value words inside the method caused confusion.",
+              "misconception_hint": "The student may need clearer place-value language during multiplication."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_05b": [
+        {
+          "prompt": "What most likely caused the division errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "equal_groups",
+              "label": "The equal-groups / sharing idea is not secure enough yet.",
+              "misconception_hint": "The student may not yet understand division situations as equal groups or sharing."
+            },
+            {
+              "id": "remainders",
+              "label": "Remainders caused the main issue.",
+              "misconception_hint": "The student may not yet understand what a remainder means."
+            },
+            {
+              "id": "place_value",
+              "label": "Place value inside the written division method caused the issue.",
+              "misconception_hint": "The student may need stronger place-value support in written division."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "sharing",
+              "label": "Sharing equally was stronger than grouping."
+            },
+            {
+              "id": "grouping",
+              "label": "Grouping was stronger than the written algorithm."
+            },
+            {
+              "id": "no_remainder",
+              "label": "Questions without remainders were stronger."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Shared into, groups of, each, remainder seemed secure."
+            },
+            {
+              "id": "share_groups",
+              "label": "Shared into / groups of caused confusion.",
+              "misconception_hint": "The student may need explicit support with division situation language."
+            },
+            {
+              "id": "remainder",
+              "label": "Remainder language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of what a remainder means."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_06a": [
+        {
+          "prompt": "What most likely caused the decimal comparison errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "whole_number",
+              "label": "The student is treating decimals like whole numbers.",
+              "misconception_hint": "The student may be comparing decimals as if the longest written number must be the largest."
+            },
+            {
+              "id": "place_value",
+              "label": "Tenths and hundredths place value is not secure.",
+              "misconception_hint": "The student may not yet understand what each decimal place means."
+            },
+            {
+              "id": "number_line",
+              "label": "The student needs a magnitude model such as a number line.",
+              "misconception_hint": "The student may need stronger sense of decimal size on a number line."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "tenths",
+              "label": "Tenths were stronger than hundredths."
+            },
+            {
+              "id": "same_whole",
+              "label": "Numbers with the same whole-number part were easier."
+            },
+            {
+              "id": "with_model",
+              "label": "A number line or place-value chart helped."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Tenths, hundredths, greater than, less than seemed secure."
+            },
+            {
+              "id": "decimal_words",
+              "label": "Tenths / hundredths language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of decimal place-value words."
+            },
+            {
+              "id": "comparison_words",
+              "label": "Greater than / less than caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of comparison language with decimals."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_06b": [
+        {
+          "prompt": "What most likely caused the conversion errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "equivalence",
+              "label": "The student does not yet connect fractions, decimals, and percentages as equivalent forms.",
+              "misconception_hint": "The student may not yet see fractions, decimals, and percentages as equivalent representations."
+            },
+            {
+              "id": "percent_100",
+              "label": "Percent as 'out of 100' is not secure.",
+              "misconception_hint": "The student may not yet understand percentage as out of 100."
+            },
+            {
+              "id": "notation",
+              "label": "The notation change itself caused confusion.",
+              "misconception_hint": "The student may understand one notation more than the others."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "fraction_decimal",
+              "label": "Fraction-decimal links were stronger than percentages."
+            },
+            {
+              "id": "benchmark",
+              "label": "Benchmark equivalents such as 1/2 = 0.5 = 50% were stronger."
+            },
+            {
+              "id": "visual",
+              "label": "Visual models were stronger than symbols."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Equivalent, percent, decimal, fraction seemed secure."
+            },
+            {
+              "id": "equivalent",
+              "label": "Equivalent language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of equivalent-as-same-value language."
+            },
+            {
+              "id": "percent",
+              "label": "Percent / out of 100 language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of percentage language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_07": [
+        {
+          "prompt": "What most likely caused the x10 / x100 scaling errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "digit_shift",
+              "label": "The student may be relying on a 'move the digits' rule instead of place-value understanding.",
+              "misconception_hint": "The student may be relying on a digits-shift rule instead of place-value reasoning."
+            },
+            {
+              "id": "place_value",
+              "label": "The student does not yet understand how each digit changes value.",
+              "misconception_hint": "The student may not yet understand how digits change value when multiplying or dividing by powers of 10."
+            },
+            {
+              "id": "decimal_point",
+              "label": "The decimal point is being interpreted inconsistently.",
+              "misconception_hint": "The student may need clearer understanding of how the decimal point anchors place value."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "multiply10",
+              "label": "Multiplying by 10 was stronger than dividing."
+            },
+            {
+              "id": "whole_numbers",
+              "label": "Whole numbers were stronger than decimals."
+            },
+            {
+              "id": "with_chart",
+              "label": "A place-value chart helped more than mental rules."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Times 10, divide by 10, tenths, hundredths seemed secure."
+            },
+            {
+              "id": "times_divide",
+              "label": "Times by / divide by language caused confusion.",
+              "misconception_hint": "The student may need explicit support with multiplicative language."
+            },
+            {
+              "id": "decimal_words",
+              "label": "Tenths / hundredths language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of decimal place-value words."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_08": [
+        {
+          "prompt": "What most likely caused the decimal add/subtract errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "alignment",
+              "label": "Decimal alignment was the main issue.",
+              "misconception_hint": "The student may not yet align place values correctly in decimal calculations."
+            },
+            {
+              "id": "place_value",
+              "label": "Tenths and hundredths values are not secure enough.",
+              "misconception_hint": "The student may not yet understand the size of tenths and hundredths in calculation."
+            },
+            {
+              "id": "operation_choice",
+              "label": "The operation or strategy choice was the issue.",
+              "misconception_hint": "The student may need a more reliable decimal calculation strategy."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "tenths",
+              "label": "Tenths only were stronger than hundredths."
+            },
+            {
+              "id": "addition",
+              "label": "Addition was stronger than subtraction."
+            },
+            {
+              "id": "grid_help",
+              "label": "A place-value grid helped more than lined-up digits alone."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Decimal point, tenths, hundredths, add, subtract seemed secure."
+            },
+            {
+              "id": "decimal_words",
+              "label": "Tenths / hundredths language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of decimal place-value vocabulary."
+            },
+            {
+              "id": "operation_words",
+              "label": "Add / subtract wording caused confusion.",
+              "misconception_hint": "The student may need clearer support with the operation language used in decimal tasks."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_09": [
+        {
+          "prompt": "What most likely caused the mixed/improper fraction errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "whole_part",
+              "label": "The whole-and-part relationship is not secure enough yet.",
+              "misconception_hint": "The student may not yet understand how many parts make one whole."
+            },
+            {
+              "id": "equivalence",
+              "label": "Equivalent fractions needed for conversion are not secure.",
+              "misconception_hint": "The student may not yet see the equivalence needed when converting mixed and improper fractions."
+            },
+            {
+              "id": "notation",
+              "label": "The notation change itself caused confusion.",
+              "misconception_hint": "The student may understand one form better than the other."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "mixed",
+              "label": "Reading mixed numbers was stronger than converting them."
+            },
+            {
+              "id": "improper",
+              "label": "Improper fractions were easier when drawn."
+            },
+            {
+              "id": "visual",
+              "label": "Fraction models helped more than symbols."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Numerator, denominator, mixed number, improper fraction seemed secure."
+            },
+            {
+              "id": "fraction_terms",
+              "label": "Numerator / denominator caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of fraction-part vocabulary."
+            },
+            {
+              "id": "mixed_improper",
+              "label": "Mixed number / improper fraction caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of the names of the two forms."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_10": [
+        {
+          "prompt": "What most likely caused the fraction/percentage-of-number errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "of_means",
+              "label": "The meaning of 'of' as an operator is not secure.",
+              "misconception_hint": "The student may not yet understand 'of' as acting on the quantity."
+            },
+            {
+              "id": "partition",
+              "label": "Partitioning the amount into equal parts was difficult.",
+              "misconception_hint": "The student may not yet partition amounts reliably for fraction-of tasks."
+            },
+            {
+              "id": "percent",
+              "label": "Percentage-of-a-number is weaker than simple fraction-of.",
+              "misconception_hint": "The student may not yet connect percentages to fraction/decimal operators."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "fractions",
+              "label": "Simple fractions of sets were stronger than percentages."
+            },
+            {
+              "id": "materials",
+              "label": "Using counters or diagrams was stronger than symbols."
+            },
+            {
+              "id": "benchmark",
+              "label": "Benchmark percentages such as 50% were stronger."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Of, half, quarter, percent, shared equally seemed secure."
+            },
+            {
+              "id": "of_word",
+              "label": "'Of' caused confusion.",
+              "misconception_hint": "The student may need explicit teaching that 'of' means take that fraction or percent of the whole amount."
+            },
+            {
+              "id": "percent_words",
+              "label": "Percent / percentage language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of percentage language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_11": [
+        {
+          "prompt": "What most likely caused the fraction comparison/simplifying errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "size",
+              "label": "The student does not yet reason about fraction size well enough.",
+              "misconception_hint": "The student may not yet compare fractions by size with confidence."
+            },
+            {
+              "id": "equivalence",
+              "label": "Equivalent fractions are not secure enough yet.",
+              "misconception_hint": "The student may not yet use equivalence reliably when comparing or simplifying fractions."
+            },
+            {
+              "id": "common_denominator",
+              "label": "Finding or using common denominators was the issue.",
+              "misconception_hint": "The student may not yet use common denominators effectively."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "same_denom",
+              "label": "Fractions with the same denominator were stronger."
+            },
+            {
+              "id": "visual",
+              "label": "Fraction strips or drawings helped more than symbols."
+            },
+            {
+              "id": "simplify_only",
+              "label": "Simplifying familiar fractions was stronger than ordering them."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Equivalent, simplest form, greater than, denominator seemed secure."
+            },
+            {
+              "id": "equivalent",
+              "label": "Equivalent / simplest form language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of equivalence and simplest-form language."
+            },
+            {
+              "id": "comparison",
+              "label": "Greater than / less than language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of comparison language in fraction tasks."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ],
+      "sec_12": [
+        {
+          "prompt": "What most likely caused the fraction add/subtract errors?",
+          "evidence_code": "likely_barrier",
+          "response_options": [
+            {
+              "id": "denominator",
+              "label": "The student does not yet understand what happens to the denominator.",
+              "misconception_hint": "The student may not yet understand why the denominator stays the same or when equivalent fractions are needed."
+            },
+            {
+              "id": "equivalence",
+              "label": "Equivalent fractions needed before calculating were not secure.",
+              "misconception_hint": "The student may not yet use equivalent fractions reliably before adding or subtracting."
+            },
+            {
+              "id": "whole_parts",
+              "label": "The student is combining the numbers procedurally without understanding the parts.",
+              "misconception_hint": "The student may be applying a rule without understanding the fraction parts."
+            },
+            {
+              "id": "not_clear",
+              "label": "It's still not clear from this short probe."
+            }
+          ]
+        },
+        {
+          "prompt": "What looked strongest?",
+          "evidence_code": "secure_floor",
+          "response_options": [
+            {
+              "id": "same_denom",
+              "label": "Same-denominator questions were stronger."
+            },
+            {
+              "id": "visual",
+              "label": "Visual models helped more than symbols."
+            },
+            {
+              "id": "addition",
+              "label": "Addition was stronger than subtraction."
+            },
+            {
+              "id": "not_secure",
+              "label": "No clear starting point yet."
+            }
+          ]
+        },
+        {
+          "prompt": "Which language seemed to block the response?",
+          "evidence_code": "language_comprehension",
+          "response_options": [
+            {
+              "id": "secure",
+              "label": "Numerator, denominator, equivalent, simplify seemed secure."
+            },
+            {
+              "id": "fraction_terms",
+              "label": "Numerator / denominator language caused confusion.",
+              "misconception_hint": "The student may need explicit teaching of fraction-part vocabulary."
+            },
+            {
+              "id": "equivalent",
+              "label": "Equivalent fraction language caused confusion.",
+              "misconception_hint": "The student may need explicit support with equivalent-fraction language."
+            },
+            {
+              "id": "task_words",
+              "label": "The wording load itself seemed too high."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
