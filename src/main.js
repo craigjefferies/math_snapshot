@@ -182,6 +182,15 @@ function renderPage(contentHtml, options = {}) {
             <strong>${escapeHtml(phaseConfig.label)}</strong>
             <small>${escapeHtml(phaseConfig.subtitle)}</small>
           </div>
+          <button
+            type="button"
+            id="phaseCollapsedBtn"
+            class="phase-collapsed-indicator"
+            aria-label="Switch learning phase. Current phase ${escapeAttribute(phaseConfig.label)}"
+            title="${escapeAttribute(`Current ${phaseConfig.label}. Click to switch phase.`)}"
+          >
+            ${phaseConfig.key === "phase2" ? "2" : "1"}
+          </button>
         </section>
 
         <nav class="sidebar-nav">
@@ -235,6 +244,14 @@ function bindShellActions() {
   const phaseToggle = document.getElementById("phaseToggleBtn");
   if (phaseToggle) {
     phaseToggle.addEventListener("click", () => {
+      const nextPhaseKey = state.ui.current_phase === "phase1" ? "phase2" : "phase1";
+      onPhaseToggle(nextPhaseKey);
+    });
+  }
+
+  const collapsedPhaseToggle = document.getElementById("phaseCollapsedBtn");
+  if (collapsedPhaseToggle) {
+    collapsedPhaseToggle.addEventListener("click", () => {
       const nextPhaseKey = state.ui.current_phase === "phase1" ? "phase2" : "phase1";
       onPhaseToggle(nextPhaseKey);
     });

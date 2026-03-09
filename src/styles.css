@@ -442,6 +442,30 @@ fieldset {
   padding: 0.1rem 0.1rem 0;
 }
 
+.phase-collapsed-indicator {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0.6rem;
+  border-radius: 16px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.teacher-shell.phase-phase1 .phase-collapsed-indicator {
+  background: linear-gradient(180deg, #ffffff 0%, var(--accent-soft) 100%);
+  border-color: var(--accent-line);
+  color: var(--accent-strong);
+}
+
+.teacher-shell.phase-phase2 .phase-collapsed-indicator {
+  background: linear-gradient(180deg, #ffffff 0%, var(--accent-soft) 100%);
+  border-color: var(--accent-line);
+  color: var(--accent-strong);
+}
+
 .phase-toggle.is-phase1 + .phase-toggle-current strong {
   color: #166534;
 }
@@ -553,21 +577,15 @@ fieldset {
   text-align: center;
 }
 
-.teacher-shell.sidebar-collapsed .phase-toggle {
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
+.teacher-shell.sidebar-collapsed .phase-switcher-header,
+.teacher-shell.sidebar-collapsed .phase-toggle,
+.teacher-shell.sidebar-collapsed .phase-toggle-current {
+  display: none;
+}
+
+.teacher-shell.sidebar-collapsed .phase-collapsed-indicator {
+  display: inline-flex;
   width: 100%;
-  min-height: auto;
-  padding: 0.75rem 0.35rem;
-}
-
-.teacher-shell.sidebar-collapsed .phase-toggle-label {
-  font-size: 0.74rem;
-  text-align: center;
-}
-
-.teacher-shell.sidebar-collapsed .phase-toggle-track {
-  justify-self: center;
 }
 
 .teacher-shell.mode-student .sidebar-nav {
