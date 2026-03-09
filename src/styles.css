@@ -874,8 +874,7 @@ fieldset {
   background: #fff;
 }
 
-.section-card-top,
-.section-card-bottom {
+.section-card-top {
   display: grid;
   gap: 0.3rem;
   padding: 0.85rem 0.95rem;
@@ -907,18 +906,6 @@ fieldset {
   font-size: 0.98rem;
   line-height: 1.25;
   color: #0f172a;
-}
-
-.section-card-bottom {
-  min-height: 78px;
-  align-content: start;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-}
-
-.section-card-topic {
-  color: #475569;
-  font-size: 0.82rem;
-  line-height: 1.45;
 }
 
 .section-card:has(input:checked) {

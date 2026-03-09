@@ -591,9 +591,6 @@ function renderSetup() {
                       <small class="section-card-strand">${escapeHtml(section.strand)}</small>
                       <strong>${escapeHtml(sectionLabel(section))}</strong>
                     </span>
-                    <span class="section-card-bottom">
-                      <span class="section-card-topic">${escapeHtml(section.topic || "Run this section to collect evidence in this area.")}</span>
-                    </span>
                   </span>
                 </label>
               `)
