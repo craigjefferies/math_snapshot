@@ -2728,25 +2728,27 @@ function buildTeacherProbePlan(section, summary, diagnosticSummary) {
 }
 
 function normalizeTeacherProbePlan(section, summary, diagnosticSummary, teacherProbe) {
+  const latestPlan = buildTeacherProbePlan(section, summary, diagnosticSummary);
   if (!teacherProbe || !Array.isArray(teacherProbe.probe_items)) {
-    return buildTeacherProbePlan(section, summary, diagnosticSummary);
+    return latestPlan;
   }
 
-  const hasModernItems = teacherProbe.probe_items.every(
-    (item) => Array.isArray(item.response_options)
+  const existingChoices = new Map(
+    teacherProbe.probe_items
+      .filter((item) => item?.evidence_code)
+      .map((item) => [item.evidence_code, String(item.selected_option || "")])
   );
-  if (!hasModernItems) {
-    return buildTeacherProbePlan(section, summary, diagnosticSummary);
-  }
 
   return {
     status: teacherProbe.status || (diagnosticSummary?.teacher_probe_needed ? "recommended" : "not_run"),
-    probe_items: teacherProbe.probe_items.map((item) => ({
-      ...item,
-      response_options: Array.isArray(item.response_options) ? item.response_options : [],
-      selected_option: String(item.selected_option || ""),
-      selected_label: String(item.selected_label || getProbeOptionLabel(item, item.selected_option || ""))
-    })),
+    probe_items: latestPlan.probe_items.map((item) => {
+      const selectedOption = existingChoices.get(item.evidence_code) || "";
+      return {
+        ...item,
+        selected_option: selectedOption,
+        selected_label: getProbeOptionLabel(item, selectedOption)
+      };
+    }),
     teacher_summary: String(teacherProbe.teacher_summary || "")
   };
 }
@@ -3370,7 +3372,15 @@ function getTeacherProbePrompts(section, summary) {
   };
 
   const prompts = promptSets[phaseKey]?.[section?.section_id] || generic;
-  return injectSectionLanguageOptions(section, prompts);
+  return finalizeTeacherProbePrompts(injectSectionLanguageOptions(section, prompts));
+}
+
+function finalizeTeacherProbePrompts(prompts) {
+  const priority = ["likely_barrier", "concept_detail", "secure_floor", "best_representation", "language_comprehension"];
+  return (prompts || [])
+    .filter((prompt) => prompt?.evidence_code !== "teaching_entry")
+    .sort((left, right) => priority.indexOf(left.evidence_code) - priority.indexOf(right.evidence_code))
+    .slice(0, 3);
 }
 
 function getProbeOptionLabel(item, choiceId) {
@@ -3485,8 +3495,7 @@ function buildTeacherProbeSummary(teacherProbe) {
     concept_detail: "Pattern seen",
     secure_floor: "Strongest so far",
     best_representation: "Best support",
-    language_comprehension: "Language",
-    teaching_entry: "Next move"
+    language_comprehension: "Language"
   };
 
   const parts = (teacherProbe?.probe_items || [])
@@ -4081,11 +4090,10 @@ function buildTeacherSectionSummary(row) {
   const diagnosticSummary = row.run?.diagnostic_summary || buildDiagnosticSummary(row.section, row.summary);
   const bestFit = formatTeacherYearLabel(row.summary.observed_year_level);
   const language = getTeacherProbeChoice(row.run, "language_comprehension") || "No specific language issue was confirmed.";
-  const nextMove = getTeacherProbeChoice(row.run, "teaching_entry") || getNextStepForSection(row.section, row.summary)[0] || "";
   const strongest = getTeacherProbeChoice(row.run, "secure_floor") || simplifyLastSecureSkillText(diagnosticSummary.last_secure_skill);
   const whatThisSuggests = diagnosticSummary.likely_misconception;
   const teacherCheck = row.run?.teacher_probe?.status === "completed" ? "Used" : "Not used";
-  const narrative = `This student is working around ${bestFit} in ${sectionLabel(row.section)}. ${whatThisSuggests} ${language === "No specific language issue was confirmed." ? "" : `Language to watch: ${language}`} ${nextMove ? `Best next move: ${nextMove}` : ""}`.replace(/\s+/g, " ").trim();
+  const narrative = `This student is working around ${bestFit} in ${sectionLabel(row.section)}. ${whatThisSuggests} ${language === "No specific language issue was confirmed." ? "" : `Language to watch: ${language}`}`.replace(/\s+/g, " ").trim();
 
   return {
     bestFit,
@@ -4093,7 +4101,6 @@ function buildTeacherSectionSummary(row) {
     whatThisSuggests,
     strongest,
     language,
-    nextMove,
     teacherCheck,
     narrative
   };
@@ -4108,7 +4115,6 @@ function buildTeacherSectionCard(row) {
       <p><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
-      <p><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
       <p class="teacher-report-narrative">${escapeHtml(summary.narrative)}</p>
     </article>
   `;
@@ -4123,7 +4129,6 @@ function buildTeacherSectionPdfBlock(row) {
       <p class="summary-kv"><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p class="summary-kv"><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p class="summary-kv"><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
-      <p class="summary-kv"><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
       <p class="summary-paragraph">${escapeHtml(summary.narrative)}</p>
     </article>
   `;

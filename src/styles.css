@@ -680,23 +680,29 @@ fieldset {
 
 .app-content {
   min-width: 0;
+  display: grid;
+  gap: 1.25rem;
 }
 
 .panel {
-  padding: 1.5rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: var(--shadow-md);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .panel-setup {
-  padding: 1.25rem;
+  padding: 0;
 }
 
 .panel-error {
+  padding: 1.5rem;
   background: #fff7f7;
+  border: 1px solid #fecaca;
   border-color: #fecaca;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .grid-form,
@@ -1967,8 +1973,6 @@ hr.section-divider {
     padding: 0.875rem;
   }
 
-  .panel,
-  .panel-setup,
   .teacher-sidebar {
     padding: 1rem;
   }
