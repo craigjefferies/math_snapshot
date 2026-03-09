@@ -563,90 +563,113 @@ function renderSetup() {
   const content = `
     <section class="panel panel-setup">
       ${currentSessionPanel}
-      <h1>${escapeHtml(state.bank?.assessment?.name || `${phaseConfig.label} Maths Snapshot`)}</h1>
-      <p class="subtle">Select the sections you want to run, choose a starting year level, and use a memorable session label. Real names are optional and only used on exported reports.</p>
       ${historyPanel}
-
-      <form id="setupForm" class="grid-form grid-form-setup">
-        <fieldset>
-          <legend>Session Label</legend>
-          <p class="subtle start-note">Use a friendly nickname for this assessment session. No personal information needed.</p>
-          <div class="session-label-row">
-            <label class="session-name-label">
-              Session label
-              <input type="text" name="sessionLabel" value="${escapeAttribute(state.ui.draft_session_label)}" placeholder="e.g. Tui Rocket" autocomplete="off" />
-            </label>
-            <button type="button" id="regenerateSessionLabelBtn">New Label</button>
+      <div class="setup-flow">
+        <aside class="setup-steps" aria-hidden="true">
+          <div class="setup-step is-current">
+            <span class="setup-step-number">1</span>
+            <span class="setup-step-copy">Session label</span>
           </div>
-        </fieldset>
+          <div class="setup-step">
+            <span class="setup-step-number">2</span>
+            <span class="setup-step-copy">Starting questions</span>
+          </div>
+          <div class="setup-step">
+            <span class="setup-step-number">3</span>
+            <span class="setup-step-copy">Sections to run</span>
+          </div>
+          <div class="setup-step">
+            <span class="setup-step-number">4</span>
+            <span class="setup-step-copy">Optional report names</span>
+          </div>
+        </aside>
 
-        <fieldset class="start-mode start-mode-compact">
-          <legend>Starting Questions</legend>
-          <p class="subtle start-note">Chooses the first year-level questions shown for each section.</p>
+        <div class="setup-flow-main">
+          <h1>${escapeHtml(state.bank?.assessment?.name || `${phaseConfig.label} Maths Snapshot`)}</h1>
+          <p class="subtle">Select the sections you want to run, choose a starting year level, and use a memorable session label. Real names are optional and only used on exported reports.</p>
 
-          <label class="radio-row radio-choice">
-            <input type="radio" name="startMode" value="from_floor" checked />
-            <span>${escapeHtml(phaseConfig.floor_label)}</span>
-          </label>
-
-          <div class="radio-row radio-row-specified">
-            <label class="radio-choice">
-              <input type="radio" name="startMode" value="specified" />
-              <span>Start from specified year</span>
-            </label>
-            <div id="specifiedYearWrap" class="specified-year-inline disabled" aria-label="Specified year options">
-              ${startYears.map((year, index) => `
-                <label class="year-check">
-                  <input type="radio" name="startYear" value="${year}" ${index === 0 ? "checked" : ""} disabled />
-                  <span>${escapeHtml(formatSetupYearLabel(year))}</span>
+          <form id="setupForm" class="grid-form grid-form-setup">
+            <fieldset>
+              <legend>Session Label</legend>
+              <p class="subtle start-note">Use a friendly nickname for this assessment session. No personal information needed.</p>
+              <div class="session-label-row">
+                <label class="session-name-label">
+                  Session label
+                  <input type="text" name="sessionLabel" value="${escapeAttribute(state.ui.draft_session_label)}" placeholder="e.g. Tui Rocket" autocomplete="off" />
                 </label>
-              `).join("")}
-            </div>
-          </div>
-        </fieldset>
+                <button type="button" id="regenerateSessionLabelBtn">New Label</button>
+              </div>
+            </fieldset>
 
-        <fieldset>
-          <legend>Sections To Run</legend>
-          <div class="selection-tools">
-            <button type="button" id="selectAllSectionsBtn">Select All</button>
-            <button type="button" id="clearSectionsBtn">Clear All</button>
-            <span id="selectedSectionsCount" class="selection-count">0 selected</span>
-          </div>
-          <div class="section-grid">
-            ${sections
-              .map((section) => `
-                <label class="checkbox-row section-card">
-                  <input type="checkbox" name="sectionId" value="${section.section_id}" />
-                  <span class="section-card-check" aria-hidden="true"></span>
-                  <span class="section-card-body">
-                    <span class="section-card-top">
-                      <small class="section-card-strand">${escapeHtml(section.strand)}</small>
-                      <strong>${escapeHtml(sectionLabel(section))}</strong>
-                    </span>
-                  </span>
+            <fieldset class="start-mode start-mode-compact">
+              <legend>Starting Questions</legend>
+              <p class="subtle start-note">Chooses the first year-level questions shown for each section.</p>
+
+              <label class="radio-row radio-choice">
+                <input type="radio" name="startMode" value="from_floor" checked />
+                <span>${escapeHtml(phaseConfig.floor_label)}</span>
+              </label>
+
+              <div class="radio-row radio-row-specified">
+                <label class="radio-choice">
+                  <input type="radio" name="startMode" value="specified" />
+                  <span>Start from specified year</span>
                 </label>
-              `)
-              .join("")}
-          </div>
-        </fieldset>
+                <div id="specifiedYearWrap" class="specified-year-inline disabled" aria-label="Specified year options">
+                  ${startYears.map((year, index) => `
+                    <label class="year-check">
+                      <input type="radio" name="startYear" value="${year}" ${index === 0 ? "checked" : ""} disabled />
+                      <span>${escapeHtml(formatSetupYearLabel(year))}</span>
+                    </label>
+                  `).join("")}
+                </div>
+              </div>
+            </fieldset>
 
-        <fieldset>
-          <legend>Optional Report Names</legend>
-          <p class="subtle start-note">Only used in downloaded PDF reports and saved report rows.</p>
-          <div class="session-names-grid">
-            <label class="session-name-label">
-              Student report name
-              <input type="text" name="studentName" value="" placeholder="e.g. Alex" autocomplete="off" />
-            </label>
-            <label class="session-name-label">
-              Teacher name
-              <input type="text" name="teacherName" value="" placeholder="e.g. Ms Smith" autocomplete="off" />
-            </label>
-          </div>
-        </fieldset>
-        <p id="setupFormError" class="form-error" hidden></p>
-        <button type="submit" class="btn-primary">${savedSession && !savedSession.generated_at ? "Start New Assessment" : "Start Assessment"}</button>
-      </form>
+            <fieldset>
+              <legend>Sections To Run</legend>
+              <div class="selection-tools">
+                <button type="button" id="selectAllSectionsBtn">Select All</button>
+                <button type="button" id="clearSectionsBtn">Clear All</button>
+                <span id="selectedSectionsCount" class="selection-count">0 selected</span>
+              </div>
+              <div class="section-grid">
+                ${sections
+                  .map((section) => `
+                    <label class="checkbox-row section-card">
+                      <input type="checkbox" name="sectionId" value="${section.section_id}" />
+                      <span class="section-card-check" aria-hidden="true"></span>
+                      <span class="section-card-body">
+                        <span class="section-card-top">
+                          <small class="section-card-strand">${escapeHtml(section.strand)}</small>
+                          <strong>${escapeHtml(sectionLabel(section))}</strong>
+                        </span>
+                      </span>
+                    </label>
+                  `)
+                  .join("")}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Optional Report Names</legend>
+              <p class="subtle start-note">Only used in downloaded PDF reports and saved report rows.</p>
+              <div class="session-names-grid">
+                <label class="session-name-label">
+                  Student report name
+                  <input type="text" name="studentName" value="" placeholder="e.g. Alex" autocomplete="off" />
+                </label>
+                <label class="session-name-label">
+                  Teacher name
+                  <input type="text" name="teacherName" value="" placeholder="e.g. Ms Smith" autocomplete="off" />
+                </label>
+              </div>
+            </fieldset>
+            <p id="setupFormError" class="form-error" hidden></p>
+            <button type="submit" class="btn-primary">${savedSession && !savedSession.generated_at ? "Start New Assessment" : "Start Assessment"}</button>
+          </form>
+        </div>
+      </div>
     </section>
   `;
   renderPage(content, { homeEnabled: false, activeStep: "setup" });
