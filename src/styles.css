@@ -130,6 +130,13 @@ textarea:focus-visible {
   outline-offset: 1px;
 }
 
+.radio-row input[type="radio"]:focus-visible,
+.year-check input[type="radio"]:focus-visible,
+.section-card input[type="checkbox"]:focus-visible,
+.observation-check input[type="checkbox"]:focus-visible {
+  outline: none;
+}
+
 input,
 select,
 textarea {
@@ -817,6 +824,10 @@ fieldset {
   border-color: var(--accent-line);
 }
 
+.radio-row:has(input[name="startMode"]:focus-visible) {
+  box-shadow: 0 0 0 3px var(--accent-outline);
+}
+
 .radio-choice {
   display: grid;
   gap: 0.5rem;
@@ -873,6 +884,10 @@ fieldset {
   color: var(--accent-strong);
 }
 
+.year-check:has(input:focus-visible) span {
+  box-shadow: 0 0 0 3px var(--accent-outline);
+}
+
 .selection-tools {
   display: flex;
   flex-wrap: wrap;
@@ -890,6 +905,13 @@ fieldset {
   display: grid;
   gap: 0.625rem;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.sections-fieldset {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .checkbox-row strong {

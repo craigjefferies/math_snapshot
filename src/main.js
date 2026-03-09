@@ -641,7 +641,7 @@ function renderSetup() {
               </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset class="sections-fieldset">
               <legend>Sections To Run</legend>
               <div class="selection-tools">
                 <button type="button" id="selectAllSectionsBtn">Select All</button>
