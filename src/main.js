@@ -853,6 +853,7 @@ function beginCurrentSection(optionalYear = null) {
     attempt_number: run.attempts.length + 1,
     item_ids: variant.item_refs,
     responses: {},
+    observations: {},
     current_item_index: 0
   };
 
@@ -869,7 +870,7 @@ function renderAssessment() {
   const currentIndex = attempt.current_item_index;
   const currentItem = items[currentIndex];
   const currentResponse = attempt.responses[currentItem.item_id];
-  const completedCount = items.filter((item) => !isBlank(attempt.responses[item.item_id])).length;
+  const completedCount = items.filter((item) => hasSavedAnswer(item, attempt.responses[item.item_id], attempt.observations?.[item.item_id])).length;
   const isLastQuestion = currentIndex === items.length - 1;
   const nextLabel = isLastQuestion ? "Save & Finish" : "Save & Next";
   const attemptYearLabel = yearLabelForDisplay(attempt.year_level);
@@ -891,6 +892,11 @@ function renderAssessment() {
           ? `<p class="note">Timed facts section: each item target is ${section.default_time_limit_seconds ?? 4} seconds. Skips are allowed and tracked.</p>`
           : ""
       }
+      ${
+        state.ui.current_phase === "phase1"
+          ? `<p class="note note-observation">Phase 1 follows the teacher recording sheet. Type a response when useful, or tick <strong>Observed successful</strong> if the student showed the answer orally, with materials, or by demonstration.</p>`
+          : ""
+      }
 
       <section class="tracker-panel" aria-label="Question tracker">
         <div class="tracker-layout">
@@ -904,9 +910,10 @@ function renderAssessment() {
                 ${items
                   .map((item, index) => {
                     const response = attempt.responses[item.item_id];
-                    const statusClass = isBlank(response)
+                    const wasObserved = !!attempt.observations?.[item.item_id];
+                    const statusClass = !hasSavedAnswer(item, response, wasObserved)
                       ? "tracker-unanswered"
-                      : (evaluateItemResponse(item, response) ? "tracker-correct" : "tracker-incorrect");
+                      : ((wasObserved || evaluateItemResponse(item, response)) ? "tracker-correct" : "tracker-incorrect");
                     const currentClass = index === currentIndex ? "tracker-current" : "";
                     return `
                       <button
@@ -933,8 +940,9 @@ function renderAssessment() {
       <form id="questionForm" class="item-list">
         <article class="item-card">
           <h3>Q${currentIndex + 1}</h3>
+          ${renderItemMedia(currentItem)}
           <p class="item-prompt">${formatPromptHtml(currentItem)}</p>
-          ${renderItemInput(currentItem, currentResponse)}
+          ${renderItemInput(currentItem, currentResponse, !!attempt.observations?.[currentItem.item_id])}
         </article>
         <div class="actions-row">
           <button type="submit" class="btn-primary">${nextLabel}</button>
@@ -962,9 +970,18 @@ function renderAssessment() {
   focusQuestionInput();
 }
 
-function renderItemInput(item, savedResponse) {
+function renderItemInput(item, savedResponse, observedSuccess = false) {
   const hint = getInputHint(item);
   const defaultInputMode = getDefaultInputMode(item);
+  const observationControl = shouldShowObservationTick(item)
+    ? `
+      <label class="observation-check">
+        <input type="checkbox" name="${item.item_id}__observed_success" ${observedSuccess ? "checked" : ""} />
+        <span>Observed successful</span>
+        <small>Use this when the student shows the answer without typing it.</small>
+      </label>
+    `
+    : "";
 
   if (isExpandedFormItem(item)) {
     const boxCount = expandedFormBoxCount(item);
@@ -984,6 +1001,7 @@ function renderItemInput(item, savedResponse) {
         ${parts.join("")}
       </div>
       ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
+      ${observationControl}
     `;
   }
 
@@ -1027,6 +1045,7 @@ function renderItemInput(item, savedResponse) {
         </div>
       </div>
       ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
+      ${observationControl}
     `;
   }
 
@@ -1052,13 +1071,41 @@ function renderItemInput(item, savedResponse) {
           .join("")}
       </div>
       ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
+      ${observationControl}
     `;
   }
 
   return `
     <input class="answer-input" name="${item.item_id}" value="${escapeAttribute(savedResponse ?? "")}" inputmode="${escapeAttribute(defaultInputMode)}" autocomplete="off" />
     ${hint ? `<p class="input-hint">${escapeHtml(hint)}</p>` : ""}
+    ${observationControl}
   `;
+}
+
+function renderItemMedia(item) {
+  if (!item?.media || item.media.kind !== "image" || !item.media.src) {
+    return "";
+  }
+
+  return `
+    <figure class="item-media">
+      <img
+        class="item-media-image"
+        src="${escapeAttribute(item.media.src)}"
+        alt="${escapeAttribute(item.media.alt || "")}"
+        loading="eager"
+        decoding="async"
+      />
+    </figure>
+  `;
+}
+
+function shouldShowObservationTick(item) {
+  return state.ui.current_phase === "phase1" && !!item;
+}
+
+function hasSavedAnswer(item, response, observedSuccess = false) {
+  return !!observedSuccess || !isBlank(response);
 }
 
 function getDefaultInputMode(item) {
@@ -1140,6 +1187,7 @@ function onSkipQuestion() {
   if (!attempt) return;
   const currentItemId = attempt.item_ids[attempt.current_item_index];
   attempt.responses[currentItemId] = "";
+  attempt.observations[currentItemId] = false;
   const isLastQuestion = attempt.current_item_index === attempt.item_ids.length - 1;
   if (isLastQuestion) {
     finishCurrentAttempt();
@@ -1164,7 +1212,16 @@ function saveCurrentQuestionResponse() {
   }
 
   attempt.responses[item.item_id] = readItemResponseFromForm(form, item);
+  attempt.observations[item.item_id] = readItemObservationFromForm(form, item);
   saveSessionToStorage();
+}
+
+function readItemObservationFromForm(form, item) {
+  if (!shouldShowObservationTick(item)) {
+    return false;
+  }
+  const formData = new FormData(form);
+  return formData.get(`${item.item_id}__observed_success`) === "on";
 }
 
 function readItemResponseFromForm(form, item) {
@@ -1531,23 +1588,26 @@ function onTeacherProbeSkip() {
 function evaluateAttempt(section, attempt, items, responses) {
   let correct = 0;
   let skipped = 0;
+  const observations = attempt.observations || {};
 
   const item_results = items.map((item) => {
     const response = item.item_id in responses ? responses[item.item_id] : defaultResponseForItem(item);
+    const observed_success = !!observations[item.item_id];
     const is_skipped = isBlank(response);
 
-    if (is_skipped) {
+    if (is_skipped && !observed_success) {
       skipped += 1;
       return {
         item_id: item.item_id,
         response,
         is_correct: false,
         is_skipped: true,
-        response_mode: "skipped"
+        response_mode: "skipped",
+        observed_success: false
       };
     }
 
-    const is_correct = evaluateItemResponse(item, response);
+    const is_correct = observed_success || evaluateItemResponse(item, response);
     if (is_correct) {
       correct += 1;
     }
@@ -1557,7 +1617,8 @@ function evaluateAttempt(section, attempt, items, responses) {
       response,
       is_correct,
       is_skipped: false,
-      response_mode: "answered"
+      response_mode: observed_success && isBlank(response) ? "observed" : "answered",
+      observed_success
     };
   });
 

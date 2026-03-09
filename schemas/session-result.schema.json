@@ -115,8 +115,9 @@
                       "is_skipped": { "type": "boolean" },
                       "response_mode": {
                         "type": "string",
-                        "enum": ["answered", "skipped", "timed_out", "corrected", "guessed"]
-                      }
+                        "enum": ["answered", "skipped", "timed_out", "corrected", "guessed", "observed"]
+                      },
+                      "observed_success": { "type": "boolean" }
                     }
                   }
                 }

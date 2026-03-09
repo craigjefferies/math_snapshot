@@ -11,8 +11,8 @@
     },
     "notes": [
       "Formative snapshot; use sections independently.",
-      "Adapted for typed digital responses from the raw Phase 1 recording sheet.",
-      "Subitising image tasks are not included in this first digital bank."
+      "Teacher-led digital version aligned to the raw Phase 1 recording sheet.",
+      "Phase 1 supports observed-success recording because many tasks are demonstrated orally or with materials."
     ],
     "source": {
       "file_name": "2025 Phase 1 Maths Snapshots recording sheet4.docx.pdf",
@@ -26,7 +26,7 @@
       "title": "Counting",
       "strand": "Number Structure",
       "topic": "Count forwards and backwards across increasing number ranges",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_01_y0",
@@ -72,7 +72,7 @@
       "title": "Identify Numbers",
       "strand": "Number Structure",
       "topic": "Recognise numerals and find the number before and after",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_02_y0",
@@ -81,7 +81,11 @@
             "itm_sec_02_y0_q01",
             "itm_sec_02_y0_q02",
             "itm_sec_02_y0_q03",
-            "itm_sec_02_y0_q04"
+            "itm_sec_02_y0_q04",
+            "itm_sec_02_y0_q05",
+            "itm_sec_02_y0_q06",
+            "itm_sec_02_y0_q07",
+            "itm_sec_02_y0_q08"
           ]
         },
         {
@@ -91,7 +95,11 @@
             "itm_sec_02_y1_q01",
             "itm_sec_02_y1_q02",
             "itm_sec_02_y1_q03",
-            "itm_sec_02_y1_q04"
+            "itm_sec_02_y1_q04",
+            "itm_sec_02_y1_q05",
+            "itm_sec_02_y1_q06",
+            "itm_sec_02_y1_q07",
+            "itm_sec_02_y1_q08"
           ]
         },
         {
@@ -101,7 +109,11 @@
             "itm_sec_02_y2_q01",
             "itm_sec_02_y2_q02",
             "itm_sec_02_y2_q03",
-            "itm_sec_02_y2_q04"
+            "itm_sec_02_y2_q04",
+            "itm_sec_02_y2_q05",
+            "itm_sec_02_y2_q06",
+            "itm_sec_02_y2_q07",
+            "itm_sec_02_y2_q08"
           ]
         },
         {
@@ -112,7 +124,57 @@
             "itm_sec_02_y3_q02",
             "itm_sec_02_y3_q03",
             "itm_sec_02_y3_q04",
-            "itm_sec_02_y3_q05"
+            "itm_sec_02_y3_q05",
+            "itm_sec_02_y3_q06",
+            "itm_sec_02_y3_q07",
+            "itm_sec_02_y3_q08",
+            "itm_sec_02_y3_q09",
+            "itm_sec_02_y3_q10"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      }
+    },
+    {
+      "section_id": "sec_03",
+      "section_number": 3,
+      "title": "Subitise",
+      "strand": "Number Structure",
+      "topic": "Recognise quantities without counting using the Subitise cards",
+      "instructions": "Teacher-led observation task. Show the Subitise card, then type the student's answer or tick observed-success when they show the quantity correctly.",
+      "variants": [
+        {
+          "variant_id": "var_sec_03_y0",
+          "year_level": 0,
+          "item_refs": [
+            "itm_sec_03_y0_q01"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y1",
+          "year_level": 1,
+          "item_refs": [
+            "itm_sec_03_y1_q01",
+            "itm_sec_03_y1_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y2",
+          "year_level": 2,
+          "item_refs": [
+            "itm_sec_03_y2_q01",
+            "itm_sec_03_y2_q02"
+          ]
+        },
+        {
+          "variant_id": "var_sec_03_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_03_y3_q01",
+            "itm_sec_03_y3_q02"
           ]
         }
       ],
@@ -127,7 +189,7 @@
       "title": "Place Value",
       "strand": "Number Structure",
       "topic": "Use base-10 groupings to interpret quantities",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_04_y1",
@@ -163,7 +225,7 @@
       "title": "Add/Sub Basic Facts to 10",
       "strand": "Number Operations",
       "topic": "Recall addition and subtraction facts to 10",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_05a_y2",
@@ -178,7 +240,17 @@
             "itm_sec_05a_y2_q07",
             "itm_sec_05a_y2_q08",
             "itm_sec_05a_y2_q09",
-            "itm_sec_05a_y2_q10"
+            "itm_sec_05a_y2_q10",
+            "itm_sec_05a_y2_q11",
+            "itm_sec_05a_y2_q12",
+            "itm_sec_05a_y2_q13",
+            "itm_sec_05a_y2_q14",
+            "itm_sec_05a_y2_q15",
+            "itm_sec_05a_y2_q16",
+            "itm_sec_05a_y2_q17",
+            "itm_sec_05a_y2_q18",
+            "itm_sec_05a_y2_q19",
+            "itm_sec_05a_y2_q20"
           ]
         }
       ],
@@ -194,7 +266,7 @@
       "title": "Add/Sub Basic Facts to 20",
       "strand": "Number Operations",
       "topic": "Recall addition and subtraction facts to 20",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_05b_y3",
@@ -207,7 +279,15 @@
             "itm_sec_05b_y3_q05",
             "itm_sec_05b_y3_q06",
             "itm_sec_05b_y3_q07",
-            "itm_sec_05b_y3_q08"
+            "itm_sec_05b_y3_q08",
+            "itm_sec_05b_y3_q09",
+            "itm_sec_05b_y3_q10",
+            "itm_sec_05b_y3_q11",
+            "itm_sec_05b_y3_q12",
+            "itm_sec_05b_y3_q13",
+            "itm_sec_05b_y3_q14",
+            "itm_sec_05b_y3_q15",
+            "itm_sec_05b_y3_q16"
           ]
         }
       ],
@@ -223,7 +303,7 @@
       "title": "Add / Sub Operations",
       "strand": "Number Operations",
       "topic": "Join and separate quantities across increasing number ranges",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_06_y0",
@@ -268,10 +348,10 @@
     {
       "section_id": "sec_07a",
       "section_number": 7,
-      "title": "Multiplication and Division Facts",
+      "title": "Multiplication and Division",
       "strand": "Number Operations",
-      "topic": "Use skip counting and basic multiplication/division facts",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "topic": "Y1-2 operations or Y3 basic facts recall",
+      "instructions": "Teacher-led task. Use typed input or observed-success. For the strategy row, record success by observation.",
       "variants": [
         {
           "variant_id": "var_sec_07a_y1",
@@ -280,7 +360,8 @@
             "itm_sec_07a_y1_q01",
             "itm_sec_07a_y1_q02",
             "itm_sec_07a_y1_q03",
-            "itm_sec_07a_y1_q04"
+            "itm_sec_07a_y1_q04",
+            "itm_sec_07a_y1_q05"
           ]
         },
         {
@@ -290,16 +371,15 @@
             "itm_sec_07a_y2_q01",
             "itm_sec_07a_y2_q02",
             "itm_sec_07a_y2_q03",
-            "itm_sec_07a_y2_q04"
+            "itm_sec_07a_y2_q04",
+            "itm_sec_07a_y2_q05"
           ]
         },
         {
           "variant_id": "var_sec_07a_y3",
           "year_level": 3,
           "item_refs": [
-            "itm_sec_07a_y3_q01",
-            "itm_sec_07a_y3_q02",
-            "itm_sec_07a_y3_q03"
+            "itm_sec_07a_y3_q01"
           ]
         }
       ],
@@ -310,12 +390,36 @@
       "part": "a"
     },
     {
+      "section_id": "sec_07b",
+      "section_number": 7,
+      "title": "Multiplication and Division Operations",
+      "strand": "Number Operations",
+      "topic": "Multiply 1 x 2 digit numbers and divide by 1-digit divisors with no remainders",
+      "instructions": "Teacher-led task. Use typed input or observed-success.",
+      "variants": [
+        {
+          "variant_id": "var_sec_07b_y3",
+          "year_level": 3,
+          "item_refs": [
+            "itm_sec_07b_y3_q01",
+            "itm_sec_07b_y3_q02",
+            "itm_sec_07b_y3_q03"
+          ]
+        }
+      ],
+      "mastery_thresholds": {
+        "secure_pct": 80,
+        "developing_pct": 50
+      },
+      "part": "b"
+    },
+    {
       "section_id": "sec_08",
       "section_number": 8,
       "title": "Rational Numbers",
       "strand": "Rational Numbers",
       "topic": "Identify and find simple fractions of sets",
-      "instructions": "Answer each item. Skips are allowed and tracked.",
+      "instructions": "Teacher-led task. Type a response when useful, or use observed-success recording.",
       "variants": [
         {
           "variant_id": "var_sec_08_y1",
@@ -507,16 +611,16 @@
       "item_id": "itm_sec_02_y0_q01",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y0",
-      "prompt": "What number comes after 1?",
+      "prompt": "What is this number? 1",
       "answer_type": "integer",
-      "answer": 2,
+      "answer": 1,
       "source_page": 1
     },
     {
       "item_id": "itm_sec_02_y0_q02",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y0",
-      "prompt": "What number comes before 3?",
+      "prompt": "What number comes after 1?",
       "answer_type": "integer",
       "answer": 2,
       "source_page": 1
@@ -525,13 +629,49 @@
       "item_id": "itm_sec_02_y0_q03",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y0",
+      "prompt": "What is this number? 3",
+      "answer_type": "integer",
+      "answer": 3,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y0_q04",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y0",
+      "prompt": "What number comes before 3?",
+      "answer_type": "integer",
+      "answer": 2,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y0_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y0",
+      "prompt": "What is this number? 6",
+      "answer_type": "integer",
+      "answer": 6,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y0_q06",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y0",
       "prompt": "What number comes after 6?",
       "answer_type": "integer",
       "answer": 7,
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y0_q04",
+      "item_id": "itm_sec_02_y0_q07",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y0",
+      "prompt": "What is this number? 9",
+      "answer_type": "integer",
+      "answer": 9,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y0_q08",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y0",
       "prompt": "What number comes before 9?",
@@ -543,16 +683,16 @@
       "item_id": "itm_sec_02_y1_q01",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y1",
-      "prompt": "What number comes after 12?",
+      "prompt": "What is this number? 12",
       "answer_type": "integer",
-      "answer": 13,
+      "answer": 12,
       "source_page": 1
     },
     {
       "item_id": "itm_sec_02_y1_q02",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y1",
-      "prompt": "What number comes before 14?",
+      "prompt": "What number comes after 12?",
       "answer_type": "integer",
       "answer": 13,
       "source_page": 1
@@ -561,13 +701,49 @@
       "item_id": "itm_sec_02_y1_q03",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y1",
+      "prompt": "What is this number? 14",
+      "answer_type": "integer",
+      "answer": 14,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y1_q04",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y1",
+      "prompt": "What number comes before 14?",
+      "answer_type": "integer",
+      "answer": 13,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y1_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y1",
+      "prompt": "What is this number? 16",
+      "answer_type": "integer",
+      "answer": 16,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y1_q06",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y1",
       "prompt": "What number comes after 16?",
       "answer_type": "integer",
       "answer": 17,
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y1_q04",
+      "item_id": "itm_sec_02_y1_q07",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y1",
+      "prompt": "What is this number? 19",
+      "answer_type": "integer",
+      "answer": 19,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y1_q08",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y1",
       "prompt": "What number comes before 19?",
@@ -579,13 +755,31 @@
       "item_id": "itm_sec_02_y2_q01",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y2",
+      "prompt": "What is this number? 29",
+      "answer_type": "integer",
+      "answer": 29,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y2_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y2",
       "prompt": "What number comes after 29?",
       "answer_type": "integer",
       "answer": 30,
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y2_q02",
+      "item_id": "itm_sec_02_y2_q03",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y2",
+      "prompt": "What is this number? 36",
+      "answer_type": "integer",
+      "answer": 36,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y2_q04",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y2",
       "prompt": "What number comes before 36?",
@@ -594,7 +788,16 @@
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y2_q03",
+      "item_id": "itm_sec_02_y2_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y2",
+      "prompt": "What is this number? 41",
+      "answer_type": "integer",
+      "answer": 41,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y2_q06",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y2",
       "prompt": "What number comes after 41?",
@@ -603,7 +806,16 @@
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y2_q04",
+      "item_id": "itm_sec_02_y2_q07",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y2",
+      "prompt": "What is this number? 80",
+      "answer_type": "integer",
+      "answer": 80,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y2_q08",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y2",
       "prompt": "What number comes before 80?",
@@ -615,13 +827,31 @@
       "item_id": "itm_sec_02_y3_q01",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y3",
+      "prompt": "What is this number? 100",
+      "answer_type": "integer",
+      "answer": 100,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y3_q02",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
       "prompt": "What number comes after 100?",
       "answer_type": "integer",
       "answer": 101,
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y3_q02",
+      "item_id": "itm_sec_02_y3_q03",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "What is this number? 137",
+      "answer_type": "integer",
+      "answer": 137,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y3_q04",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y3",
       "prompt": "What number comes before 137?",
@@ -630,7 +860,16 @@
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y3_q03",
+      "item_id": "itm_sec_02_y3_q05",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "What is this number? 409",
+      "answer_type": "integer",
+      "answer": 409,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y3_q06",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y3",
       "prompt": "What number comes after 409?",
@@ -639,7 +878,16 @@
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y3_q04",
+      "item_id": "itm_sec_02_y3_q07",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "What is this number? 870",
+      "answer_type": "integer",
+      "answer": 870,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y3_q08",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y3",
       "prompt": "What number comes before 870?",
@@ -648,13 +896,188 @@
       "source_page": 1
     },
     {
-      "item_id": "itm_sec_02_y3_q05",
+      "item_id": "itm_sec_02_y3_q09",
+      "section_id": "sec_02",
+      "variant_id": "var_sec_02_y3",
+      "prompt": "What is this number? 999",
+      "answer_type": "integer",
+      "answer": 999,
+      "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_02_y3_q10",
       "section_id": "sec_02",
       "variant_id": "var_sec_02_y3",
       "prompt": "What number comes before 999?",
       "answer_type": "integer",
       "answer": 998,
       "source_page": 1
+    },
+    {
+      "item_id": "itm_sec_03_y0_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y0",
+      "prompt": "How many dots are there?",
+      "answer_type": "integer",
+      "answer": 3,
+      "source_page": 1,
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3a.png",
+        "alt": "Subitise card 3A showing three dots."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y1_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y1",
+      "prompt": "How many dots are there?",
+      "answer_type": "integer",
+      "answer": 5,
+      "source_page": 1,
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3b.png",
+        "alt": "Subitise card 3B showing five dots."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y1_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y1",
+      "prompt": "How many dots are there?",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 1,
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3c.png",
+        "alt": "Subitise card 3C showing four dots."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y2_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y2",
+      "prompt": "How many dots are there?",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 1,
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3d.png",
+        "alt": "Subitise card 3D showing eight dots in grouped rows."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y2_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y2",
+      "prompt": "How many dots are there?",
+      "answer_type": "integer",
+      "answer": 6,
+      "source_page": 1,
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3e.png",
+        "alt": "Subitise card 3E showing six dots in two groups."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y3_q01",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y3",
+      "prompt": "About how many dots are there?",
+      "answer_type": "integer",
+      "answer": 10,
+      "source_page": 1,
+      "accepted_answers": [
+        {
+          "value": 9,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 10,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 11,
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3f.png",
+        "alt": "Subitise card 3F showing about ten dots in grouped clusters."
+      }
+    },
+    {
+      "item_id": "itm_sec_03_y3_q02",
+      "section_id": "sec_03",
+      "variant_id": "var_sec_03_y3",
+      "prompt": "About how many dots are there?",
+      "answer_type": "integer",
+      "answer": 54,
+      "source_page": 1,
+      "accepted_answers": [
+        {
+          "value": 48,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 49,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 50,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 51,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 52,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 53,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 54,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 55,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 56,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 57,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 58,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 59,
+          "kind": "equivalent_numeric"
+        },
+        {
+          "value": 60,
+          "kind": "equivalent_numeric"
+        }
+      ],
+      "media": {
+        "kind": "image",
+        "src": "assets/phase1-subitise/3g.png",
+        "alt": "Subitise card 3G showing a larger collection of grouped dots."
+      }
     },
     {
       "item_id": "itm_sec_04_y1_q01",
@@ -732,13 +1155,31 @@
       "item_id": "itm_sec_05a_y2_q05",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
+      "prompt": "1 + 4",
+      "answer_type": "integer",
+      "answer": 5,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q06",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
       "prompt": "5 - 2",
       "answer_type": "integer",
       "answer": 3,
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05a_y2_q06",
+      "item_id": "itm_sec_05a_y2_q07",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "5 - 4",
+      "answer_type": "integer",
+      "answer": 1,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q08",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
       "prompt": "5 + 4",
@@ -747,7 +1188,16 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05a_y2_q07",
+      "item_id": "itm_sec_05a_y2_q09",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "2 + 5",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q10",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
       "prompt": "8 - 3",
@@ -756,7 +1206,7 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05a_y2_q08",
+      "item_id": "itm_sec_05a_y2_q11",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
       "prompt": "3 + 3",
@@ -765,7 +1215,34 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05a_y2_q09",
+      "item_id": "itm_sec_05a_y2_q12",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "4 + 4",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q13",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "6 - 3",
+      "answer_type": "integer",
+      "answer": 3,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q14",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "2 + 8",
+      "answer_type": "integer",
+      "answer": 10,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q15",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
       "prompt": "7 + ? = 10",
@@ -774,12 +1251,48 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05a_y2_q10",
+      "item_id": "itm_sec_05a_y2_q16",
       "section_id": "sec_05a",
       "variant_id": "var_sec_05a_y2",
       "prompt": "10 - 4",
       "answer_type": "integer",
       "answer": 6,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q17",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "3 + 4",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q18",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "2 + 6",
+      "answer_type": "integer",
+      "answer": 8,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q19",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "9 - 3",
+      "answer_type": "integer",
+      "answer": 6,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05a_y2_q20",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y2",
+      "prompt": "8 - 6",
+      "answer_type": "integer",
+      "answer": 2,
       "source_page": 2
     },
     {
@@ -804,13 +1317,22 @@
       "item_id": "itm_sec_05b_y3_q03",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
+      "prompt": "14 - 10",
+      "answer_type": "integer",
+      "answer": 4,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q04",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
       "prompt": "7 + 7",
       "answer_type": "integer",
       "answer": 14,
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05b_y3_q04",
+      "item_id": "itm_sec_05b_y3_q05",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
       "prompt": "9 + 9",
@@ -819,7 +1341,7 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05b_y3_q05",
+      "item_id": "itm_sec_05b_y3_q06",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
       "prompt": "16 - 8",
@@ -828,7 +1350,16 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05b_y3_q06",
+      "item_id": "itm_sec_05b_y3_q07",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "5 + 6",
+      "answer_type": "integer",
+      "answer": 11,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q08",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
       "prompt": "8 + 7",
@@ -837,7 +1368,43 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05b_y3_q07",
+      "item_id": "itm_sec_05b_y3_q09",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "9 + 6",
+      "answer_type": "integer",
+      "answer": 15,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q10",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "6 + 8",
+      "answer_type": "integer",
+      "answer": 14,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q11",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "7 + 5",
+      "answer_type": "integer",
+      "answer": 12,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q12",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "5 + 9",
+      "answer_type": "integer",
+      "answer": 14,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q13",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
       "prompt": "14 - 5",
@@ -846,12 +1413,30 @@
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_05b_y3_q08",
+      "item_id": "itm_sec_05b_y3_q14",
       "section_id": "sec_05b",
       "variant_id": "var_sec_05b_y3",
       "prompt": "17 - 8",
       "answer_type": "integer",
       "answer": 9,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q15",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "12 - 5",
+      "answer_type": "integer",
+      "answer": 7,
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_05b_y3_q16",
+      "section_id": "sec_05b",
+      "variant_id": "var_sec_05b_y3",
+      "prompt": "15 - 9",
+      "answer_type": "integer",
+      "answer": 6,
       "source_page": 2
     },
     {
@@ -981,6 +1566,15 @@
       "source_page": 2
     },
     {
+      "item_id": "itm_sec_07a_y1_q05",
+      "section_id": "sec_07a",
+      "variant_id": "var_sec_07a_y1",
+      "prompt": "Strategy used: share / count in 1s",
+      "answer_type": "short_text",
+      "answer": "",
+      "source_page": 2
+    },
+    {
       "item_id": "itm_sec_07a_y2_q01",
       "section_id": "sec_07a",
       "variant_id": "var_sec_07a_y2",
@@ -1017,27 +1611,45 @@
       "source_page": 2
     },
     {
+      "item_id": "itm_sec_07a_y2_q05",
+      "section_id": "sec_07a",
+      "variant_id": "var_sec_07a_y2",
+      "prompt": "Strategy used: skip count",
+      "answer_type": "short_text",
+      "answer": "",
+      "source_page": 2
+    },
+    {
       "item_id": "itm_sec_07a_y3_q01",
       "section_id": "sec_07a",
       "variant_id": "var_sec_07a_y3",
+      "prompt": "Strategy used: recall basic fact",
+      "answer_type": "short_text",
+      "answer": "",
+      "source_page": 2
+    },
+    {
+      "item_id": "itm_sec_07b_y3_q01",
+      "section_id": "sec_07b",
+      "variant_id": "var_sec_07b_y3",
       "prompt": "4 \u00d7 6",
       "answer_type": "integer",
       "answer": 24,
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_07a_y3_q02",
-      "section_id": "sec_07a",
-      "variant_id": "var_sec_07a_y3",
+      "item_id": "itm_sec_07b_y3_q02",
+      "section_id": "sec_07b",
+      "variant_id": "var_sec_07b_y3",
       "prompt": "2 \u00d7 23",
       "answer_type": "integer",
       "answer": 46,
       "source_page": 2
     },
     {
-      "item_id": "itm_sec_07a_y3_q03",
-      "section_id": "sec_07a",
-      "variant_id": "var_sec_07a_y3",
+      "item_id": "itm_sec_07b_y3_q03",
+      "section_id": "sec_07b",
+      "variant_id": "var_sec_07b_y3",
       "prompt": "32 \u00f7 4",
       "answer_type": "integer",
       "answer": 8,

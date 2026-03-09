@@ -198,6 +198,19 @@
             }
           }
         },
+        "media": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "src", "alt"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["image"]
+            },
+            "src": { "type": "string" },
+            "alt": { "type": "string" }
+          }
+        },
         "answer": {
           "anyOf": [
             { "type": "string" },

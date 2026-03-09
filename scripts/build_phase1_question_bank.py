@@ -14,8 +14,8 @@ assessment = {
     "intended_year_range": {"min": 0, "max": 3},
     "notes": [
         "Formative snapshot; use sections independently.",
-        "Adapted for typed digital responses from the raw Phase 1 recording sheet.",
-        "Subitising image tasks are not included in this first digital bank."
+        "Teacher-led digital version aligned to the raw Phase 1 recording sheet.",
+        "Phase 1 supports observed-success recording because many tasks are demonstrated orally or with materials."
     ],
     "source": {
         "file_name": "2025 Phase 1 Maths Snapshots recording sheet4.docx.pdf",
@@ -27,7 +27,7 @@ sections = []
 items = []
 
 
-def spec(prompt, answer_type, answer, source_page, accepted_answers=None, validation=None, fields=None):
+def spec(prompt, answer_type, answer, source_page, accepted_answers=None, validation=None, fields=None, media=None):
     row = {
         "prompt": prompt,
         "answer_type": answer_type,
@@ -40,6 +40,8 @@ def spec(prompt, answer_type, answer, source_page, accepted_answers=None, valida
         row["validation"] = validation
     if fields:
         row["fields"] = fields
+    if media:
+        row["media"] = media
     return row
 
 
@@ -52,7 +54,7 @@ def add_section(
     variants,
     source_page,
     part=None,
-    instructions="Answer each item. Skips are allowed and tracked."
+    instructions="Teacher-led task. Type a response when useful, or use observed-success recording."
 ):
     section_variants = []
     for year in sorted(variants.keys()):
@@ -76,6 +78,8 @@ def add_section(
             for opt in ("accepted_answers", "validation", "fields"):
                 if opt in item_spec:
                     item[opt] = item_spec[opt]
+            if "media" in item_spec:
+                item["media"] = item_spec["media"]
             items.append(item)
             refs.append(item_id)
 
@@ -110,6 +114,14 @@ def sequence_answers(numbers):
         {"value": base, "kind": "literal"},
         {"value": comma, "kind": "literal"},
     ]
+
+
+def image_media(src, alt):
+    return {
+        "kind": "image",
+        "src": src,
+        "alt": alt,
+    }
 
 
 # 1. Counting
@@ -151,29 +163,119 @@ add_section(
     source_page=1,
     variants={
         0: [
+            spec("What is this number? 1", "integer", 1, 1),
             spec("What number comes after 1?", "integer", 2, 1),
+            spec("What is this number? 3", "integer", 3, 1),
             spec("What number comes before 3?", "integer", 2, 1),
+            spec("What is this number? 6", "integer", 6, 1),
             spec("What number comes after 6?", "integer", 7, 1),
+            spec("What is this number? 9", "integer", 9, 1),
             spec("What number comes before 9?", "integer", 8, 1),
         ],
         1: [
+            spec("What is this number? 12", "integer", 12, 1),
             spec("What number comes after 12?", "integer", 13, 1),
+            spec("What is this number? 14", "integer", 14, 1),
             spec("What number comes before 14?", "integer", 13, 1),
+            spec("What is this number? 16", "integer", 16, 1),
             spec("What number comes after 16?", "integer", 17, 1),
+            spec("What is this number? 19", "integer", 19, 1),
             spec("What number comes before 19?", "integer", 18, 1),
         ],
         2: [
+            spec("What is this number? 29", "integer", 29, 1),
             spec("What number comes after 29?", "integer", 30, 1),
+            spec("What is this number? 36", "integer", 36, 1),
             spec("What number comes before 36?", "integer", 35, 1),
+            spec("What is this number? 41", "integer", 41, 1),
             spec("What number comes after 41?", "integer", 42, 1),
+            spec("What is this number? 80", "integer", 80, 1),
             spec("What number comes before 80?", "integer", 79, 1),
         ],
         3: [
+            spec("What is this number? 100", "integer", 100, 1),
             spec("What number comes after 100?", "integer", 101, 1),
+            spec("What is this number? 137", "integer", 137, 1),
             spec("What number comes before 137?", "integer", 136, 1),
+            spec("What is this number? 409", "integer", 409, 1),
             spec("What number comes after 409?", "integer", 410, 1),
+            spec("What is this number? 870", "integer", 870, 1),
             spec("What number comes before 870?", "integer", 869, 1),
+            spec("What is this number? 999", "integer", 999, 1),
             spec("What number comes before 999?", "integer", 998, 1),
+        ],
+    },
+)
+
+
+# 3. Subitise
+add_section(
+    section_id="sec_03",
+    section_number=3,
+    title="Subitise",
+    strand="Number Structure",
+    topic="Recognise quantities without counting using the Subitise cards",
+    source_page=1,
+    instructions="Teacher-led observation task. Show the Subitise card, then type the student's answer or tick observed-success when they show the quantity correctly.",
+    variants={
+        0: [
+            spec(
+                "How many dots are there?",
+                "integer",
+                3,
+                1,
+                media=image_media("assets/phase1-subitise/3a.png", "Subitise card 3A showing three dots.")
+            ),
+        ],
+        1: [
+            spec(
+                "How many dots are there?",
+                "integer",
+                5,
+                1,
+                media=image_media("assets/phase1-subitise/3b.png", "Subitise card 3B showing five dots.")
+            ),
+            spec(
+                "How many dots are there?",
+                "integer",
+                4,
+                1,
+                media=image_media("assets/phase1-subitise/3c.png", "Subitise card 3C showing four dots.")
+            ),
+        ],
+        2: [
+            spec(
+                "How many dots are there?",
+                "integer",
+                8,
+                1,
+                media=image_media("assets/phase1-subitise/3d.png", "Subitise card 3D showing eight dots in grouped rows.")
+            ),
+            spec(
+                "How many dots are there?",
+                "integer",
+                6,
+                1,
+                media=image_media("assets/phase1-subitise/3e.png", "Subitise card 3E showing six dots in two groups.")
+            ),
+        ],
+        3: [
+            spec(
+                "About how many dots are there?",
+                "integer",
+                10,
+                1,
+                accepted_answers=[{"value": value, "kind": "equivalent_numeric"} for value in range(9, 12)],
+                media=image_media("assets/phase1-subitise/3f.png", "Subitise card 3F showing about ten dots in grouped clusters.")
+            ),
+            spec(
+                "About how many dots are there?",
+                "integer",
+                54,
+                1,
+                accepted_answers=[{"value": value, "kind": "equivalent_numeric"} for value in range(48, 61)],
+                media=image_media("assets/phase1-subitise/3g.png", "Subitise card 3G showing a larger collection of grouped dots.")
+            ),
         ],
     },
 )
@@ -217,12 +319,22 @@ add_section(
             spec("5 + 0", "integer", 5, 2),
             spec("4 - 1", "integer", 3, 2),
             spec("2 + 3", "integer", 5, 2),
+            spec("1 + 4", "integer", 5, 2),
             spec("5 - 2", "integer", 3, 2),
+            spec("5 - 4", "integer", 1, 2),
             spec("5 + 4", "integer", 9, 2),
+            spec("2 + 5", "integer", 7, 2),
             spec("8 - 3", "integer", 5, 2),
             spec("3 + 3", "integer", 6, 2),
+            spec("4 + 4", "integer", 8, 2),
+            spec("6 - 3", "integer", 3, 2),
+            spec("2 + 8", "integer", 10, 2),
             spec("7 + ? = 10", "integer", 3, 2),
             spec("10 - 4", "integer", 6, 2),
+            spec("3 + 4", "integer", 7, 2),
+            spec("2 + 6", "integer", 8, 2),
+            spec("9 - 3", "integer", 6, 2),
+            spec("8 - 6", "integer", 2, 2),
         ],
     },
 )
@@ -241,12 +353,20 @@ add_section(
         3: [
             spec("10 + 8", "integer", 18, 2),
             spec("17 - 7", "integer", 10, 2),
+            spec("14 - 10", "integer", 4, 2),
             spec("7 + 7", "integer", 14, 2),
             spec("9 + 9", "integer", 18, 2),
             spec("16 - 8", "integer", 8, 2),
+            spec("5 + 6", "integer", 11, 2),
             spec("8 + 7", "integer", 15, 2),
+            spec("9 + 6", "integer", 15, 2),
+            spec("6 + 8", "integer", 14, 2),
+            spec("7 + 5", "integer", 12, 2),
+            spec("5 + 9", "integer", 14, 2),
             spec("14 - 5", "integer", 9, 2),
             spec("17 - 8", "integer", 9, 2),
+            spec("12 - 5", "integer", 7, 2),
+            spec("15 - 9", "integer", 6, 2),
         ],
     },
 )
@@ -283,28 +403,49 @@ add_section(
 )
 
 
-# 7a. Multiplication and division basic facts / operations
+# 7a. Multiplication and division: Y1-2 operations or Y3 basic facts recall
 add_section(
     section_id="sec_07a",
     section_number=7,
     part="a",
-    title="Multiplication and Division Facts",
+    title="Multiplication and Division",
     strand="Number Operations",
-    topic="Use skip counting and basic multiplication/division facts",
+    topic="Y1-2 operations or Y3 basic facts recall",
     source_page=2,
+    instructions="Teacher-led task. Use typed input or observed-success. For the strategy row, record success by observation.",
     variants={
         1: [
             spec("8 × 2", "integer", 16, 2),
             spec("14 ÷ 2", "integer", 7, 2),
             spec("7 × 10", "integer", 70, 2),
             spec("60 ÷ 10", "integer", 6, 2),
+            spec("Strategy used: share / count in 1s", "short_text", "", 2),
         ],
         2: [
             spec("6 × 5", "integer", 30, 2),
             spec("40 ÷ 5", "integer", 8, 2),
             spec("6 × 3", "integer", 18, 2),
             spec("24 ÷ 3", "integer", 8, 2),
+            spec("Strategy used: skip count", "short_text", "", 2),
         ],
+        3: [
+            spec("Strategy used: recall basic fact", "short_text", "", 2),
+        ],
+    },
+)
+
+
+# 7b. Multiplication and division operations
+add_section(
+    section_id="sec_07b",
+    section_number=7,
+    part="b",
+    title="Multiplication and Division Operations",
+    strand="Number Operations",
+    topic="Multiply 1 x 2 digit numbers and divide by 1-digit divisors with no remainders",
+    source_page=2,
+    instructions="Teacher-led task. Use typed input or observed-success.",
+    variants={
         3: [
             spec("4 × 6", "integer", 24, 2),
             spec("2 × 23", "integer", 46, 2),
