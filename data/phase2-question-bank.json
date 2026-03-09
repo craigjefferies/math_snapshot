@@ -6,7 +6,7 @@
     "publisher_year": 2025,
     "learning_phase": "Phase 2",
     "intended_year_range": {
-      "min": 4,
+      "min": 3,
       "max": 6
     },
     "notes": [
@@ -340,7 +340,8 @@
           "variant_id": "var_sec_05a_y6",
           "year_level": 6,
           "item_refs": [
-            "itm_sec_05a_y6_q01"
+            "itm_sec_05a_y6_q01",
+            "itm_sec_05a_y6_q02"
           ]
         }
       ],
@@ -1995,6 +1996,15 @@
       "prompt": "54 x 132",
       "answer_type": "integer",
       "answer": 7128,
+      "source_page": 6
+    },
+    {
+      "item_id": "itm_sec_05a_y6_q02",
+      "section_id": "sec_05a",
+      "variant_id": "var_sec_05a_y6",
+      "prompt": "36 x 274",
+      "answer_type": "integer",
+      "answer": 9864,
       "source_page": 6
     },
     {

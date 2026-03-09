@@ -2,8 +2,11 @@
 import json
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 ROOT = Path("/home/craigjefferies/projects/maths_snapshots")
 OUT_PATH = ROOT / "data" / "phase1-question-bank.json"
+SCHEMA_PATH = ROOT / "schemas" / "question-bank.schema.json"
 
 
 assessment = {
@@ -297,8 +300,20 @@ add_section(
             spec("How many bags of 10 lollies can you make with 50 lollies?", "integer", 5, 1),
         ],
         3: [
-            spec("How many groups of 10 can you make with 83 sticks?", "integer", 8, 1),
-            spec("A phone costs $270. How many $10 notes do you need to pay for it?", "integer", 27, 1),
+            spec(
+                "How many groups of 10 can you make with 83 sticks?",
+                "integer",
+                8,
+                1,
+                media=image_media("assets/phase1-place-value/sticks.png", "A small bundle of sticks used for the place-value question.")
+            ),
+            spec(
+                "A phone costs $270. How many $10 notes do you need to pay for it?",
+                "integer",
+                27,
+                1,
+                media=image_media("assets/phase1-place-value/phone.png", "A phone image used for the $270 place-value question.")
+            ),
         ],
     },
 )
@@ -465,17 +480,59 @@ add_section(
     source_page=2,
     variants={
         1: [
-            spec("Type the symbol for one half.", "fraction", "1/2", 2, validation={"fraction_equivalence": True}),
-            spec("Type the symbol for one quarter.", "fraction", "1/4", 2, validation={"fraction_equivalence": True}),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/2",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/half.png", "A triangle split into two equal parts with one half shaded.")
+            ),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/4",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/quarter.png", "A rectangle split into four equal parts with one quarter shaded.")
+            ),
         ],
         2: [
-            spec("Type the symbol for one eighth.", "fraction", "1/8", 2, validation={"fraction_equivalence": True}),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/8",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/eighth.png", "A rectangle split into eight equal parts with one eighth shaded.")
+            ),
             spec("Find 1/4 of 12.", "integer", 3, 2),
         ],
         3: [
-            spec("Type the symbol for one fifth.", "fraction", "1/5", 2, validation={"fraction_equivalence": True}),
-            spec("Type the symbol for one third.", "fraction", "1/3", 2, validation={"fraction_equivalence": True}),
-            spec("Type the symbol for one sixth.", "fraction", "1/6", 2, validation={"fraction_equivalence": True}),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/5",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/fifth.png", "A circle split into five equal parts with one fifth shaded.")
+            ),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/3",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/third.png", "A rectangle split into three equal parts with one third shaded.")
+            ),
+            spec(
+                "What fraction is shaded?",
+                "fraction",
+                "1/6",
+                2,
+                validation={"fraction_equivalence": True},
+                media=image_media("assets/phase1-rational/sixth.png", "A rectangle split into six equal parts with one sixth shaded.")
+            ),
             spec("Find 1/3 of 15.", "integer", 5, 2),
         ],
     },
@@ -490,6 +547,8 @@ bank = {
 }
 
 OUT_PATH.write_text(json.dumps(bank, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+Draft202012Validator(json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))).validate(bank)
 print(f"Wrote {OUT_PATH}")
 print(f"Sections: {len(sections)}")
 print(f"Items: {len(items)}")
+print("Schema: valid")

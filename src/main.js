@@ -26,6 +26,8 @@ const STRAND_WEIGHTS = {
   "Number Operations": 0.4,
   "Rational Numbers": 0.4
 };
+const SESSION_BIRDS = ["Tui", "Kea", "Kakapo", "Fantail", "Morepork", "Kotare", "Pukeko", "Kiwi", "Ruru", "Kereru", "Piwakawaka", "Hoiho"];
+const SESSION_OBJECTS = ["Backpack", "Rocket", "Lantern", "Biscuit", "Compass", "Scooter", "Teacup", "Pencil", "Button", "Kite", "Drum", "Bucket"];
 const UI_STORAGE_KEY = "maths_snapshot_ui_v1";
 
 const state = {
@@ -37,9 +39,9 @@ const state = {
   notice: "",
   ui: {
     sidebar_collapsed: loadSidebarPreference(),
-    show_history_panel: false,
     review_section_id: null,
-    current_phase: loadCurrentPhasePreference()
+    current_phase: loadCurrentPhasePreference(),
+    draft_session_label: ""
   }
 };
 
@@ -59,6 +61,7 @@ async function init() {
       state.banksByPhase.set(config.key, bank);
     }
     activatePhase(state.ui.current_phase, { rerender: false });
+    state.ui.draft_session_label = generateSessionLabel();
     renderSetup();
   } catch (error) {
     renderError(error);
@@ -482,89 +485,101 @@ function formatSetupYearLabel(year) {
 }
 
 function renderSetup() {
+  if (!state.ui.draft_session_label) {
+    state.ui.draft_session_label = generateSessionLabel();
+  }
   const sections = getSortedSections();
   const phaseConfig = getCurrentPhaseConfig();
   const startYears = getAvailableStartYears();
   const savedSession = loadSessionFromStorage();
   const sessionHistory = loadSessionHistoryFromStorage();
-  const resumeBanner = (savedSession && !savedSession.generated_at)
-    ? `<div class="notice resume-notice">
-        <strong>Resume?</strong> Session in progress for <strong>${escapeHtml(savedSession.student?.name || "a student")}</strong>.
-        ${savedSession.last_saved_at ? `<span class="resume-meta">Last saved ${escapeHtml(formatSavedAt(savedSession.last_saved_at))}</span>` : ""}
-        <span class="resume-actions">
-          <button type="button" id="resumeSessionBtn" class="btn-resume">Resume session</button>
-          <button type="button" id="discardSessionBtn" class="btn-discard-sm">Discard</button>
-        </span>
-      </div>`
-    : "";
-  const historyPanel = sessionHistory.length
-    ? `<section class="device-history" aria-label="Saved reports on this device">
-        <div class="device-history-head">
+  const currentSessionPanel = (savedSession && !savedSession.generated_at)
+    ? `<section class="session-stack">
+        <div class="history-head">
           <div>
-            <strong>Saved reports on this device</strong>
-            <p class="subtle">Expand only when needed. Clear this browser if students share the device.</p>
-          </div>
-          <div class="device-history-actions">
-            <button type="button" id="toggleHistoryBtn">${state.ui.show_history_panel ? "Hide history" : `Show history (${sessionHistory.length})`}</button>
-            <button type="button" id="clearHistoryBtn" class="btn-clear-results">Clear device history</button>
+            <h2>Current Assessment</h2>
+            <p class="subtle">Resume it, or discard it before starting a new one.</p>
           </div>
         </div>
-        ${state.ui.show_history_panel
-          ? `<div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Student</th>
-                    <th>Teacher</th>
-                    <th>Overall</th>
-                    <th>Sections</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${sessionHistory
-                    .map((entry) => `
-                      <tr>
-                        <td>${escapeHtml(formatSavedAt(entry.generated_at))}</td>
-                        <td>
-                          ${entry.student_name
-                            ? escapeHtml(entry.student_name)
-                            : `<input type="text" data-history-student="${escapeAttribute(entry.session_id)}" placeholder="Student name" value="" autocomplete="off" />`}
-                        </td>
-                        <td>
-                          ${entry.teacher_name
-                            ? escapeHtml(entry.teacher_name)
-                            : `<input type="text" data-history-teacher="${escapeAttribute(entry.session_id)}" placeholder="Teacher name" value="" autocomplete="off" />`}
-                        </td>
-                        <td>${escapeHtml(entry.overall_year || "Insufficient Data")} (${escapeHtml(entry.confidence || "Low")})</td>
-                        <td>${escapeHtml(String(entry.sections_completed || 0))}/${escapeHtml(String(entry.section_count || 0))}</td>
-                        <td>
-                          ${entry.session_payload
-                            ? `<button type="button" data-history-open="${escapeAttribute(entry.session_id)}">Open report</button>`
-                            : `<span class="subtle">Legacy entry</span>`}
-                          ${(!entry.student_name || !entry.teacher_name)
-                            ? `<button type="button" data-history-save="${escapeAttribute(entry.session_id)}">Save</button>`
-                            : ""}
-                        </td>
-                      </tr>
-                    `)
-                    .join("")}
-                </tbody>
-              </table>
-            </div>`
-          : ""}
+        <article class="session-card session-card-current">
+          <div class="session-card-head">
+            <div>
+              <strong>${escapeHtml(getSessionLabel(savedSession))}</strong>
+              <p class="subtle">${escapeHtml(PHASE_CONFIGS[savedSession.phase_key]?.label || phaseConfig.label)} • ${escapeHtml(buildSessionProgressText(savedSession))}</p>
+            </div>
+            <span class="session-card-time">${savedSession.last_saved_at ? `Saved ${escapeHtml(formatSavedAt(savedSession.last_saved_at))}` : "In progress"}</span>
+          </div>
+          <div class="session-chip-row">
+            <span class="nav-chip"><strong>Sections:</strong> ${escapeHtml(String(savedSession.selected_section_ids?.length || 0))}</span>
+            ${savedSession.teacher?.name ? `<span class="nav-chip"><strong>Teacher:</strong> ${escapeHtml(savedSession.teacher.name)}</span>` : ""}
+            ${savedSession.student?.name ? `<span class="nav-chip"><strong>Report name:</strong> ${escapeHtml(savedSession.student.name)}</span>` : ""}
+          </div>
+          <div class="resume-actions">
+            <button type="button" id="resumeSessionBtn" class="btn-primary">Resume Current Assessment</button>
+            <button type="button" id="discardSessionBtn">Discard Current Assessment</button>
+          </div>
+        </article>
+      </section>`
+    : "";
+  const historyPanel = sessionHistory.length
+    ? `<section class="session-stack" aria-label="Saved reports on this device">
+        <div class="history-head">
+          <div>
+            <h2>Recent Reports</h2>
+            <p class="subtle">Stored on this device only. Reopen any completed report when needed.</p>
+          </div>
+          <div class="history-actions">
+            <button type="button" id="clearHistoryBtn" class="btn-clear-results">Clear history</button>
+          </div>
+        </div>
+        <div class="session-card-grid">
+          ${sessionHistory
+            .map((entry) => `
+              <article class="session-card">
+                <div class="session-card-head">
+                  <div>
+                    <strong>${escapeHtml(getSessionLabel(entry))}</strong>
+                    <p class="subtle">${escapeHtml(PHASE_CONFIGS[entry.phase_key]?.label || "Saved report")} • ${escapeHtml(entry.overall_year || "Insufficient Data")} (${escapeHtml(entry.confidence || "Low")})</p>
+                  </div>
+                  <span class="session-card-time">${escapeHtml(formatSavedAt(entry.generated_at))}</span>
+                </div>
+                <div class="session-chip-row">
+                  <span class="nav-chip"><strong>Sections:</strong> ${escapeHtml(String(entry.sections_completed || 0))}/${escapeHtml(String(entry.section_count || 0))}</span>
+                  ${entry.teacher_name ? `<span class="nav-chip"><strong>Teacher:</strong> ${escapeHtml(entry.teacher_name)}</span>` : ""}
+                  ${entry.student_name ? `<span class="nav-chip"><strong>Report name:</strong> ${escapeHtml(entry.student_name)}</span>` : ""}
+                </div>
+                <div class="resume-actions">
+                  ${entry.session_payload
+                    ? `<button type="button" data-history-open="${escapeAttribute(entry.session_id)}">Open Report</button>`
+                    : `<span class="subtle">Legacy entry</span>`}
+                </div>
+              </article>
+            `)
+            .join("")}
+        </div>
       </section>`
     : "";
 
   const content = `
     <section class="panel panel-setup">
-      ${resumeBanner}
+      ${currentSessionPanel}
       <h1>${escapeHtml(state.bank?.assessment?.name || `${phaseConfig.label} Maths Snapshot`)}</h1>
-      <p class="subtle">Select the sections you want to run, choose a starting year level, and enter names for the PDF report. Each section takes around 3–5 minutes. Hand the device to the student when ready.</p>
+      <p class="subtle">Select the sections you want to run, choose a starting year level, and use a memorable session label. Real names are optional and only used on exported reports.</p>
       ${historyPanel}
 
       <form id="setupForm" class="grid-form grid-form-setup">
+        <fieldset>
+          <legend>Session Label</legend>
+          <p class="subtle start-note">Use a friendly nickname for this assessment session. No personal information needed.</p>
+          <div class="session-label-row">
+            <label class="session-name-label">
+              Session label
+              <input type="text" name="sessionLabel" value="${escapeAttribute(state.ui.draft_session_label)}" placeholder="e.g. Tui Rocket" autocomplete="off" />
+            </label>
+            <button type="button" id="regenerateSessionLabelBtn">New Label</button>
+          </div>
+        </fieldset>
+
         <fieldset class="start-mode start-mode-compact">
           <legend>Starting Questions</legend>
           <p class="subtle start-note">Chooses the first year-level questions shown for each section.</p>
@@ -616,21 +631,21 @@ function renderSetup() {
         </fieldset>
 
         <fieldset>
-          <legend>Report Names</legend>
-          <p class="subtle start-note">Added to downloaded PDF reports. Both fields are optional.</p>
+          <legend>Optional Report Names</legend>
+          <p class="subtle start-note">Only used in downloaded PDF reports and saved report rows.</p>
           <div class="session-names-grid">
             <label class="session-name-label">
-              Student name
-              <input type="text" name="studentName" value="${escapeAttribute(savedSession?.student?.name || "")}" placeholder="e.g. Alex" autocomplete="off" />
+              Student report name
+              <input type="text" name="studentName" value="" placeholder="e.g. Alex" autocomplete="off" />
             </label>
             <label class="session-name-label">
               Teacher name
-              <input type="text" name="teacherName" value="${escapeAttribute(savedSession?.teacher?.name || "")}" placeholder="e.g. Ms Smith" autocomplete="off" />
+              <input type="text" name="teacherName" value="" placeholder="e.g. Ms Smith" autocomplete="off" />
             </label>
           </div>
         </fieldset>
         <p id="setupFormError" class="form-error" hidden></p>
-        <button type="submit" class="btn-primary">Start Diagnostic Session</button>
+        <button type="submit" class="btn-primary">${savedSession && !savedSession.generated_at ? "Start New Assessment" : "Start Assessment"}</button>
       </form>
     </section>
   `;
@@ -672,24 +687,11 @@ function renderSetup() {
       }
     });
   }
-  const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
-  if (toggleHistoryBtn) {
-    toggleHistoryBtn.addEventListener("click", () => {
-      state.ui.show_history_panel = !state.ui.show_history_panel;
-      renderSetup();
-    });
-  }
   const clearHistoryBtn = document.getElementById("clearHistoryBtn");
   if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener("click", () => {
       clearSessionHistoryFromStorage();
-      state.ui.show_history_panel = false;
       renderSetup();
-    });
-  }
-  for (const button of document.querySelectorAll("[data-history-save]")) {
-    button.addEventListener("click", () => {
-      saveHistoryNames(button.dataset.historySave);
     });
   }
   for (const button of document.querySelectorAll("[data-history-open]")) {
@@ -697,10 +699,19 @@ function renderSetup() {
       openHistorySession(button.dataset.historyOpen);
     });
   }
+  const regenerateSessionLabelBtn = document.getElementById("regenerateSessionLabelBtn");
+  if (regenerateSessionLabelBtn) {
+    regenerateSessionLabelBtn.addEventListener("click", () => {
+      state.ui.draft_session_label = generateSessionLabel();
+      renderSetup();
+    });
+  }
   const discardBtn = document.getElementById("discardSessionBtn");
   if (discardBtn) {
     discardBtn.addEventListener("click", () => {
       clearSessionFromStorage();
+      state.session = null;
+      state.ui.draft_session_label = generateSessionLabel();
       renderSetup();
     });
   }
@@ -773,6 +784,7 @@ function bindSectionSelectionControls(form) {
 function onStartSession(event) {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
+  const savedSession = loadSessionFromStorage();
 
   const selectedSectionIds = form.getAll("sectionId");
   if (!selectedSectionIds.length) {
@@ -791,6 +803,14 @@ function onStartSession(event) {
     : phaseConfig.default_start_year;
   const teacherName = String(form.get("teacherName") || "").trim();
   const studentName = String(form.get("studentName") || "").trim();
+  const sessionLabel = String(form.get("sessionLabel") || state.ui.draft_session_label || "").trim();
+
+  if (savedSession && !savedSession.generated_at) {
+    const shouldReplace = window.confirm(`Discard ${getSessionLabel(savedSession)} and start a new assessment?`);
+    if (!shouldReplace) {
+      return;
+    }
+  }
 
   clearSessionFromStorage();
 
@@ -809,6 +829,7 @@ function onStartSession(event) {
 
   state.session = {
     session_id: getSessionId(),
+    session_label: sessionLabel || generateSessionLabel(),
     teacher: { name: teacherName },
     student: { name: studentName },
     phase_key: phaseConfig.key,
@@ -827,6 +848,7 @@ function onStartSession(event) {
   };
 
   state.notice = "";
+  state.ui.draft_session_label = generateSessionLabel();
   setReviewSection(selectedSectionIds[0] || null);
   saveSessionToStorage();
   beginCurrentSection();
@@ -1441,7 +1463,10 @@ function renderTeacherProbe(run) {
 
   const content = `
     <section class="panel">
-      <h1>${escapeHtml(sectionLabel(section))} — Short Teacher Probe</h1>
+      <header class="teacher-probe-header">
+        <h1>Short Teacher Probe</h1>
+        <p class="subtle teacher-probe-subtitle">${escapeHtml(sectionLabel(section))}</p>
+      </header>
 
       <form id="teacherProbeForm" class="teacher-probe-form">
         ${showingIntro
@@ -1513,7 +1538,7 @@ function renderTeacherProbe(run) {
   });
 
   document.getElementById("teacherProbeForm").addEventListener("submit", onTeacherProbeSubmit);
-  document.getElementById("skipTeacherProbeBtn").addEventListener("click", onTeacherProbeSkip);
+  document.getElementById("skipTeacherProbeBtn").addEventListener("click", () => onTeacherProbeSkip(run));
 }
 
 function onTeacherProbeSubmit(event) {
@@ -1574,8 +1599,8 @@ function onTeacherProbeSubmit(event) {
   startTeacherProbeFlowOrFinalize();
 }
 
-function onTeacherProbeSkip() {
-  const run = findCurrentProbeRun();
+function onTeacherProbeSkip(runArg = null) {
+  const run = runArg || findCurrentProbeRun();
   if (run?.teacher_probe) {
     run.teacher_probe.status = "recommended";
   }
@@ -3708,10 +3733,14 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
       </ul>
 
       <h2>Report Names</h2>
-      <p class="subtle">Used for exports and the saved reports list on this device.</p>
+      <p class="subtle">Session label is used for saved sessions on this device. Report names are optional and used in exports.</p>
       <div class="session-names-grid">
         <label class="session-name-label">
-          Student name
+          Session label
+          <input id="resultsSessionLabelInput" type="text" value="${escapeAttribute(state.session.session_label || "")}" placeholder="e.g. Tui Rocket" autocomplete="off" />
+        </label>
+        <label class="session-name-label">
+          Student report name
           <input id="resultsStudentNameInput" type="text" value="${escapeAttribute(state.session.student.name || "")}" placeholder="e.g. Alex" autocomplete="off" />
         </label>
         <label class="session-name-label">
@@ -3828,6 +3857,7 @@ function downloadSectionTeacherPdf(run) {
     subtitle: `${phase} | Section Report`,
     metaRows: [
       ["Generated", timestamp],
+      ["Session label", getSessionLabel(state.session)],
       ["Teacher", state.session.teacher.name],
       ["Student", state.session.student.name],
       ["Section", sectionLabel(section)],
@@ -3921,6 +3951,7 @@ function downloadFinalTeacherPdf() {
     subtitle: `${phase} | Full Session`,
     metaRows: [
       ["Generated", timestamp],
+      ["Session label", getSessionLabel(state.session)],
       ["Teacher", state.session.teacher.name],
       ["Student", state.session.student.name],
       ["Phase", phase],
@@ -4370,17 +4401,20 @@ function formatAnswerForExport(value) {
 }
 
 function safeFileBase() {
-  const name = String(state.session?.student?.name || "").trim();
+  const name = String(state.session?.student?.name || state.session?.session_label || "").trim();
   return name ? name.replace(/\s+/g, "_") : "student";
 }
 
 function buildAssessmentHeaderContext(attemptNumber, attemptYearLabel) {
   const chips = [];
   const studentName = String(state.session?.student?.name || "").trim();
+  const sessionLabel = getSessionLabel(state.session);
   const teacherName = String(state.session?.teacher?.name || "").trim();
 
   if (studentName) {
     chips.push(`<span class="nav-chip"><strong>Student:</strong> ${escapeHtml(studentName)}</span>`);
+  } else if (sessionLabel) {
+    chips.push(`<span class="nav-chip"><strong>Session:</strong> ${escapeHtml(sessionLabel)}</span>`);
   }
   if (teacherName) {
     chips.push(`<span class="nav-chip"><strong>Teacher:</strong> ${escapeHtml(teacherName)}</span>`);
@@ -4395,9 +4429,12 @@ function buildAssessmentHeaderContext(attemptNumber, attemptYearLabel) {
 function buildSessionHeaderContext() {
   const chips = [];
   const studentName = String(state.session?.student?.name || "").trim();
+  const sessionLabel = getSessionLabel(state.session);
   const teacherName = String(state.session?.teacher?.name || "").trim();
   if (studentName) {
     chips.push(`<span class="nav-chip"><strong>Student:</strong> ${escapeHtml(studentName)}</span>`);
+  } else if (sessionLabel) {
+    chips.push(`<span class="nav-chip"><strong>Session:</strong> ${escapeHtml(sessionLabel)}</span>`);
   }
   if (teacherName) {
     chips.push(`<span class="nav-chip"><strong>Teacher:</strong> ${escapeHtml(teacherName)}</span>`);
@@ -4415,6 +4452,72 @@ function getSessionId() {
   return `session-${Date.now()}`;
 }
 
+function hashString(value) {
+  let hash = 0;
+  const text = String(value || "");
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(index);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function generateSessionLabel(seed = "") {
+  const source = seed || `${Date.now()}-${Math.random()}`;
+  const bird = SESSION_BIRDS[hashString(`${source}-bird`) % SESSION_BIRDS.length];
+  const object = SESSION_OBJECTS[hashString(`${source}-object`) % SESSION_OBJECTS.length];
+  return `${bird} ${object}`;
+}
+
+function getSessionLabel(sessionLike) {
+  return String(
+    sessionLike?.session_label
+    || sessionLike?.student?.name
+    || sessionLike?.student_name
+    || generateSessionLabel(sessionLike?.session_id || "")
+  ).trim();
+}
+
+function buildSessionProgressText(session) {
+  const runCount = Array.isArray(session?.section_runs) ? session.section_runs.length : Number(session?.section_count || 0);
+  const completed = Array.isArray(session?.section_runs)
+    ? session.section_runs.filter((run) => !!run.summary).length
+    : Number(session?.sections_completed || 0);
+  const probeActive = !!session?.current_probe_section_id;
+  const assessmentActive = !!session?.current_attempt;
+
+  if (!runCount) {
+    return "Not started";
+  }
+  if (assessmentActive) {
+    return `${completed}/${runCount} sections complete`;
+  }
+  if (probeActive) {
+    return `Teacher probe after ${completed}/${runCount} sections`;
+  }
+  if (session?.generated_at) {
+    return `${completed}/${runCount} sections complete`;
+  }
+  return `${completed}/${runCount} sections complete`;
+}
+
+function hydrateSessionShape(session) {
+  if (!session || typeof session !== "object") {
+    return null;
+  }
+
+  const next = session;
+  next.teacher = typeof next.teacher === "object" && next.teacher ? next.teacher : { name: "" };
+  next.student = typeof next.student === "object" && next.student ? next.student : { name: "" };
+  next.phase_key = next.phase_key || state.ui.current_phase;
+  next.session_label = String(next.session_label || "").trim() || generateSessionLabel(next.session_id || "");
+
+  if (!Array.isArray(next.section_runs)) {
+    next.section_runs = [];
+  }
+  return next;
+}
+
 // ── LocalStorage helpers ──────────────────────────────────────────────────────
 const STORAGE_KEY = "maths_snapshot_session_v1";
 const HISTORY_KEY = "maths_snapshot_history_v2";
@@ -4422,6 +4525,7 @@ const HISTORY_KEY = "maths_snapshot_history_v2";
 function saveSessionToStorage() {
   if (!state.session) return;
   try {
+    hydrateSessionShape(state.session);
     state.session.last_saved_at = new Date().toISOString();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.session));
   } catch (_) {}
@@ -4482,7 +4586,7 @@ function clearSessionFromStorage() {
 function loadSessionFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    return raw ? hydrateSessionShape(JSON.parse(raw)) : null;
   } catch (_) {
     return null;
   }
@@ -4507,6 +4611,8 @@ function buildStoredSessionSummary() {
     .filter(Boolean);
   return {
     session_id: state.session.session_id,
+    session_label: getSessionLabel(state.session),
+    phase_key: state.session.phase_key,
     generated_at: state.session.generated_at,
     student_name: state.session.student?.name || "",
     teacher_name: state.session.teacher?.name || "",
@@ -4522,7 +4628,13 @@ function loadSessionHistoryFromStorage() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.map((entry) => ({
+          ...entry,
+          session_label: String(entry?.session_label || "").trim() || generateSessionLabel(entry?.session_id || ""),
+          phase_key: entry?.phase_key || "phase2"
+        }))
+      : [];
   } catch (_) {
     return [];
   }
@@ -4532,52 +4644,6 @@ function clearSessionHistoryFromStorage() {
   try {
     localStorage.removeItem(HISTORY_KEY);
   } catch (_) {}
-}
-
-function saveHistoryNames(sessionId) {
-  if (!sessionId) {
-    return;
-  }
-
-  const studentInput = document.querySelector(`[data-history-student="${CSS.escape(sessionId)}"]`);
-  const teacherInput = document.querySelector(`[data-history-teacher="${CSS.escape(sessionId)}"]`);
-  const studentName = String(studentInput?.value || "").trim();
-  const teacherName = String(teacherInput?.value || "").trim();
-
-  try {
-    const history = loadSessionHistoryFromStorage();
-    const entry = history.find((item) => item.session_id === sessionId);
-    if (!entry) {
-      return;
-    }
-    if (studentName) {
-      entry.student_name = studentName;
-      if (entry.session_payload?.student) {
-        entry.session_payload.student.name = studentName;
-      }
-    }
-    if (teacherName) {
-      entry.teacher_name = teacherName;
-      if (entry.session_payload?.teacher) {
-        entry.session_payload.teacher.name = teacherName;
-      }
-    }
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-
-    if (state.session?.session_id === sessionId) {
-      if (studentName) {
-        state.session.student.name = studentName;
-      }
-      if (teacherName) {
-        state.session.teacher.name = teacherName;
-      }
-      saveSessionToStorage();
-    }
-  } catch (_) {
-    return;
-  }
-
-  renderSetup();
 }
 
 function openHistorySession(sessionId) {
@@ -4592,7 +4658,7 @@ function openHistorySession(sessionId) {
     return;
   }
 
-  state.session = JSON.parse(JSON.stringify(entry.session_payload));
+  state.session = hydrateSessionShape(JSON.parse(JSON.stringify(entry.session_payload)));
   if (state.session?.phase_key && state.session.phase_key !== state.ui.current_phase) {
     activatePhase(state.session.phase_key, { rerender: false });
   }
@@ -4632,12 +4698,14 @@ function openHistorySession(sessionId) {
 }
 
 function saveReportNamesFromResults() {
+  const sessionLabelInput = document.getElementById("resultsSessionLabelInput");
   const studentInput = document.getElementById("resultsStudentNameInput");
   const teacherInput = document.getElementById("resultsTeacherNameInput");
-  if (!studentInput || !teacherInput || !state.session) {
+  if (!sessionLabelInput || !studentInput || !teacherInput || !state.session) {
     return;
   }
 
+  state.session.session_label = sessionLabelInput.value.trim() || generateSessionLabel(state.session.session_id);
   state.session.student.name = studentInput.value.trim();
   state.session.teacher.name = teacherInput.value.trim();
   saveSessionToStorage();

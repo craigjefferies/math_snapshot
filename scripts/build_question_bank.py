@@ -2,8 +2,11 @@
 import json
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 ROOT = Path('/home/craigjefferies/projects/maths_snapshots')
 OUT_PATH = ROOT / 'data' / 'phase2-question-bank.json'
+SCHEMA_PATH = ROOT / 'schemas' / 'question-bank.schema.json'
 
 
 assessment = {
@@ -11,7 +14,7 @@ assessment = {
     'name': '2025 Phase 2 Maths Snapshot',
     'publisher_year': 2025,
     'learning_phase': 'Phase 2',
-    'intended_year_range': {'min': 4, 'max': 6},
+    'intended_year_range': {'min': 3, 'max': 6},
     'notes': [
         'Formative snapshot; use sections independently.',
         'Not standardised or norm referenced.',
@@ -298,6 +301,7 @@ add_section(
         ],
         6: [
             spec('54 x 132', 'integer', 7128, 6),
+            spec('36 x 274', 'integer', 9864, 6),
         ],
     },
 )
@@ -591,6 +595,8 @@ bank = {
 }
 
 OUT_PATH.write_text(json.dumps(bank, indent=2, ensure_ascii=True) + '\n', encoding='utf-8')
+Draft202012Validator(json.loads(SCHEMA_PATH.read_text(encoding='utf-8'))).validate(bank)
 print(f'Wrote {OUT_PATH}')
 print(f'Sections: {len(sections)}')
 print(f'Items: {len(items)}')
+print('Schema: valid')

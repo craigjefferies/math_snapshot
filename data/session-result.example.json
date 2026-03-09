@@ -26,8 +26,15 @@
           "mastery_band": "Secure",
           "item_results": [
             {
-              "item_id": "itm_sec_03_y4_q1",
+              "item_id": "itm_sec_03_y4_q01",
               "response": "449",
+              "is_correct": true,
+              "is_skipped": false,
+              "response_mode": "answered"
+            },
+            {
+              "item_id": "itm_sec_03_y4_q02",
+              "response": "831",
               "is_correct": true,
               "is_skipped": false,
               "response_mode": "answered"

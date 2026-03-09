@@ -973,6 +973,80 @@ fieldset {
   font-weight: 600;
 }
 
+.session-stack {
+  display: grid;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.875rem;
+}
+
+.session-card-grid {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.session-card {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at top right, var(--accent-soft-strong), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgb(15 23 42 / 0.05);
+}
+
+.session-card-current {
+  border-color: var(--accent-line);
+  box-shadow: 0 14px 28px var(--accent-shadow);
+}
+
+.session-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.session-card-head strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 1.02rem;
+}
+
+.session-card-head p {
+  margin: 0;
+}
+
+.session-card-time {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.session-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.session-label-row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
 .device-history {
   margin-bottom: 1rem;
   padding: 1rem;
@@ -1288,6 +1362,20 @@ fieldset {
 .teacher-probe-form {
   display: grid;
   gap: 1rem;
+}
+
+.teacher-probe-header {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.teacher-probe-header h1 {
+  margin: 0;
+}
+
+.teacher-probe-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
 }
 
 .teacher-probe-intro {
@@ -1997,6 +2085,10 @@ hr.section-divider {
   .resume-notice {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .session-label-row {
+    grid-template-columns: 1fr;
   }
 
   .tracker-legend-inline {
