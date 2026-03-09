@@ -161,6 +161,7 @@ function renderPage(contentHtml, options = {}) {
   const activeStepTitle = {
     setup: "Session Setup",
     assessment: "Live Assessment",
+    handoff: "Checkpoint",
     section: "Section Summary",
     probe: "Teacher Probe",
     results: "Teacher Report"
@@ -334,6 +335,10 @@ function onShellNavigate(event) {
   }
 
   if (target === "probe") {
+    if (state.session?.pending_teacher_handoff) {
+      renderTeacherHandoff();
+      return;
+    }
     const run = findNextProbeRun();
     if (run) {
       renderTeacherProbe(run);
@@ -702,6 +707,10 @@ function renderSetup() {
       if (state.session?.phase_key && state.session.phase_key !== state.ui.current_phase) {
         activatePhase(state.session.phase_key, { rerender: false });
       }
+      if (state.session?.pending_teacher_handoff) {
+        renderTeacherHandoff();
+        return;
+      }
       if (state.session.current_probe_section_id) {
         const probeRun = findCurrentProbeRun();
         if (probeRun) {
@@ -880,6 +889,7 @@ function onStartSession(event) {
     current_attempt: null,
     current_probe_section_id: null,
     current_probe_item_index: -1,
+    pending_teacher_handoff: false,
     generated_at: null,
     strand_summary: [],
     overall_summary: null,
@@ -915,6 +925,7 @@ function beginCurrentSection(optionalYear = null) {
     item_ids: variant.item_refs,
     responses: {},
     observations: {},
+    skip_intents: {},
     current_item_index: 0
   };
 
@@ -974,7 +985,7 @@ function renderAssessment() {
                     const wasObserved = !!attempt.observations?.[item.item_id];
                     const statusClass = !hasSavedAnswer(item, response, wasObserved)
                       ? "tracker-unanswered"
-                      : ((wasObserved || evaluateItemResponse(item, response)) ? "tracker-correct" : "tracker-incorrect");
+                      : "tracker-answered";
                     const currentClass = index === currentIndex ? "tracker-current" : "";
                     return `
                       <button
@@ -989,8 +1000,7 @@ function renderAssessment() {
                   .join("")}
               </div>
               <div class="tracker-legend tracker-legend-inline">
-                <span><i class="tracker-legend-dot tracker-correct"></i>Correct</span>
-                <span><i class="tracker-legend-dot tracker-incorrect"></i>Incorrect</span>
+                <span><i class="tracker-legend-dot tracker-answered"></i>Answered</span>
                 <span><i class="tracker-legend-dot tracker-unanswered"></i>Not yet answered</span>
               </div>
             </div>
@@ -1007,7 +1017,7 @@ function renderAssessment() {
         </article>
         <div class="actions-row">
           <button type="submit" class="btn-primary">${nextLabel}</button>
-          ${isLastQuestion ? "" : `<button type="button" id="skipQuestionBtn" class="btn-skip">Skip Question</button>`}
+          <button type="button" id="skipQuestionBtn" class="btn-skip">I don't know yet</button>
         </div>
       </form>
     </section>
@@ -1217,9 +1227,11 @@ function getInputHint(item) {
 
 function onQuestionFormSubmit(event) {
   event.preventDefault();
-  saveCurrentQuestionResponse();
-
   const attempt = state.session.current_attempt;
+  const result = confirmBlankQuestionNavigation();
+  if (!result?.saved) {
+    return;
+  }
   const isLastQuestion = attempt.current_item_index === attempt.item_ids.length - 1;
 
   if (isLastQuestion) {
@@ -1233,7 +1245,10 @@ function onQuestionFormSubmit(event) {
 }
 
 function onQuestionTrackerClick(event) {
-  saveCurrentQuestionResponse();
+  const result = confirmBlankQuestionNavigation();
+  if (!result?.saved) {
+    return;
+  }
   const index = Number(event.currentTarget.dataset.questionIndex);
   if (!Number.isInteger(index)) {
     return;
@@ -1243,12 +1258,55 @@ function onQuestionTrackerClick(event) {
   renderAssessment();
 }
 
+function confirmBlankQuestionNavigation() {
+  const attempt = state.session.current_attempt;
+  const currentItemId = attempt?.item_ids?.[attempt.current_item_index];
+  const previousResponse = currentItemId ? attempt.responses[currentItemId] : "";
+  const previousObservation = currentItemId ? !!attempt.observations[currentItemId] : false;
+  const previousSkipIntent = currentItemId ? !!attempt.skip_intents?.[currentItemId] : false;
+  const saved = saveCurrentQuestionResponse();
+  if (!saved) {
+    return { saved: null, shouldProceed: false };
+  }
+
+  if (!saved.observedSuccess && isBlank(saved.response)) {
+    const shouldSkip = window.confirm("No answer was entered. Skip this question for now?");
+    if (!shouldSkip) {
+      attempt.responses[saved.item.item_id] = previousResponse ?? defaultResponseForItem(saved.item);
+      attempt.observations[saved.item.item_id] = previousObservation;
+      attempt.skip_intents = attempt.skip_intents || {};
+      attempt.skip_intents[saved.item.item_id] = previousSkipIntent;
+      saveSessionToStorage();
+      return { saved: null, shouldProceed: false };
+    }
+    attempt.skip_intents = attempt.skip_intents || {};
+    attempt.skip_intents[saved.item.item_id] = true;
+    saveSessionToStorage();
+  }
+
+  return { saved, shouldProceed: true };
+}
+
 function onSkipQuestion() {
   const attempt = state.session.current_attempt;
   if (!attempt) return;
   const currentItemId = attempt.item_ids[attempt.current_item_index];
+  const item = state.itemsById.get(currentItemId);
+  const form = document.getElementById("questionForm");
+  if (item && form) {
+    const currentResponse = readItemResponseFromForm(form, item);
+    const observedSuccess = readItemObservationFromForm(form, item);
+    if (!observedSuccess && !isBlank(currentResponse)) {
+      const shouldDiscard = window.confirm("Ignore the answer entered here and skip this question for now?");
+      if (!shouldDiscard) {
+        return;
+      }
+    }
+  }
   attempt.responses[currentItemId] = "";
   attempt.observations[currentItemId] = false;
+  attempt.skip_intents = attempt.skip_intents || {};
+  attempt.skip_intents[currentItemId] = true;
   const isLastQuestion = attempt.current_item_index === attempt.item_ids.length - 1;
   if (isLastQuestion) {
     finishCurrentAttempt();
@@ -1262,19 +1320,27 @@ function onSkipQuestion() {
 function saveCurrentQuestionResponse() {
   const attempt = state.session.current_attempt;
   if (!attempt) {
-    return;
+    return null;
   }
 
   const currentItemId = attempt.item_ids[attempt.current_item_index];
   const item = state.itemsById.get(currentItemId);
   const form = document.getElementById("questionForm");
   if (!item || !form) {
-    return;
+    return null;
   }
 
-  attempt.responses[item.item_id] = readItemResponseFromForm(form, item);
-  attempt.observations[item.item_id] = readItemObservationFromForm(form, item);
+  const response = readItemResponseFromForm(form, item);
+  const observedSuccess = readItemObservationFromForm(form, item);
+
+  attempt.responses[item.item_id] = response;
+  attempt.observations[item.item_id] = observedSuccess;
+  attempt.skip_intents = attempt.skip_intents || {};
+  if (observedSuccess || !isBlank(response)) {
+    attempt.skip_intents[item.item_id] = false;
+  }
   saveSessionToStorage();
+  return { item, response, observedSuccess };
 }
 
 function readItemObservationFromForm(form, item) {
@@ -1353,13 +1419,51 @@ function finishCurrentAttempt() {
     return;
   }
 
-  startTeacherProbeFlowOrFinalize();
+  state.session.pending_teacher_handoff = true;
+  state.notice = "";
+  saveSessionToStorage();
+  renderTeacherHandoff();
 }
 
 function moveToNextSection() {
   state.session.current_section_index += 1;
   state.session.current_attempt = null;
   beginCurrentSection();
+}
+
+function renderTeacherHandoff() {
+  const nextProbe = findNextProbeRun();
+  const followUpCopy = nextProbe
+    ? "Your teacher will now complete a short follow-up check before opening the final report."
+    : "Your teacher will now review the final report.";
+
+  const content = `
+    <section class="panel">
+      <article class="teacher-handoff-card">
+        <p class="teacher-handoff-kicker">Assessment complete</p>
+        <h1>Great job.</h1>
+        <p>Please hand the device back to your teacher.</p>
+        <p class="teacher-handoff-copy">${escapeHtml(followUpCopy)}</p>
+        <div class="actions-row">
+          <button id="continueTeacherReviewBtn" type="button" class="btn-primary">Continue to Teacher Review</button>
+        </div>
+      </article>
+    </section>
+  `;
+
+  renderPage(content, {
+    activeStep: "handoff",
+    shellMode: "student",
+    lockSidebar: true
+  });
+
+  document.getElementById("continueTeacherReviewBtn").addEventListener("click", () => {
+    if (state.session) {
+      state.session.pending_teacher_handoff = false;
+      saveSessionToStorage();
+    }
+    startTeacherProbeFlowOrFinalize();
+  });
 }
 
 function renderSectionSummary(run) {
@@ -1656,6 +1760,7 @@ function evaluateAttempt(section, attempt, items, responses) {
   let correct = 0;
   let skipped = 0;
   const observations = attempt.observations || {};
+  const skipIntents = attempt.skip_intents || {};
 
   const item_results = items.map((item) => {
     const response = item.item_id in responses ? responses[item.item_id] : defaultResponseForItem(item);
@@ -1669,7 +1774,7 @@ function evaluateAttempt(section, attempt, items, responses) {
         response,
         is_correct: false,
         is_skipped: true,
-        response_mode: "skipped",
+        response_mode: skipIntents[item.item_id] ? "skipped" : "unanswered",
         observed_success: false
       };
     }
@@ -2981,6 +3086,9 @@ function refineMisconceptionFromProbe(fallback, teacherProbe) {
 }
 
 function startTeacherProbeFlowOrFinalize() {
+  if (state.session) {
+    state.session.pending_teacher_handoff = false;
+  }
   const nextRun = findNextProbeRun();
   if (!nextRun) {
     state.session.current_probe_section_id = null;
@@ -3066,6 +3174,7 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
   const completedSections = sectionReportRows.filter((row) => !!row.summary).length;
   const sessionAnalytics = buildAnalyticsSummaryFromRuns(state.session.section_runs);
   const prioritySteps = buildFinalNextSteps(sectionSummaries);
+  const overallNarrative = buildOverallTeacherNarrative(sectionReportRows, overallSummary);
   const totalCorrect = `${sessionAnalytics.correct_answers} / ${sessionAnalytics.questions_answered} answered correctly`;
   const completedProbeRows = sectionReportRows.filter((row) => row.run?.teacher_probe?.status === "completed");
   const completedSectionCards = sectionReportRows
@@ -3091,6 +3200,10 @@ function renderResults(sectionSummaries, strandSummary, overallSummary) {
           <span class="result-hero-label">Questions</span>
           <span class="result-hero-value">${escapeHtml(totalCorrect)}</span>
         </div>
+      </div>
+
+      <div class="summary-banner">
+        <strong>Overall teaching summary:</strong> ${escapeHtml(overallNarrative)}
       </div>
 
       <h2>Section Summary</h2>
@@ -3338,6 +3451,7 @@ function downloadFinalTeacherPdf() {
   const phase = state.bank?.assessment?.learning_phase || getCurrentPhaseConfig().label;
   const sectionReportRows = buildSectionReportRows();
   const completedSections = sectionReportRows.filter((row) => !!row.summary).length;
+  const overallNarrative = buildOverallTeacherNarrative(sectionReportRows, state.session.overall_summary || {});
   const sectionSummaryBlocks = sectionReportRows
     .filter((row) => !!row.summary)
     .map((row) => buildTeacherSectionPdfBlock(row))
@@ -3388,6 +3502,8 @@ function downloadFinalTeacherPdf() {
       ["Confidence", overall.confidence]
     ],
     bodyHtml: `
+      <h3>Overall Teaching Summary</h3>
+      <p>${escapeHtml(overallNarrative)}</p>
       <h3>Section Summary</h3>
       <div class="summary-grid">${sectionSummaryBlocks || "<p>No completed sections yet.</p>"}</div>
       ${probeBlocks ? `<h3>Diagnostic Appendix</h3><p class="pdf-note">Detailed teacher-check evidence is included below for reference.</p>${probeBlocks}` : ""}
@@ -3533,6 +3649,57 @@ function getTeacherProbeChoice(run, evidenceCode) {
   return run?.teacher_probe?.probe_items?.find((item) => item.evidence_code === evidenceCode)?.selected_label || "";
 }
 
+function joinLabels(values) {
+  const labels = values.filter(Boolean);
+  if (!labels.length) {
+    return "";
+  }
+  if (labels.length === 1) {
+    return labels[0];
+  }
+  if (labels.length === 2) {
+    return `${labels[0]} and ${labels[1]}`;
+  }
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+}
+
+function buildOverallTeacherNarrative(sectionReportRows, overallSummary) {
+  const completedRows = sectionReportRows.filter((row) => !!row.summary);
+  if (!completedRows.length) {
+    return "No completed sections are available yet for an overall teaching summary.";
+  }
+
+  const bestFit = formatTeacherYearLabel(overallSummary?.observed_operating_year || "Insufficient Data");
+  const confidence = String(overallSummary?.confidence || "Low").toLowerCase();
+  const numericYears = completedRows
+    .map((row) => parseYearLabel(row.summary.observed_year_level))
+    .filter((year) => Number.isFinite(year));
+  const profileNote = numericYears.length >= 2 && (Math.max(...numericYears) - Math.min(...numericYears) > 1)
+    ? "The profile is uneven across the completed sections."
+    : "The profile is fairly consistent across the completed sections.";
+  const prioritySections = completedRows
+    .filter((row) => row.summary.mastery_band !== "Secure")
+    .slice(0, 2)
+    .map((row) => sectionLabel(row.section));
+  const secureSections = completedRows
+    .filter((row) => row.summary.mastery_band === "Secure")
+    .slice(0, 2)
+    .map((row) => sectionLabel(row.section));
+
+  const parts = [
+    `Overall, this snapshot places the student around ${bestFit} with ${confidence} confidence.`,
+    profileNote
+  ];
+
+  if (prioritySections.length) {
+    parts.push(`Teaching should start with ${joinLabels(prioritySections)}.`);
+  } else if (secureSections.length) {
+    parts.push(`Current evidence is strongest in ${joinLabels(secureSections)}.`);
+  }
+
+  return parts.join(" ");
+}
+
 function simplifyLastSecureSkillText(text) {
   const raw = String(text || "").trim();
   if (!raw) {
@@ -3554,6 +3721,7 @@ function buildTeacherSectionSummary(row) {
   const whatThisSuggests = diagnosticSummary.likely_misconception;
   const teacherCheck = row.run?.teacher_probe?.status === "completed" ? "Used" : "Not used";
   const difficultyQuestions = allocationEvidence.barrierItems.slice(0, 3);
+  const nextMove = getNextStepForSection(row.section, row.summary)[0] || "";
   const narrative = `This student is working around ${bestFit} in ${sectionLabel(row.section)}. ${whatThisSuggests} ${language === "No specific language issue was confirmed." ? "" : `Language to watch: ${language}`}`.replace(/\s+/g, " ").trim();
 
   return {
@@ -3564,6 +3732,7 @@ function buildTeacherSectionSummary(row) {
     language,
     teacherCheck,
     difficultyQuestions,
+    nextMove,
     narrative
   };
 }
@@ -3574,6 +3743,8 @@ function buildTeacherSectionCard(row) {
     <article class="section-summary-card teacher-report-card">
       <h3>${escapeHtml(sectionLabel(row.section))}</h3>
       <p><strong>Best-fit:</strong> ${escapeHtml(summary.bestFit)} <span class="teacher-report-divider">|</span> <strong>Confidence:</strong> ${escapeHtml(summary.confidence)} <span class="teacher-report-divider">|</span> <strong>Teacher check:</strong> ${escapeHtml(summary.teacherCheck)}</p>
+      <p class="teacher-report-narrative">${escapeHtml(summary.narrative)}</p>
+      <p><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
       <p><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
@@ -3587,7 +3758,6 @@ function buildTeacherSectionCard(row) {
             </ul>
           </div>`
         : ""}
-      <p class="teacher-report-narrative">${escapeHtml(summary.narrative)}</p>
     </article>
   `;
 }
@@ -3598,6 +3768,8 @@ function buildTeacherSectionPdfBlock(row) {
     <article class="summary-card">
       <h4>${escapeHtml(sectionLabel(row.section))}</h4>
       <p class="summary-kv"><strong>Best-fit:</strong> ${escapeHtml(summary.bestFit)} | <strong>Confidence:</strong> ${escapeHtml(summary.confidence)} | <strong>Teacher check:</strong> ${escapeHtml(summary.teacherCheck)}</p>
+      <p class="summary-paragraph">${escapeHtml(summary.narrative)}</p>
+      <p class="summary-kv"><strong>Best next teaching move:</strong> ${escapeHtml(summary.nextMove)}</p>
       <p class="summary-kv"><strong>What this suggests:</strong> ${escapeHtml(summary.whatThisSuggests)}</p>
       <p class="summary-kv"><strong>Strongest so far:</strong> ${escapeHtml(summary.strongest)}</p>
       <p class="summary-kv"><strong>Language to watch:</strong> ${escapeHtml(summary.language)}</p>
@@ -3611,7 +3783,6 @@ function buildTeacherSectionPdfBlock(row) {
             </ul>
           </div>`
         : ""}
-      <p class="summary-paragraph">${escapeHtml(summary.narrative)}</p>
     </article>
   `;
 }
@@ -3713,6 +3884,7 @@ function buildQaRecords(runs) {
           prompt: item?.prompt ?? "",
           expected_answer: formatAnswerForExport(item?.answer),
           student_response: formatAnswerForExport(itemResult.response),
+          response_mode: itemResult.response_mode || "",
           is_correct: itemResult.is_correct,
           is_skipped: itemResult.is_skipped
         });
@@ -3764,6 +3936,7 @@ function buildDetailedCsvExport() {
     "prompt",
     "expected_answer",
     "student_response",
+    "response_mode",
     "is_correct",
     "is_skipped"
   ];
@@ -3802,6 +3975,7 @@ function buildDetailedCsvExport() {
           prompt: item?.prompt ?? "",
           expected_answer: formatAnswerForExport(item?.answer),
           student_response: formatAnswerForExport(itemResult.response),
+          response_mode: itemResult.response_mode || "",
           is_correct: itemResult.is_correct,
           is_skipped: itemResult.is_skipped
         });
@@ -3936,12 +4110,16 @@ function buildSessionProgressText(session) {
     : Number(session?.sections_completed || 0);
   const probeActive = !!session?.current_probe_section_id;
   const assessmentActive = !!session?.current_attempt;
+  const handoffPending = !!session?.pending_teacher_handoff;
 
   if (!runCount) {
     return "Not started";
   }
   if (assessmentActive) {
     return `${completed}/${runCount} sections complete`;
+  }
+  if (handoffPending) {
+    return "Ready for teacher review";
   }
   if (probeActive) {
     return `Teacher probe after ${completed}/${runCount} sections`;
@@ -3962,6 +4140,7 @@ function hydrateSessionShape(session) {
   next.student = typeof next.student === "object" && next.student ? next.student : { name: "" };
   next.phase_key = next.phase_key || state.ui.current_phase;
   next.session_label = String(next.session_label || "").trim() || generateSessionLabel(next.session_id || "");
+  next.pending_teacher_handoff = !!next.pending_teacher_handoff;
 
   if (!Array.isArray(next.section_runs)) {
     next.section_runs = [];
@@ -4121,6 +4300,11 @@ function openHistorySession(sessionId) {
     return;
   }
 
+  if (state.session.pending_teacher_handoff) {
+    renderTeacherHandoff();
+    return;
+  }
+
   if (state.session.current_attempt) {
     renderAssessment();
     return;
@@ -4238,6 +4422,19 @@ function formatStudentResponseForReport(response) {
   return String(formatted || "").trim() ? formatted : "No response";
 }
 
+function describeResponseIssue(itemResult) {
+  if (!itemResult?.is_skipped) {
+    return "Incorrect";
+  }
+  if (itemResult.response_mode === "skipped") {
+    return "Skipped for now";
+  }
+  if (itemResult.response_mode === "timed_out") {
+    return "Timed out";
+  }
+  return "No response";
+}
+
 function buildBlockingItemEvidence(attempt, limit = 6) {
   if (!attempt?.item_results?.length) {
     return [];
@@ -4253,7 +4450,7 @@ function buildBlockingItemEvidence(attempt, limit = 6) {
         prompt: item?.prompt ?? itemResult.item_id,
         expected: formatAnswerForExport(item?.answer),
         response: formatStudentResponseForReport(itemResult.response),
-        issue: itemResult.is_skipped ? "Skipped" : "Incorrect"
+        issue: describeResponseIssue(itemResult)
       };
     });
 }

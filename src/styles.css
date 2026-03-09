@@ -1276,17 +1276,11 @@ fieldset {
   background: #fff;
 }
 
-.tracker-step.tracker-correct,
-.tracker-legend-dot.tracker-correct {
-  background: #22c55e;
-  border-color: #16a34a;
-  color: #fff;
-}
-
-.tracker-step.tracker-incorrect,
-.tracker-legend-dot.tracker-incorrect {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
+.tracker-step.tracker-answered,
+.tracker-legend-dot.tracker-answered {
+  background: var(--accent-soft);
+  border-color: var(--accent-mid);
+  color: var(--accent-strong);
 }
 
 .tracker-step.tracker-current,
@@ -1324,6 +1318,45 @@ fieldset {
 .item-list {
   display: grid;
   gap: 1rem;
+}
+
+.teacher-handoff-card {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 3rem auto 0;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, color-mix(in srgb, var(--accent-soft) 28%, #ffffff) 100%);
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.teacher-handoff-kicker {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teacher-handoff-card h1 {
+  margin: 0;
+}
+
+.teacher-handoff-card p {
+  margin: 0;
+  color: #334155;
+}
+
+.teacher-handoff-copy {
+  max-width: 40ch;
+  margin-inline: auto !important;
+}
+
+.teacher-handoff-card .actions-row {
+  justify-content: center;
 }
 
 .item-card {
@@ -1927,7 +1960,7 @@ fieldset {
   padding: 1rem;
   background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 10px;
 }
 
 .mastery-badge {
@@ -2018,9 +2051,7 @@ fieldset {
 }
 
 .teacher-report-narrative {
-  margin-top: 0.75rem !important;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
+  margin-top: 0.5rem !important;
   color: #334155 !important;
   line-height: 1.5;
 }

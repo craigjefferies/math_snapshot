@@ -115,7 +115,7 @@
                       "is_skipped": { "type": "boolean" },
                       "response_mode": {
                         "type": "string",
-                        "enum": ["answered", "skipped", "timed_out", "corrected", "guessed", "observed"]
+                        "enum": ["answered", "skipped", "unanswered", "timed_out", "corrected", "guessed", "observed"]
                       },
                       "observed_success": { "type": "boolean" }
                     }
@@ -153,7 +153,7 @@
               "teacher_probe_needed": { "type": "boolean" },
               "teacher_probe_status": {
                 "type": "string",
-                "enum": ["not_needed", "recommended", "completed"]
+                "enum": ["not_needed", "recommended", "completed", "skipped"]
               },
               "confidence_risk_flags": {
                 "type": "array",
@@ -169,7 +169,7 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["not_run", "recommended", "completed"]
+                "enum": ["not_run", "recommended", "completed", "skipped"]
               },
               "probe_items": {
                 "type": "array",
