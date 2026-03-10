@@ -2781,6 +2781,20 @@ function buildSectionRiskFlags(section, summary) {
 }
 
 function inferLikelyMisconception(section, summary, riskFlags) {
+  if (summary?.mastery_band === "Secure") {
+    if (section?.strand === "Number Structure") {
+      return "Place-value ideas looked secure at this level from the snapshot evidence.";
+    }
+    if (section?.strand === "Number Operations") {
+      return "Calculation strategies looked secure at this level from the snapshot evidence.";
+    }
+    if (section?.strand === "Rational Numbers") {
+      return "Fraction ideas looked secure at this level from the snapshot evidence.";
+    }
+
+    return "This area looked secure at this level from the snapshot evidence.";
+  }
+
   const attempts = summary?.attempts || [];
   const wrongPrompts = attempts
     .flatMap((attempt) => attempt.item_results || [])
